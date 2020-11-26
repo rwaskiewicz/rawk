@@ -31,6 +31,7 @@ fn main() {
 fn run_prompt() {
     println!("R-AWK - a subset of awk written in Rust");
 
+    let scanner = Scanner::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
@@ -42,8 +43,9 @@ fn run_prompt() {
             .read_line(&mut awk_line)
             .expect("failed to get r-awk line");
         print!("R-AWK Line: {}", awk_line);
+        scanner.scan(&awk_line);
         while !awk_input.contains("STOP!") {
-            print!("Input Data >> ");
+            print!("Input Data (type STOP! to end data input) >> ");
             io::stdout().flush().expect("Unable to flush STDOUT!");
 
             awk_input.clear();
@@ -55,5 +57,38 @@ fn run_prompt() {
         }
         awk_input.clear();
         awk_line.clear();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        // TODO: Make this test more realistic
+        assert_eq!(2 + 2, 4);
+    }
+}
+
+#[derive(Debug)]
+pub struct Scanner {
+    lexeme_start: u32,
+    lexeme_current: u32,
+    current_line: u32,
+}
+
+impl Scanner {
+    pub fn new() -> Scanner {
+        Scanner {
+            current_line: 1,
+            lexeme_current: 0,
+            lexeme_start: 0,
+        }
+    }
+
+    pub fn scan(&self, input: &str) {
+        println!("It is time to scan! {}", input);
+        for ch in input.chars() {
+            println!("Character: {}", ch);
+        }
     }
 }
