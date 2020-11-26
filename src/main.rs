@@ -3,7 +3,7 @@ use std::io;
 use std::io::Write;
 
 fn main() {
-    let matches = App::new("R-Awk")
+    let matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")
         .arg(
@@ -29,20 +29,20 @@ fn main() {
 }
 
 fn run_prompt() {
-    println!("R-AWK - a subset of awk written in Rust");
+    println!("r-awk - a subset of awk written in Rust");
 
     let scanner = Scanner::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
     loop {
-        print!("RAWK > ");
+        print!("r-awk > ");
         io::stdout().flush().expect("Unable to flush STDOUT!");
 
         io::stdin()
             .read_line(&mut awk_line)
             .expect("failed to get r-awk line");
-        print!("R-AWK Line: {}", awk_line);
+        print!("r-awk line to process: {}", awk_line);
         scanner.scan(&awk_line);
         while !awk_input.contains("STOP!") {
             print!("Input Data (type STOP! to end data input) >> ");
@@ -86,9 +86,26 @@ impl Scanner {
     }
 
     pub fn scan(&self, input: &str) {
-        println!("It is time to scan! {}", input);
         for ch in input.chars() {
-            println!("Character: {}", ch);
+            println!("Inspecting Character: '{}'", ch);
+            // TODO: This is _very_ basic switching that is not looking for combining operator '>='
+            match ch {
+                ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
+                '{' | '}' | '\'' | '\"' => println!("I can see the '{}'", ch),
+                '>' | '<' => println!("I can see a comparator '{}'", ch),
+                '=' => println!("I can see an equality check '{}'", ch),
+                '!' => println!("I can see a negation'{}'", ch),
+                '$' => println!("I found a sigil '{}'", ch),
+                _ => {
+                    if ch.is_digit(10) {
+                        println!("I see a number! {}", ch);
+                    } else if ch.is_alphabetic() {
+                        println!("I see an alpha {}", ch);
+                    } else {
+                        println!("ALERT: We found a character we can not handle, '{}'", ch);
+                    }
+                }
+            }
         }
     }
 }
