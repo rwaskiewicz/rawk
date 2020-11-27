@@ -145,7 +145,7 @@ impl Scanner {
 }
 
 #[cfg(test)]
-mod tests {
+mod lexing {
     use super::*;
 
     #[test]
