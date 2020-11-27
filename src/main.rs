@@ -31,7 +31,7 @@ fn main() {
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
-    let mut scanner = Scanner::new();
+    let scanner = Scanner::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
@@ -60,16 +60,7 @@ fn run_prompt() {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        // TODO: Make this test more realistic
-        assert_eq!(2 + 2, 4);
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenType {
     LeftCurly,
     RightCurly,
@@ -87,32 +78,27 @@ pub enum TokenType {
 }
 
 #[derive(Debug)]
-pub struct Scanner {
-    lexeme_start: u32,
-    lexeme_current: u32,
-    current_line: u32,
-    tokens: Vec<TokenType>,
-}
+pub struct Scanner {}
 
 impl Scanner {
     pub fn new() -> Scanner {
-        Scanner {
-            current_line: 1,
-            lexeme_current: 0,
-            lexeme_start: 0,
-            tokens: Vec::new(),
-        }
+        Scanner {}
     }
 
-    pub fn scan(&mut self, input: &str) {
+    pub fn scan(&self, input: &str) -> Vec<TokenType> {
+        let mut tokens = Vec::new();
+        let mut current_line = 1;
+        let mut _lexeme_current = 0;
+        let mut _lexeme_start = 0;
+
         for ch in input.chars() {
             println!("Inspecting Character: '{}'", ch);
             // TODO: This is _very_ basic switching that is not looking for combining operator '>='
             match ch {
                 ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
                 '\n' => {
-                    self.current_line += 1;
-                    println!("I can see the newline, which is now {}", self.current_line);
+                    current_line += 1;
+                    println!("I can see the newline, which is now {}", current_line);
                 }
                 '{' => {
                     println!(
@@ -120,7 +106,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftCurly
                     );
-                    self.tokens.push(TokenType::LeftCurly);
+                    tokens.push(TokenType::LeftCurly);
                 }
                 '}' => {
                     println!(
@@ -128,7 +114,7 @@ impl Scanner {
                         ch,
                         TokenType::RightCurly
                     );
-                    self.tokens.push(TokenType::RightCurly);
+                    tokens.push(TokenType::RightCurly);
                 }
                 '[' => {
                     println!(
@@ -136,7 +122,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftSquareBracket
                     );
-                    self.tokens.push(TokenType::LeftSquareBracket);
+                    tokens.push(TokenType::LeftSquareBracket);
                 }
                 ']' => {
                     println!(
@@ -144,7 +130,7 @@ impl Scanner {
                         ch,
                         TokenType::RightSquareBracket
                     );
-                    self.tokens.push(TokenType::RightSquareBracket);
+                    tokens.push(TokenType::RightSquareBracket);
                 }
                 '(' => {
                     println!(
@@ -152,7 +138,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftParenthesis
                     );
-                    self.tokens.push(TokenType::LeftParenthesis);
+                    tokens.push(TokenType::LeftParenthesis);
                 }
                 ')' => {
                     println!(
@@ -160,7 +146,7 @@ impl Scanner {
                         ch,
                         TokenType::RightParenthesis
                     );
-                    self.tokens.push(TokenType::RightParenthesis);
+                    tokens.push(TokenType::RightParenthesis);
                 }
                 '\'' => {
                     println!(
@@ -168,7 +154,7 @@ impl Scanner {
                         ch,
                         TokenType::SingleQuote
                     );
-                    self.tokens.push(TokenType::SingleQuote);
+                    tokens.push(TokenType::SingleQuote);
                 }
                 '\"' => {
                     println!(
@@ -176,7 +162,7 @@ impl Scanner {
                         ch,
                         TokenType::DoubleQuote
                     );
-                    self.tokens.push(TokenType::DoubleQuote);
+                    tokens.push(TokenType::DoubleQuote);
                 }
                 '>' => {
                     println!(
@@ -184,7 +170,7 @@ impl Scanner {
                         ch,
                         TokenType::GreaterThan
                     );
-                    self.tokens.push(TokenType::GreaterThan);
+                    tokens.push(TokenType::GreaterThan);
                 }
                 '<' => {
                     println!(
@@ -192,7 +178,7 @@ impl Scanner {
                         ch,
                         TokenType::LessThan
                     );
-                    self.tokens.push(TokenType::LessThan);
+                    tokens.push(TokenType::LessThan);
                 }
                 '=' => {
                     println!(
@@ -200,7 +186,7 @@ impl Scanner {
                         ch,
                         TokenType::Equals
                     );
-                    self.tokens.push(TokenType::Equals);
+                    tokens.push(TokenType::Equals);
                 }
                 '!' => {
                     println!(
@@ -208,7 +194,7 @@ impl Scanner {
                         ch,
                         TokenType::Bang
                     );
-                    self.tokens.push(TokenType::Bang);
+                    tokens.push(TokenType::Bang);
                 }
                 '$' => {
                     println!(
@@ -216,7 +202,7 @@ impl Scanner {
                         ch,
                         TokenType::Sigil
                     );
-                    self.tokens.push(TokenType::Sigil);
+                    tokens.push(TokenType::Sigil);
                 }
                 _ => {
                     if ch.is_digit(10) {
@@ -230,6 +216,116 @@ impl Scanner {
             }
         }
 
-        println!("This is the final list of Tokens {:?}", self.tokens);
+        println!("This is the final list of Tokens {:?}", tokens);
+        tokens
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_parses_a_left_curly_brace() {
+        let tokens = Scanner::new().scan("{");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftCurly));
+    }
+
+    #[test]
+    fn it_parses_a_right_curly_brace() {
+        let tokens = Scanner::new().scan("}");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::RightCurly));
+    }
+
+    #[test]
+    fn it_parses_a_left_square_bracket() {
+        let tokens = Scanner::new().scan("[");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftSquareBracket));
+    }
+
+    #[test]
+    fn it_parses_a_right_square_bracket() {
+        let tokens = Scanner::new().scan("]");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::RightSquareBracket));
+    }
+
+    #[test]
+    fn it_parses_a_left_parenthesis() {
+        let tokens = Scanner::new().scan("(");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftParenthesis));
+    }
+
+    #[test]
+    fn it_parses_a_right_parenthesis() {
+        let tokens = Scanner::new().scan(")");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::RightParenthesis));
+    }
+
+    #[test]
+    fn it_parses_a_single_quote() {
+        let tokens = Scanner::new().scan("\'");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::SingleQuote));
+    }
+
+    #[test]
+    fn it_parses_a_double_quote() {
+        let tokens = Scanner::new().scan("\"");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::DoubleQuote));
+    }
+
+    #[test]
+    fn it_parses_a_greater_than_caret() {
+        let tokens = Scanner::new().scan(">");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::GreaterThan));
+    }
+
+    #[test]
+    fn it_parses_a_less_than_caret() {
+        let tokens = Scanner::new().scan("<");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::LessThan));
+    }
+
+    #[test]
+    fn it_parses_an_assignment_token() {
+        let tokens = Scanner::new().scan("=");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Equals));
+    }
+
+    #[test]
+    fn it_parses_a_bang() {
+        let tokens = Scanner::new().scan("!");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Bang));
+    }
+
+    #[test]
+    fn it_parses_a_sigil() {
+        let tokens = Scanner::new().scan("$");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Sigil));
     }
 }
