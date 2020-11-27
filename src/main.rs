@@ -31,7 +31,7 @@ fn main() {
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
-    let scanner = Scanner::new();
+    let mut scanner = Scanner::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
@@ -91,6 +91,7 @@ pub struct Scanner {
     lexeme_start: u32,
     lexeme_current: u32,
     current_line: u32,
+    tokens: Vec<TokenType>,
 }
 
 impl Scanner {
@@ -99,6 +100,7 @@ impl Scanner {
             current_line: 1,
             lexeme_current: 0,
             lexeme_start: 0,
+            tokens: Vec::new(),
         }
     }
 
@@ -112,71 +114,110 @@ impl Scanner {
                     self.current_line += 1;
                     println!("I can see the newline, which is now {}", self.current_line);
                 }
-                '{' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::LeftCurly
-                ),
-                '}' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::RightCurly
-                ),
-                '[' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::LeftSquareBracket
-                ),
-                ']' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::RightSquareBracket
-                ),
-                '(' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::LeftParenthesis
-                ),
-                ')' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::RightParenthesis
-                ),
-                '\'' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::SingleQuote
-                ),
-                '\"' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::DoubleQuote
-                ),
-                '>' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::GreaterThan
-                ),
-                '<' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::LessThan
-                ),
-                '=' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::Equals
-                ),
-                '!' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::Bang
-                ),
-                '$' => println!(
-                    "Found a '{}', setting the type to {:?}",
-                    ch,
-                    TokenType::Sigil
-                ),
+                '{' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::LeftCurly
+                    );
+                    self.tokens.push(TokenType::LeftCurly);
+                }
+                '}' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::RightCurly
+                    );
+                    self.tokens.push(TokenType::RightCurly);
+                }
+                '[' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::LeftSquareBracket
+                    );
+                    self.tokens.push(TokenType::LeftSquareBracket);
+                }
+                ']' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::RightSquareBracket
+                    );
+                    self.tokens.push(TokenType::RightSquareBracket);
+                }
+                '(' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::LeftParenthesis
+                    );
+                    self.tokens.push(TokenType::LeftParenthesis);
+                }
+                ')' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::RightParenthesis
+                    );
+                    self.tokens.push(TokenType::RightParenthesis);
+                }
+                '\'' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::SingleQuote
+                    );
+                    self.tokens.push(TokenType::SingleQuote);
+                }
+                '\"' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::DoubleQuote
+                    );
+                    self.tokens.push(TokenType::DoubleQuote);
+                }
+                '>' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::GreaterThan
+                    );
+                    self.tokens.push(TokenType::GreaterThan);
+                }
+                '<' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::LessThan
+                    );
+                    self.tokens.push(TokenType::LessThan);
+                }
+                '=' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Equals
+                    );
+                    self.tokens.push(TokenType::Equals);
+                }
+                '!' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Bang
+                    );
+                    self.tokens.push(TokenType::Bang);
+                }
+                '$' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Sigil
+                    );
+                    self.tokens.push(TokenType::Sigil);
+                }
                 _ => {
                     if ch.is_digit(10) {
                         println!("I see a number! {}", ch);
@@ -188,5 +229,7 @@ impl Scanner {
                 }
             }
         }
+
+        println!("This is the final list of Tokens {:?}", self.tokens);
     }
 }
