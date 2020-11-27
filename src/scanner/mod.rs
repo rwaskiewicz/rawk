@@ -14,7 +14,10 @@ impl Scanner {
         let mut _lexeme_current = 0;
         let mut _lexeme_start = 0;
 
-        for ch in input.chars() {
+        let mut char_stream = input.chars().peekable();
+        while let Some(_) = char_stream.peek() {
+            // for ch in char_stream {
+            let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             // TODO: This is _very_ basic switching that is not looking for combining operator '>='
             match ch {
@@ -120,6 +123,7 @@ impl Scanner {
                     tokens.push(TokenType::Bang);
                 }
                 '$' => {
+                    // TODO: Determine binding rules for $
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
@@ -129,7 +133,27 @@ impl Scanner {
                 }
                 _ => {
                     if ch.is_digit(10) {
-                        println!("I see a number! {}", ch);
+                        // TODO: Replace this with something better to handle the Option
+                        let mut num_parsed = String::from("");
+                        num_parsed.push(ch);
+
+                        while char_stream.peek().unwrap_or(&'f').is_digit(10) {
+                            ch = char_stream.next().unwrap_or('f');
+                            num_parsed.push(ch);
+                        }
+
+                        if char_stream.peek().unwrap_or(&'f') == &'.' {
+                            ch = char_stream.next().unwrap_or('f');
+                            num_parsed.push(ch);
+                            while char_stream.peek().unwrap_or(&'f').is_digit(10) {
+                                ch = char_stream.next().unwrap_or('f');
+                                num_parsed.push(ch);
+                            }
+                        }
+
+                        println!("I see a number! {}", num_parsed);
+                        // TODO: _what_ number?
+                        tokens.push(TokenType::Number);
                     } else if ch.is_alphabetic() {
                         println!("I see an alpha {}", ch);
                     } else {
@@ -257,5 +281,61 @@ mod lexing {
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(tokens.iter().next(), Some(&TokenType::Sigil));
+    }
+
+    #[test]
+    fn it_parses_a_single_digit_number() {
+        let tokens = Scanner::new().scan("1");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_double_digit_number() {
+        let tokens = Scanner::new().scan("123");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_number_with_leading_zero() {
+        let tokens = Scanner::new().scan("01");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_floating_point_number() {
+        let tokens = Scanner::new().scan("1.0");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_floating_point_number_with_many_base_digits() {
+        let tokens = Scanner::new().scan("987.2");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_floating_point_number_with_many_fractional_digits() {
+        let tokens = Scanner::new().scan("1.09876");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+    }
+
+    #[test]
+    fn it_parses_a_number_without_a_fraction() {
+        let tokens = Scanner::new().scan("1.");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
     }
 }

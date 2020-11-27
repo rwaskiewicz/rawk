@@ -1,5 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum TokenType {
+    // Single Character Tokens
     LeftCurly,
     RightCurly,
     LeftSquareBracket,
@@ -13,4 +14,7 @@ pub enum TokenType {
     Equals,
     GreaterThan,
     LessThan,
+
+    // Variable Character Tokens
+    Number,
 }
