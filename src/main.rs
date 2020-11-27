@@ -102,12 +102,16 @@ impl Scanner {
         }
     }
 
-    pub fn scan(&self, input: &str) {
+    pub fn scan(&mut self, input: &str) {
         for ch in input.chars() {
             println!("Inspecting Character: '{}'", ch);
             // TODO: This is _very_ basic switching that is not looking for combining operator '>='
             match ch {
-                ' ' | '\r' | '\t' | '\n' => println!("I can see and accept whitespace"),
+                ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
+                '\n' => {
+                    self.current_line += 1;
+                    println!("I can see the newline, which is now {}", self.current_line);
+                }
                 '{' => println!(
                     "Found a '{}', setting the type to {:?}",
                     ch,
