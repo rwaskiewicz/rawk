@@ -1,4 +1,4 @@
-use super::super::token::token_type::TokenType;
+use super::token::token_type::TokenType;
 
 #[derive(Debug)]
 pub struct Scanner {}

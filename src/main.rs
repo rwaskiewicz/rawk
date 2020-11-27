@@ -1,8 +1,8 @@
 mod scanner;
 mod token;
 
-use crate::scanner::scanner::Scanner as s1;
 use clap::{App, Arg};
+use scanner::Scanner;
 use std::io;
 use std::io::Write;
 
@@ -35,7 +35,7 @@ fn main() {
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
-    let scanner = s1::new();
+    let scanner = Scanner::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
