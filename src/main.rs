@@ -70,6 +70,23 @@ mod tests {
 }
 
 #[derive(Debug)]
+pub enum TokenType {
+    LeftCurly,
+    RightCurly,
+    LeftSquareBracket,
+    RightSquareBracket,
+    LeftParenthesis,
+    RightParenthesis,
+    SingleQuote,
+    DoubleQuote,
+    Sigil,
+    Bang,
+    Equals,
+    GreaterThan,
+    LessThan,
+}
+
+#[derive(Debug)]
 pub struct Scanner {
     lexeme_start: u32,
     lexeme_current: u32,
@@ -90,12 +107,72 @@ impl Scanner {
             println!("Inspecting Character: '{}'", ch);
             // TODO: This is _very_ basic switching that is not looking for combining operator '>='
             match ch {
-                ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
-                '{' | '}' | '\'' | '\"' => println!("I can see the '{}'", ch),
-                '>' | '<' => println!("I can see a comparator '{}'", ch),
-                '=' => println!("I can see an equality check '{}'", ch),
-                '!' => println!("I can see a negation'{}'", ch),
-                '$' => println!("I found a sigil '{}'", ch),
+                ' ' | '\r' | '\t' | '\n' => println!("I can see and accept whitespace"),
+                '{' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::LeftCurly
+                ),
+                '}' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::RightCurly
+                ),
+                '[' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::LeftSquareBracket
+                ),
+                ']' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::RightSquareBracket
+                ),
+                '(' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::LeftParenthesis
+                ),
+                ')' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::RightParenthesis
+                ),
+                '\'' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::SingleQuote
+                ),
+                '\"' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::DoubleQuote
+                ),
+                '>' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::GreaterThan
+                ),
+                '<' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::LessThan
+                ),
+                '=' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::Equals
+                ),
+                '!' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::Bang
+                ),
+                '$' => println!(
+                    "Found a '{}', setting the type to {:?}",
+                    ch,
+                    TokenType::Sigil
+                ),
                 _ => {
                     if ch.is_digit(10) {
                         println!("I see a number! {}", ch);
