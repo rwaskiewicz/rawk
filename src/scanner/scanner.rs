@@ -149,6 +149,13 @@ mod tests {
     use super::*;
 
     #[test]
+    fn it_returns_an_empty_vector_for_empty_input() {
+        let tokens = Scanner::new().scan("");
+
+        assert_eq!(tokens.len(), 0);
+    }
+
+    #[test]
     fn it_parses_a_left_curly_brace() {
         let tokens = Scanner::new().scan("{");
 
