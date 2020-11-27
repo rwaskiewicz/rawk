@@ -133,21 +133,31 @@ impl Scanner {
                 }
                 _ => {
                     if ch.is_digit(10) {
-                        // TODO: Replace this with something better to handle the Option
                         let mut num_parsed = String::from("");
                         num_parsed.push(ch);
 
-                        while char_stream.peek().unwrap_or(&'f').is_digit(10) {
-                            ch = char_stream.next().unwrap_or('f');
-                            num_parsed.push(ch);
+                        // TODO: Refactor this function out
+                        while let Some(_) = char_stream.peek() {
+                            if let Some(next_ch) = char_stream.next() {
+                                ch = next_ch;
+                                num_parsed.push(ch);
+                            }
                         }
 
-                        if char_stream.peek().unwrap_or(&'f') == &'.' {
-                            ch = char_stream.next().unwrap_or('f');
-                            num_parsed.push(ch);
-                            while char_stream.peek().unwrap_or(&'f').is_digit(10) {
-                                ch = char_stream.next().unwrap_or('f');
-                                num_parsed.push(ch);
+                        // TODO: This still doesn't feel right
+                        if let Some(maybe_dot) = char_stream.peek() {
+                            if maybe_dot == &'.' {
+                                if let Some(dot) = char_stream.next() {
+                                    ch = dot;
+                                    num_parsed.push(ch);
+                                }
+                            }
+
+                            while let Some(_) = char_stream.peek() {
+                                if let Some(next_ch) = char_stream.next() {
+                                    ch = next_ch;
+                                    num_parsed.push(ch);
+                                }
                             }
                         }
 
