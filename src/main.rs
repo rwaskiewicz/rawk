@@ -1,3 +1,6 @@
+mod token;
+
+use crate::token::token_type::TokenType;
 use clap::{App, Arg};
 use std::io;
 use std::io::Write;
@@ -58,23 +61,6 @@ fn run_prompt() {
         awk_input.clear();
         awk_line.clear();
     }
-}
-
-#[derive(Debug, PartialEq)]
-pub enum TokenType {
-    LeftCurly,
-    RightCurly,
-    LeftSquareBracket,
-    RightSquareBracket,
-    LeftParenthesis,
-    RightParenthesis,
-    SingleQuote,
-    DoubleQuote,
-    Sigil,
-    Bang,
-    Equals,
-    GreaterThan,
-    LessThan,
 }
 
 #[derive(Debug)]
