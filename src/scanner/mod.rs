@@ -20,7 +20,6 @@ impl Scanner {
             // for ch in char_stream {
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
-            // TODO: This is _very_ basic switching that is not looking for combining operator '>='
             match ch {
                 ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
                 '\n' => {
@@ -135,37 +134,72 @@ impl Scanner {
                         TokenType::Sigil
                     );
                     tokens.push(Token::new(TokenType::Sigil));
-                },
+                }
                 '+' => {
-                    // TODO: Support addition '+'
                     // TODO: Support addition assignment '+='
                     // TODO: Support post-increment '++'
                     // TODO: Support pre-increment '++'
-                },
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Plus
+                    );
+                    tokens.push(Token::new(TokenType::Plus));
+                }
                 '-' => {
-                    // TODO: Support subtraction '-'
                     // TODO: Support subtraction assignment '-='
                     // TODO: Support post-decrement '--'
                     // TODO: Support pre-decrement '--'
-                },
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Minus
+                    );
+                    tokens.push(Token::new(TokenType::Minus));
+                }
                 '*' => {
-                    // TODO: Support multiplication '*'
                     // TODO: Support multiplication assignment '*='
-                },
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Star
+                    );
+                    tokens.push(Token::new(TokenType::Star));
+                }
                 '/' => {
-                    // TODO: Support division '/'
                     // TODO: Support division assignment '/='
-                },
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Slash
+                    );
+                    tokens.push(Token::new(TokenType::Slash));
+                }
                 '^' => {
-                    // TODO: Support exponentiation '^'
                     // TODO: Support exponentiation assignment '^='
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Caret
+                    );
+                    tokens.push(Token::new(TokenType::Caret));
                 }
                 '%' => {
-                    // TODO: Support modulus '%'
                     // TODO: Support modulus assignment '%='
-                },
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Modulus
+                    );
+                    tokens.push(Token::new(TokenType::Modulus));
+                }
                 '~' => {
-                    // TODO: Support ERE match '~'
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Tilde
+                    );
+                    tokens.push(Token::new(TokenType::Tilde));
                 }
                 // TODO: Array membership
                 // TODO: Logical AND
@@ -414,6 +448,97 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 token_type: TokenType::Sigil
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_plus() {
+        let tokens = Scanner::new().scan("+");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Plus
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_minus() {
+        let tokens = Scanner::new().scan("-");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Minus
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_star() {
+        let tokens = Scanner::new().scan("*");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Star
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_slash() {
+        let tokens = Scanner::new().scan("/");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Slash
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_caret() {
+        let tokens = Scanner::new().scan("^");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Caret
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_modulus() {
+        let tokens = Scanner::new().scan("%");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Modulus
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_tilde() {
+        let tokens = Scanner::new().scan("~");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Tilde
             })
         );
     }

@@ -14,6 +14,13 @@ pub enum TokenType {
     Equals,
     GreaterThan,
     LessThan,
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Caret,
+    Modulus,
+    Tilde,
 
     // Variable Character Tokens
     Number,
