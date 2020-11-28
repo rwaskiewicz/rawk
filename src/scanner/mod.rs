@@ -138,7 +138,10 @@ impl Scanner {
                         num_parsed.push(ch);
 
                         // TODO: Refactor this function out
-                        while let Some(_) = char_stream.peek() {
+                        while let Some(maybe_number) = char_stream.peek() {
+                            if !maybe_number.is_digit(10) {
+                                break;
+                            }
                             if let Some(next_ch) = char_stream.next() {
                                 ch = next_ch;
                                 num_parsed.push(ch);
@@ -154,7 +157,10 @@ impl Scanner {
                                 }
                             }
 
-                            while let Some(_) = char_stream.peek() {
+                            while let Some(maybe_number) = char_stream.peek() {
+                                if !maybe_number.is_digit(10) {
+                                    break;
+                                }
                                 if let Some(next_ch) = char_stream.next() {
                                     ch = next_ch;
                                     num_parsed.push(ch);
@@ -444,6 +450,32 @@ mod lexing {
         assert_eq!(tokens.len(), 1);
         assert_eq!(
             tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
+    }
+
+    #[test]
+    fn it_stops_parsing_a_number_at_whitespace() {
+        let tokens = Scanner::new().scan("1 > 0");
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::GreaterThan
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
             Some(&Token {
                 token_type: TokenType::Number
             })
