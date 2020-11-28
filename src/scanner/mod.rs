@@ -171,7 +171,21 @@ impl Scanner {
                         // TODO: _what_ number?
                         tokens.push(Token::new(TokenType::Number));
                     } else if ch.is_alphabetic() {
-                        println!("I see an alpha {}", ch);
+                        let mut word_parsed = String::from(ch);
+
+                        // TODO: This check may be too permissive
+                        while let Some(maybe_alphanumeric) = char_stream.peek() {
+                            if !maybe_alphanumeric.is_alphanumeric() && maybe_alphanumeric != &'_' {
+                                break;
+                            }
+                            if let Some(next_ch) = char_stream.next() {
+                                ch = next_ch;
+                                word_parsed.push(ch);
+                            }
+                        }
+
+                        println!("I see a word '{}'", word_parsed);
+                        tokens.push(Token::new(TokenType::Word));
                     } else {
                         println!("ALERT: We found a character we can not handle, '{}'", ch);
                     }
@@ -477,6 +491,134 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 token_type: TokenType::Number
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_word() {
+        let tokens = Scanner::new().scan("print");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_word_with_numbers() {
+        let tokens = Scanner::new().scan("h3ll0");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_word_with_underscores() {
+        let tokens = Scanner::new().scan("hello_world");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_word_with_uppercase_letters() {
+        let tokens = Scanner::new().scan("Hello");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_word_with_numbers_separately() {
+        let tokens = Scanner::new().scan("1Hello");
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_small_program() {
+        let tokens = Scanner::new().scan("'1 > 0 { print }'");
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(tokens.len(), 8);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::SingleQuote
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::GreaterThan
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::LeftCurly
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::Word
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::RightCurly
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                token_type: TokenType::SingleQuote
             })
         );
     }
