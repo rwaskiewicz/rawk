@@ -1,3 +1,4 @@
+use super::token::token::Token;
 use super::token::token_type::TokenType;
 
 #[derive(Debug)]
@@ -8,8 +9,8 @@ impl Scanner {
         Scanner {}
     }
 
-    pub fn scan(&self, input: &str) -> Vec<TokenType> {
-        let mut tokens = Vec::new();
+    pub fn scan(&self, input: &str) -> Vec<Token> {
+        let mut tokens: Vec<Token> = Vec::new();
         let mut current_line = 1;
         let mut _lexeme_current = 0;
         let mut _lexeme_start = 0;
@@ -32,7 +33,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftCurly
                     );
-                    tokens.push(TokenType::LeftCurly);
+                    tokens.push(Token::new(TokenType::LeftCurly));
                 }
                 '}' => {
                     println!(
@@ -40,7 +41,7 @@ impl Scanner {
                         ch,
                         TokenType::RightCurly
                     );
-                    tokens.push(TokenType::RightCurly);
+                    tokens.push(Token::new(TokenType::RightCurly));
                 }
                 '[' => {
                     println!(
@@ -48,7 +49,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftSquareBracket
                     );
-                    tokens.push(TokenType::LeftSquareBracket);
+                    tokens.push(Token::new(TokenType::LeftSquareBracket));
                 }
                 ']' => {
                     println!(
@@ -56,7 +57,7 @@ impl Scanner {
                         ch,
                         TokenType::RightSquareBracket
                     );
-                    tokens.push(TokenType::RightSquareBracket);
+                    tokens.push(Token::new(TokenType::RightSquareBracket));
                 }
                 '(' => {
                     println!(
@@ -64,7 +65,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftParenthesis
                     );
-                    tokens.push(TokenType::LeftParenthesis);
+                    tokens.push(Token::new(TokenType::LeftParenthesis));
                 }
                 ')' => {
                     println!(
@@ -72,7 +73,7 @@ impl Scanner {
                         ch,
                         TokenType::RightParenthesis
                     );
-                    tokens.push(TokenType::RightParenthesis);
+                    tokens.push(Token::new(TokenType::RightParenthesis));
                 }
                 '\'' => {
                     println!(
@@ -80,7 +81,7 @@ impl Scanner {
                         ch,
                         TokenType::SingleQuote
                     );
-                    tokens.push(TokenType::SingleQuote);
+                    tokens.push(Token::new(TokenType::SingleQuote));
                 }
                 '\"' => {
                     println!(
@@ -88,7 +89,7 @@ impl Scanner {
                         ch,
                         TokenType::DoubleQuote
                     );
-                    tokens.push(TokenType::DoubleQuote);
+                    tokens.push(Token::new(TokenType::DoubleQuote));
                 }
                 '>' => {
                     println!(
@@ -96,7 +97,7 @@ impl Scanner {
                         ch,
                         TokenType::GreaterThan
                     );
-                    tokens.push(TokenType::GreaterThan);
+                    tokens.push(Token::new(TokenType::GreaterThan));
                 }
                 '<' => {
                     println!(
@@ -104,7 +105,7 @@ impl Scanner {
                         ch,
                         TokenType::LessThan
                     );
-                    tokens.push(TokenType::LessThan);
+                    tokens.push(Token::new(TokenType::LessThan));
                 }
                 '=' => {
                     println!(
@@ -112,7 +113,7 @@ impl Scanner {
                         ch,
                         TokenType::Equals
                     );
-                    tokens.push(TokenType::Equals);
+                    tokens.push(Token::new(TokenType::Equals));
                 }
                 '!' => {
                     println!(
@@ -120,7 +121,7 @@ impl Scanner {
                         ch,
                         TokenType::Bang
                     );
-                    tokens.push(TokenType::Bang);
+                    tokens.push(Token::new(TokenType::Bang));
                 }
                 '$' => {
                     // TODO: Determine binding rules for $
@@ -129,7 +130,7 @@ impl Scanner {
                         ch,
                         TokenType::Sigil
                     );
-                    tokens.push(TokenType::Sigil);
+                    tokens.push(Token::new(TokenType::Sigil));
                 }
                 _ => {
                     if ch.is_digit(10) {
@@ -163,7 +164,7 @@ impl Scanner {
 
                         println!("I see a number! {}", num_parsed);
                         // TODO: _what_ number?
-                        tokens.push(TokenType::Number);
+                        tokens.push(Token::new(TokenType::Number));
                     } else if ch.is_alphabetic() {
                         println!("I see an alpha {}", ch);
                     } else {
@@ -194,7 +195,12 @@ mod lexing {
         let tokens = Scanner::new().scan("{");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftCurly));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::LeftCurly
+            })
+        );
     }
 
     #[test]
@@ -202,7 +208,12 @@ mod lexing {
         let tokens = Scanner::new().scan("}");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::RightCurly));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::RightCurly
+            })
+        );
     }
 
     #[test]
@@ -210,7 +221,12 @@ mod lexing {
         let tokens = Scanner::new().scan("[");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftSquareBracket));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::LeftSquareBracket
+            })
+        );
     }
 
     #[test]
@@ -218,7 +234,12 @@ mod lexing {
         let tokens = Scanner::new().scan("]");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::RightSquareBracket));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::RightSquareBracket
+            })
+        );
     }
 
     #[test]
@@ -226,7 +247,12 @@ mod lexing {
         let tokens = Scanner::new().scan("(");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::LeftParenthesis));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::LeftParenthesis
+            })
+        );
     }
 
     #[test]
@@ -234,7 +260,12 @@ mod lexing {
         let tokens = Scanner::new().scan(")");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::RightParenthesis));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::RightParenthesis
+            })
+        );
     }
 
     #[test]
@@ -242,7 +273,12 @@ mod lexing {
         let tokens = Scanner::new().scan("\'");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::SingleQuote));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::SingleQuote
+            })
+        );
     }
 
     #[test]
@@ -250,7 +286,12 @@ mod lexing {
         let tokens = Scanner::new().scan("\"");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::DoubleQuote));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::DoubleQuote
+            })
+        );
     }
 
     #[test]
@@ -258,7 +299,12 @@ mod lexing {
         let tokens = Scanner::new().scan(">");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::GreaterThan));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::GreaterThan
+            })
+        );
     }
 
     #[test]
@@ -266,7 +312,12 @@ mod lexing {
         let tokens = Scanner::new().scan("<");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::LessThan));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::LessThan
+            })
+        );
     }
 
     #[test]
@@ -274,7 +325,12 @@ mod lexing {
         let tokens = Scanner::new().scan("=");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Equals));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Equals
+            })
+        );
     }
 
     #[test]
@@ -282,7 +338,12 @@ mod lexing {
         let tokens = Scanner::new().scan("!");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Bang));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Bang
+            })
+        );
     }
 
     #[test]
@@ -290,7 +351,12 @@ mod lexing {
         let tokens = Scanner::new().scan("$");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Sigil));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Sigil
+            })
+        );
     }
 
     #[test]
@@ -298,7 +364,12 @@ mod lexing {
         let tokens = Scanner::new().scan("1");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -306,7 +377,12 @@ mod lexing {
         let tokens = Scanner::new().scan("123");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -314,7 +390,12 @@ mod lexing {
         let tokens = Scanner::new().scan("01");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -322,7 +403,12 @@ mod lexing {
         let tokens = Scanner::new().scan("1.0");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -330,7 +416,12 @@ mod lexing {
         let tokens = Scanner::new().scan("987.2");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -338,7 +429,12 @@ mod lexing {
         let tokens = Scanner::new().scan("1.09876");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 
     #[test]
@@ -346,6 +442,11 @@ mod lexing {
         let tokens = Scanner::new().scan("1.");
 
         assert_eq!(tokens.len(), 1);
-        assert_eq!(tokens.iter().next(), Some(&TokenType::Number));
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                token_type: TokenType::Number
+            })
+        );
     }
 }
