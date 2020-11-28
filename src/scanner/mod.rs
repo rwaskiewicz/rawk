@@ -92,6 +92,7 @@ impl Scanner {
                     tokens.push(Token::new(TokenType::DoubleQuote));
                 }
                 '>' => {
+                    // TODO: Support greater than or equal to '>='
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
@@ -100,6 +101,7 @@ impl Scanner {
                     tokens.push(Token::new(TokenType::GreaterThan));
                 }
                 '<' => {
+                    // TODO: Support less than or equal to '<='
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
@@ -108,6 +110,7 @@ impl Scanner {
                     tokens.push(Token::new(TokenType::LessThan));
                 }
                 '=' => {
+                    // TODO: Support equal to '=='
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
@@ -116,6 +119,8 @@ impl Scanner {
                     tokens.push(Token::new(TokenType::Equals));
                 }
                 '!' => {
+                    // TODO: Support not equal to '!='
+                    // TODO: Support ERE non-match '!~'
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
@@ -130,7 +135,42 @@ impl Scanner {
                         TokenType::Sigil
                     );
                     tokens.push(Token::new(TokenType::Sigil));
+                },
+                '+' => {
+                    // TODO: Support addition '+'
+                    // TODO: Support addition assignment '+='
+                    // TODO: Support post-increment '++'
+                    // TODO: Support pre-increment '++'
+                },
+                '-' => {
+                    // TODO: Support subtraction '-'
+                    // TODO: Support subtraction assignment '-='
+                    // TODO: Support post-decrement '--'
+                    // TODO: Support pre-decrement '--'
+                },
+                '*' => {
+                    // TODO: Support multiplication '*'
+                    // TODO: Support multiplication assignment '*='
+                },
+                '/' => {
+                    // TODO: Support division '/'
+                    // TODO: Support division assignment '/='
+                },
+                '^' => {
+                    // TODO: Support exponentiation '^'
+                    // TODO: Support exponentiation assignment '^='
                 }
+                '%' => {
+                    // TODO: Support modulus '%'
+                    // TODO: Support modulus assignment '%='
+                },
+                '~' => {
+                    // TODO: Support ERE match '~'
+                }
+                // TODO: Array membership
+                // TODO: Logical AND
+                // TODO: Logical OR
+                // TODO: Ternary (? and :)
                 _ => {
                     if ch.is_digit(10) {
                         let mut num_parsed = String::from("");
