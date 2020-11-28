@@ -124,7 +124,6 @@ impl Scanner {
                     tokens.push(Token::new(TokenType::Bang));
                 }
                 '$' => {
-                    // TODO: Determine binding rules for $
                     println!(
                         "Found a '{}', setting the type to {:?}",
                         ch,
