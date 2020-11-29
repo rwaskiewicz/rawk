@@ -32,7 +32,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftCurly
                     );
-                    tokens.push(Token::new(TokenType::LeftCurly));
+                    tokens.push(Token::new(None, TokenType::LeftCurly));
                 }
                 '}' => {
                     println!(
@@ -40,7 +40,7 @@ impl Scanner {
                         ch,
                         TokenType::RightCurly
                     );
-                    tokens.push(Token::new(TokenType::RightCurly));
+                    tokens.push(Token::new(None, TokenType::RightCurly));
                 }
                 '[' => {
                     println!(
@@ -48,7 +48,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftSquareBracket
                     );
-                    tokens.push(Token::new(TokenType::LeftSquareBracket));
+                    tokens.push(Token::new(None, TokenType::LeftSquareBracket));
                 }
                 ']' => {
                     println!(
@@ -56,7 +56,7 @@ impl Scanner {
                         ch,
                         TokenType::RightSquareBracket
                     );
-                    tokens.push(Token::new(TokenType::RightSquareBracket));
+                    tokens.push(Token::new(None, TokenType::RightSquareBracket));
                 }
                 '(' => {
                     println!(
@@ -64,7 +64,7 @@ impl Scanner {
                         ch,
                         TokenType::LeftParenthesis
                     );
-                    tokens.push(Token::new(TokenType::LeftParenthesis));
+                    tokens.push(Token::new(None, TokenType::LeftParenthesis));
                 }
                 ')' => {
                     println!(
@@ -72,7 +72,7 @@ impl Scanner {
                         ch,
                         TokenType::RightParenthesis
                     );
-                    tokens.push(Token::new(TokenType::RightParenthesis));
+                    tokens.push(Token::new(None, TokenType::RightParenthesis));
                 }
                 '\'' => {
                     println!(
@@ -80,7 +80,7 @@ impl Scanner {
                         ch,
                         TokenType::SingleQuote
                     );
-                    tokens.push(Token::new(TokenType::SingleQuote));
+                    tokens.push(Token::new(None, TokenType::SingleQuote));
                 }
                 '\"' => {
                     println!(
@@ -88,7 +88,7 @@ impl Scanner {
                         ch,
                         TokenType::DoubleQuote
                     );
-                    tokens.push(Token::new(TokenType::DoubleQuote));
+                    tokens.push(Token::new(None, TokenType::DoubleQuote));
                 }
                 '>' => {
                     // TODO: Support greater than or equal to '>='
@@ -97,7 +97,7 @@ impl Scanner {
                         ch,
                         TokenType::GreaterThan
                     );
-                    tokens.push(Token::new(TokenType::GreaterThan));
+                    tokens.push(Token::new(None, TokenType::GreaterThan));
                 }
                 '<' => {
                     // TODO: Support less than or equal to '<='
@@ -106,7 +106,7 @@ impl Scanner {
                         ch,
                         TokenType::LessThan
                     );
-                    tokens.push(Token::new(TokenType::LessThan));
+                    tokens.push(Token::new(None, TokenType::LessThan));
                 }
                 '=' => {
                     // TODO: Support equal to '=='
@@ -115,7 +115,7 @@ impl Scanner {
                         ch,
                         TokenType::Equals
                     );
-                    tokens.push(Token::new(TokenType::Equals));
+                    tokens.push(Token::new(None, TokenType::Equals));
                 }
                 '!' => {
                     // TODO: Support not equal to '!='
@@ -125,7 +125,7 @@ impl Scanner {
                         ch,
                         TokenType::Bang
                     );
-                    tokens.push(Token::new(TokenType::Bang));
+                    tokens.push(Token::new(None, TokenType::Bang));
                 }
                 '$' => {
                     println!(
@@ -133,7 +133,7 @@ impl Scanner {
                         ch,
                         TokenType::Sigil
                     );
-                    tokens.push(Token::new(TokenType::Sigil));
+                    tokens.push(Token::new(None, TokenType::Sigil));
                 }
                 '+' => {
                     // TODO: Support addition assignment '+='
@@ -144,7 +144,7 @@ impl Scanner {
                         ch,
                         TokenType::Plus
                     );
-                    tokens.push(Token::new(TokenType::Plus));
+                    tokens.push(Token::new(None, TokenType::Plus));
                 }
                 '-' => {
                     // TODO: Support subtraction assignment '-='
@@ -155,7 +155,7 @@ impl Scanner {
                         ch,
                         TokenType::Minus
                     );
-                    tokens.push(Token::new(TokenType::Minus));
+                    tokens.push(Token::new(None, TokenType::Minus));
                 }
                 '*' => {
                     // TODO: Support multiplication assignment '*='
@@ -164,7 +164,7 @@ impl Scanner {
                         ch,
                         TokenType::Star
                     );
-                    tokens.push(Token::new(TokenType::Star));
+                    tokens.push(Token::new(None, TokenType::Star));
                 }
                 '/' => {
                     // TODO: Support division assignment '/='
@@ -173,7 +173,7 @@ impl Scanner {
                         ch,
                         TokenType::Slash
                     );
-                    tokens.push(Token::new(TokenType::Slash));
+                    tokens.push(Token::new(None, TokenType::Slash));
                 }
                 '^' => {
                     // TODO: Support exponentiation assignment '^='
@@ -182,7 +182,7 @@ impl Scanner {
                         ch,
                         TokenType::Caret
                     );
-                    tokens.push(Token::new(TokenType::Caret));
+                    tokens.push(Token::new(None, TokenType::Caret));
                 }
                 '%' => {
                     // TODO: Support modulus assignment '%='
@@ -191,7 +191,7 @@ impl Scanner {
                         ch,
                         TokenType::Modulus
                     );
-                    tokens.push(Token::new(TokenType::Modulus));
+                    tokens.push(Token::new(None, TokenType::Modulus));
                 }
                 '~' => {
                     println!(
@@ -199,7 +199,7 @@ impl Scanner {
                         ch,
                         TokenType::Tilde
                     );
-                    tokens.push(Token::new(TokenType::Tilde));
+                    tokens.push(Token::new(None, TokenType::Tilde));
                 }
                 // TODO: Array membership
                 // TODO: Logical AND
@@ -243,7 +243,7 @@ impl Scanner {
 
                         println!("I see a number! {}", num_parsed);
                         // TODO: _what_ number?
-                        tokens.push(Token::new(TokenType::Number));
+                        tokens.push(Token::new(Some(num_parsed), TokenType::Number));
                     } else if ch.is_alphabetic() {
                         let mut word_parsed = String::from(ch);
 
@@ -259,7 +259,7 @@ impl Scanner {
                         }
 
                         println!("I see a word '{}'", word_parsed);
-                        tokens.push(Token::new(TokenType::Word));
+                        tokens.push(Token::new(Some(word_parsed), TokenType::Word));
                     } else {
                         println!("ALERT: We found a character we can not handle, '{}'", ch);
                     }
@@ -291,6 +291,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::LeftCurly
             })
         );
@@ -304,6 +305,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::RightCurly
             })
         );
@@ -317,6 +319,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::LeftSquareBracket
             })
         );
@@ -330,6 +333,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::RightSquareBracket
             })
         );
@@ -343,6 +347,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::LeftParenthesis
             })
         );
@@ -356,6 +361,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::RightParenthesis
             })
         );
@@ -369,6 +375,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::SingleQuote
             })
         );
@@ -382,6 +389,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::DoubleQuote
             })
         );
@@ -395,6 +403,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::GreaterThan
             })
         );
@@ -408,6 +417,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::LessThan
             })
         );
@@ -421,6 +431,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Equals
             })
         );
@@ -434,6 +445,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Bang
             })
         );
@@ -447,6 +459,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Sigil
             })
         );
@@ -460,6 +473,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Plus
             })
         );
@@ -473,6 +487,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Minus
             })
         );
@@ -486,6 +501,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Star
             })
         );
@@ -499,6 +515,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Slash
             })
         );
@@ -512,6 +529,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Caret
             })
         );
@@ -525,6 +543,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Modulus
             })
         );
@@ -538,6 +557,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::Tilde
             })
         );
@@ -551,6 +571,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("1")),
                 token_type: TokenType::Number
             })
         );
@@ -564,6 +585,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("123")),
                 token_type: TokenType::Number
             })
         );
@@ -577,6 +599,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("01")),
                 token_type: TokenType::Number
             })
         );
@@ -590,6 +613,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("1.0")),
                 token_type: TokenType::Number
             })
         );
@@ -603,6 +627,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("987.2")),
                 token_type: TokenType::Number
             })
         );
@@ -616,6 +641,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("1.09876")),
                 token_type: TokenType::Number
             })
         );
@@ -629,6 +655,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("1.")),
                 token_type: TokenType::Number
             })
         );
@@ -643,18 +670,21 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("1")),
                 token_type: TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::GreaterThan
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("0")),
                 token_type: TokenType::Number
             })
         );
@@ -668,6 +698,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("print")),
                 token_type: TokenType::Word
             })
         );
@@ -681,6 +712,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("h3ll0")),
                 token_type: TokenType::Word
             })
         );
@@ -694,6 +726,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("hello_world")),
                 token_type: TokenType::Word
             })
         );
@@ -707,6 +740,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
+                lexeme: Some(String::from("Hello")),
                 token_type: TokenType::Word
             })
         );
@@ -721,12 +755,14 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("1")),
                 token_type: TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("Hello")),
                 token_type: TokenType::Word
             })
         );
@@ -741,48 +777,56 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::SingleQuote
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("1")),
                 token_type: TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::GreaterThan
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("0")),
                 token_type: TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::LeftCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: Some(String::from("print")),
                 token_type: TokenType::Word
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::RightCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
+                lexeme: None,
                 token_type: TokenType::SingleQuote
             })
         );
