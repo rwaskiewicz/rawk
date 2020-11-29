@@ -27,204 +27,113 @@ impl Scanner {
                     );
                 }
                 ';' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Semicolon
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Semicolon);
                     tokens.push(Token::new(None, TokenType::Semicolon));
                 }
                 ',' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Comma
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Comma);
                     tokens.push(Token::new(None, TokenType::Comma));
                 }
                 '#' => {
                     // consume the rest of the line, as we've found a comment
                     char_stream.find(|x| x == &'\n');
-                    println!(
-                        "Found a '{}', setting the type to {:?} and iterating to the next newline",
-                        ch,
-                        TokenType::Pound
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Pound);
                     tokens.push(Token::new(None, TokenType::Pound));
                 }
                 '{' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::LeftCurly
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::LeftCurly);
                     tokens.push(Token::new(None, TokenType::LeftCurly));
                 }
                 '}' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::RightCurly
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::RightCurly);
                     tokens.push(Token::new(None, TokenType::RightCurly));
                 }
                 '[' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::LeftSquareBracket
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::LeftSquareBracket);
                     tokens.push(Token::new(None, TokenType::LeftSquareBracket));
                 }
                 ']' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::RightSquareBracket
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::RightSquareBracket);
                     tokens.push(Token::new(None, TokenType::RightSquareBracket));
                 }
                 '(' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::LeftParenthesis
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::LeftParenthesis);
                     tokens.push(Token::new(None, TokenType::LeftParenthesis));
                 }
                 ')' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::RightParenthesis
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::RightParenthesis);
                     tokens.push(Token::new(None, TokenType::RightParenthesis));
                 }
                 '\'' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::SingleQuote
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::SingleQuote);
                     tokens.push(Token::new(None, TokenType::SingleQuote));
                 }
                 '\"' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::DoubleQuote
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::DoubleQuote);
                     tokens.push(Token::new(None, TokenType::DoubleQuote));
                 }
                 '>' => {
                     // TODO: Support greater than or equal to '>='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::GreaterThan
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::GreaterThan);
                     tokens.push(Token::new(None, TokenType::GreaterThan));
                 }
                 '<' => {
                     // TODO: Support less than or equal to '<='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::LessThan
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::LessThan);
                     tokens.push(Token::new(None, TokenType::LessThan));
                 }
                 '=' => {
                     // TODO: Support equal to '=='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Equals
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Equals);
                     tokens.push(Token::new(None, TokenType::Equals));
                 }
                 '!' => {
                     // TODO: Support not equal to '!='
                     // TODO: Support ERE non-match '!~'
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Bang
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Bang);
                     tokens.push(Token::new(None, TokenType::Bang));
                 }
                 '$' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Sigil
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Sigil);
                     tokens.push(Token::new(None, TokenType::Sigil));
                 }
                 '+' => {
                     // TODO: Support addition assignment '+='
                     // TODO: Support post-increment '++'
                     // TODO: Support pre-increment '++'
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Plus
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Plus);
                     tokens.push(Token::new(None, TokenType::Plus));
                 }
                 '-' => {
                     // TODO: Support subtraction assignment '-='
                     // TODO: Support post-decrement '--'
                     // TODO: Support pre-decrement '--'
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Minus
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Minus);
                     tokens.push(Token::new(None, TokenType::Minus));
                 }
                 '*' => {
                     // TODO: Support multiplication assignment '*='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Star
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Star);
                     tokens.push(Token::new(None, TokenType::Star));
                 }
                 '/' => {
                     // TODO: Support division assignment '/='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Slash
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Slash);
                     tokens.push(Token::new(None, TokenType::Slash));
                 }
                 '^' => {
                     // TODO: Support exponentiation assignment '^='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Caret
-                    );
+                    // super::report_scanned_token();
+                    Scanner::report_scanned_character(ch, TokenType::Caret);
                     tokens.push(Token::new(None, TokenType::Caret));
                 }
                 '%' => {
                     // TODO: Support modulus assignment '%='
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Modulus
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Modulus);
                     tokens.push(Token::new(None, TokenType::Modulus));
                 }
                 '~' => {
-                    println!(
-                        "Found a '{}', setting the type to {:?}",
-                        ch,
-                        TokenType::Tilde
-                    );
+                    Scanner::report_scanned_character(ch, TokenType::Tilde);
                     tokens.push(Token::new(None, TokenType::Tilde));
                 }
                 // TODO: Array membership
@@ -270,8 +179,8 @@ impl Scanner {
                             }
                         }
 
+                        Scanner::report_scanned_string(&num_parsed, TokenType::Number);
                         // TODO: Store this value in floating point
-                        println!("I see a number! {}", num_parsed);
                         tokens.push(Token::new(Some(num_parsed), TokenType::Number));
                     } else if ch.is_alphabetic() {
                         // TODO: Support underscore for variable names
@@ -288,7 +197,7 @@ impl Scanner {
                             }
                         }
 
-                        println!("I see a word '{}'", word_parsed);
+                        Scanner::report_scanned_string(&word_parsed, TokenType::Word);
                         tokens.push(Token::new(Some(word_parsed), TokenType::Word));
                     } else {
                         println!("ALERT: We found a character we can not handle, '{}'", ch);
@@ -299,6 +208,14 @@ impl Scanner {
 
         println!("This is the final list of Tokens {:?}", tokens);
         tokens
+    }
+
+    fn report_scanned_character(ch: char, token_type: TokenType) {
+        println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
+    }
+
+    fn report_scanned_string(ch: &str, token_type: TokenType) {
+        println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
 }
 
