@@ -12,8 +12,6 @@ impl Scanner {
     pub fn scan(&self, input: &str) -> Vec<Token> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut current_line = 1;
-        let mut _lexeme_current = 0;
-        let mut _lexeme_start = 0;
 
         let mut char_stream = input.chars().peekable();
         while let Some(_) = char_stream.peek() {
@@ -21,10 +19,16 @@ impl Scanner {
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             match ch {
+                // TODO: Add support for semicolon
+                // TODO: Add support for comma
+                // TODO: Add support for comments
                 ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
                 '\n' => {
                     current_line += 1;
-                    println!("I can see the newline, which is now {}", current_line);
+                    println!(
+                        "I can see the newline. The current_line number is now {}",
+                        current_line
+                    );
                 }
                 '{' => {
                     println!(
@@ -221,6 +225,9 @@ impl Scanner {
                             }
                         }
 
+                        // TODO: Support scientific (exponential) notation like 0.707E-1, 1E1, 1e6
+                        // Note that 'e' can be cased however, and may occur before or after the dot
+
                         // TODO: This still doesn't feel right
                         if let Some(maybe_dot) = char_stream.peek() {
                             if maybe_dot == &'.' {
@@ -241,10 +248,11 @@ impl Scanner {
                             }
                         }
 
+                        // TODO: Store this value in floating point
                         println!("I see a number! {}", num_parsed);
-                        // TODO: _what_ number?
                         tokens.push(Token::new(Some(num_parsed), TokenType::Number));
                     } else if ch.is_alphabetic() {
+                        // TODO: Support underscore for variable names
                         let mut word_parsed = String::from(ch);
 
                         // TODO: This check may be too permissive
