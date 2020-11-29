@@ -21,6 +21,9 @@ pub enum TokenType {
     Caret,
     Modulus,
     Tilde,
+    Semicolon,
+    Comma,
+    Pound,
 
     // Variable Character Tokens
     Number,

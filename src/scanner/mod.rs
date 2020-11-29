@@ -15,13 +15,9 @@ impl Scanner {
 
         let mut char_stream = input.chars().peekable();
         while let Some(_) = char_stream.peek() {
-            // for ch in char_stream {
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             match ch {
-                // TODO: Add support for semicolon
-                // TODO: Add support for comma
-                // TODO: Add support for comments
                 ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
                 '\n' => {
                     current_line += 1;
@@ -29,6 +25,32 @@ impl Scanner {
                         "I can see the newline. The current_line number is now {}",
                         current_line
                     );
+                }
+                ';' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Semicolon
+                    );
+                    tokens.push(Token::new(None, TokenType::Semicolon));
+                }
+                ',' => {
+                    println!(
+                        "Found a '{}', setting the type to {:?}",
+                        ch,
+                        TokenType::Comma
+                    );
+                    tokens.push(Token::new(None, TokenType::Comma));
+                }
+                '#' => {
+                    // consume the rest of the line, as we've found a comment
+                    char_stream.find(|x| x == &'\n');
+                    println!(
+                        "Found a '{}', setting the type to {:?} and iterating to the next newline",
+                        ch,
+                        TokenType::Pound
+                    );
+                    tokens.push(Token::new(None, TokenType::Pound));
                 }
                 '{' => {
                     println!(
@@ -289,6 +311,84 @@ mod lexing {
         let tokens = Scanner::new().scan("");
 
         assert_eq!(tokens.len(), 0);
+    }
+
+    #[test]
+    fn it_parses_a_semicolon() {
+        let tokens = Scanner::new().scan(";");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Semicolon
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_comma() {
+        let tokens = Scanner::new().scan(",");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Comma
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_pound() {
+        let tokens = Scanner::new().scan("#");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Pound
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_comment_as_a_string() {
+        let tokens = Scanner::new().scan("{print} # this print is important");
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(tokens.len(), 4);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::LeftCurly
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("print")),
+                token_type: TokenType::Word
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::RightCurly
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Pound
+            })
+        );
     }
 
     #[test]
@@ -699,6 +799,35 @@ mod lexing {
     }
 
     #[test]
+    fn it_parses_a_number_with_a_comma_into_two() {
+        let tokens = Scanner::new().scan("1,000");
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("1")),
+                token_type: TokenType::Number
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Comma
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("000")),
+                token_type: TokenType::Number
+            })
+        );
+    }
+
+    #[test]
     fn it_parses_a_word() {
         let tokens = Scanner::new().scan("print");
 
@@ -778,10 +907,10 @@ mod lexing {
 
     #[test]
     fn it_parses_a_small_program() {
-        let tokens = Scanner::new().scan("'1 > 0 { print }'");
+        let tokens = Scanner::new().scan("'1 > 0 { print; }' # print is cool");
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 8);
+        assert_eq!(tokens.len(), 10);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -828,6 +957,13 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
+                token_type: TokenType::Semicolon
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
                 token_type: TokenType::RightCurly
             })
         );
@@ -836,6 +972,13 @@ mod lexing {
             Some(&Token {
                 lexeme: None,
                 token_type: TokenType::SingleQuote
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: TokenType::Pound
             })
         );
     }
