@@ -1,12 +1,19 @@
 use super::token::token::Token;
 use super::token::token_type::TokenType;
+use std::collections::HashMap;
 
 #[derive(Debug)]
-pub struct Scanner {}
+pub struct Scanner {
+    keywords: HashMap<&'static str, &'static TokenType>,
+}
 
 impl Scanner {
     pub fn new() -> Scanner {
-        Scanner {}
+        let mut keywords: HashMap<&str, &TokenType> = HashMap::new();
+        keywords.insert("print", &TokenType::Print);
+        keywords.shrink_to_fit();
+
+        Scanner { keywords }
     }
 
     pub fn scan(&self, input: &str) -> Vec<Token> {
@@ -27,114 +34,114 @@ impl Scanner {
                     );
                 }
                 ';' => {
-                    Scanner::report_scanned_character(ch, TokenType::Semicolon);
-                    tokens.push(Token::new(None, TokenType::Semicolon));
+                    Scanner::report_scanned_character(ch, &TokenType::Semicolon);
+                    tokens.push(Token::new(None, &TokenType::Semicolon));
                 }
                 ',' => {
-                    Scanner::report_scanned_character(ch, TokenType::Comma);
-                    tokens.push(Token::new(None, TokenType::Comma));
+                    Scanner::report_scanned_character(ch, &TokenType::Comma);
+                    tokens.push(Token::new(None, &TokenType::Comma));
                 }
                 '#' => {
                     // consume the rest of the line, as we've found a comment
                     char_stream.find(|x| x == &'\n');
-                    Scanner::report_scanned_character(ch, TokenType::Pound);
-                    tokens.push(Token::new(None, TokenType::Pound));
+                    Scanner::report_scanned_character(ch, &TokenType::Pound);
+                    tokens.push(Token::new(None, &TokenType::Pound));
                 }
                 '{' => {
-                    Scanner::report_scanned_character(ch, TokenType::LeftCurly);
-                    tokens.push(Token::new(None, TokenType::LeftCurly));
+                    Scanner::report_scanned_character(ch, &TokenType::LeftCurly);
+                    tokens.push(Token::new(None, &TokenType::LeftCurly));
                 }
                 '}' => {
-                    Scanner::report_scanned_character(ch, TokenType::RightCurly);
-                    tokens.push(Token::new(None, TokenType::RightCurly));
+                    Scanner::report_scanned_character(ch, &TokenType::RightCurly);
+                    tokens.push(Token::new(None, &TokenType::RightCurly));
                 }
                 '[' => {
-                    Scanner::report_scanned_character(ch, TokenType::LeftSquareBracket);
-                    tokens.push(Token::new(None, TokenType::LeftSquareBracket));
+                    Scanner::report_scanned_character(ch, &TokenType::LeftSquareBracket);
+                    tokens.push(Token::new(None, &TokenType::LeftSquareBracket));
                 }
                 ']' => {
-                    Scanner::report_scanned_character(ch, TokenType::RightSquareBracket);
-                    tokens.push(Token::new(None, TokenType::RightSquareBracket));
+                    Scanner::report_scanned_character(ch, &TokenType::RightSquareBracket);
+                    tokens.push(Token::new(None, &TokenType::RightSquareBracket));
                 }
                 '(' => {
-                    Scanner::report_scanned_character(ch, TokenType::LeftParenthesis);
-                    tokens.push(Token::new(None, TokenType::LeftParenthesis));
+                    Scanner::report_scanned_character(ch, &TokenType::LeftParenthesis);
+                    tokens.push(Token::new(None, &TokenType::LeftParenthesis));
                 }
                 ')' => {
-                    Scanner::report_scanned_character(ch, TokenType::RightParenthesis);
-                    tokens.push(Token::new(None, TokenType::RightParenthesis));
+                    Scanner::report_scanned_character(ch, &TokenType::RightParenthesis);
+                    tokens.push(Token::new(None, &TokenType::RightParenthesis));
                 }
                 '\'' => {
-                    Scanner::report_scanned_character(ch, TokenType::SingleQuote);
-                    tokens.push(Token::new(None, TokenType::SingleQuote));
+                    Scanner::report_scanned_character(ch, &TokenType::SingleQuote);
+                    tokens.push(Token::new(None, &TokenType::SingleQuote));
                 }
                 '\"' => {
-                    Scanner::report_scanned_character(ch, TokenType::DoubleQuote);
-                    tokens.push(Token::new(None, TokenType::DoubleQuote));
+                    Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
+                    tokens.push(Token::new(None, &TokenType::DoubleQuote));
                 }
                 '>' => {
                     // TODO: Support greater than or equal to '>='
-                    Scanner::report_scanned_character(ch, TokenType::GreaterThan);
-                    tokens.push(Token::new(None, TokenType::GreaterThan));
+                    Scanner::report_scanned_character(ch, &TokenType::GreaterThan);
+                    tokens.push(Token::new(None, &TokenType::GreaterThan));
                 }
                 '<' => {
                     // TODO: Support less than or equal to '<='
-                    Scanner::report_scanned_character(ch, TokenType::LessThan);
-                    tokens.push(Token::new(None, TokenType::LessThan));
+                    Scanner::report_scanned_character(ch, &TokenType::LessThan);
+                    tokens.push(Token::new(None, &TokenType::LessThan));
                 }
                 '=' => {
                     // TODO: Support equal to '=='
-                    Scanner::report_scanned_character(ch, TokenType::Equals);
-                    tokens.push(Token::new(None, TokenType::Equals));
+                    Scanner::report_scanned_character(ch, &TokenType::Equals);
+                    tokens.push(Token::new(None, &TokenType::Equals));
                 }
                 '!' => {
                     // TODO: Support not equal to '!='
                     // TODO: Support ERE non-match '!~'
-                    Scanner::report_scanned_character(ch, TokenType::Bang);
-                    tokens.push(Token::new(None, TokenType::Bang));
+                    Scanner::report_scanned_character(ch, &TokenType::Bang);
+                    tokens.push(Token::new(None, &TokenType::Bang));
                 }
                 '$' => {
-                    Scanner::report_scanned_character(ch, TokenType::Sigil);
-                    tokens.push(Token::new(None, TokenType::Sigil));
+                    Scanner::report_scanned_character(ch, &TokenType::Sigil);
+                    tokens.push(Token::new(None, &TokenType::Sigil));
                 }
                 '+' => {
                     // TODO: Support addition assignment '+='
                     // TODO: Support post-increment '++'
                     // TODO: Support pre-increment '++'
-                    Scanner::report_scanned_character(ch, TokenType::Plus);
-                    tokens.push(Token::new(None, TokenType::Plus));
+                    Scanner::report_scanned_character(ch, &TokenType::Plus);
+                    tokens.push(Token::new(None, &TokenType::Plus));
                 }
                 '-' => {
                     // TODO: Support subtraction assignment '-='
                     // TODO: Support post-decrement '--'
                     // TODO: Support pre-decrement '--'
-                    Scanner::report_scanned_character(ch, TokenType::Minus);
-                    tokens.push(Token::new(None, TokenType::Minus));
+                    Scanner::report_scanned_character(ch, &TokenType::Minus);
+                    tokens.push(Token::new(None, &TokenType::Minus));
                 }
                 '*' => {
                     // TODO: Support multiplication assignment '*='
-                    Scanner::report_scanned_character(ch, TokenType::Star);
-                    tokens.push(Token::new(None, TokenType::Star));
+                    Scanner::report_scanned_character(ch, &TokenType::Star);
+                    tokens.push(Token::new(None, &TokenType::Star));
                 }
                 '/' => {
                     // TODO: Support division assignment '/='
-                    Scanner::report_scanned_character(ch, TokenType::Slash);
-                    tokens.push(Token::new(None, TokenType::Slash));
+                    Scanner::report_scanned_character(ch, &TokenType::Slash);
+                    tokens.push(Token::new(None, &TokenType::Slash));
                 }
                 '^' => {
                     // TODO: Support exponentiation assignment '^='
                     // super::report_scanned_token();
-                    Scanner::report_scanned_character(ch, TokenType::Caret);
-                    tokens.push(Token::new(None, TokenType::Caret));
+                    Scanner::report_scanned_character(ch, &TokenType::Caret);
+                    tokens.push(Token::new(None, &TokenType::Caret));
                 }
                 '%' => {
                     // TODO: Support modulus assignment '%='
-                    Scanner::report_scanned_character(ch, TokenType::Modulus);
-                    tokens.push(Token::new(None, TokenType::Modulus));
+                    Scanner::report_scanned_character(ch, &TokenType::Modulus);
+                    tokens.push(Token::new(None, &TokenType::Modulus));
                 }
                 '~' => {
-                    Scanner::report_scanned_character(ch, TokenType::Tilde);
-                    tokens.push(Token::new(None, TokenType::Tilde));
+                    Scanner::report_scanned_character(ch, &TokenType::Tilde);
+                    tokens.push(Token::new(None, &TokenType::Tilde));
                 }
                 // TODO: Array membership
                 // TODO: Logical AND
@@ -179,9 +186,9 @@ impl Scanner {
                             }
                         }
 
-                        Scanner::report_scanned_string(&num_parsed, TokenType::Number);
+                        Scanner::report_scanned_string(&num_parsed, &TokenType::Number);
                         // TODO: Store this value in floating point
-                        tokens.push(Token::new(Some(num_parsed), TokenType::Number));
+                        tokens.push(Token::new(Some(num_parsed), &TokenType::Number));
                     } else if ch.is_alphabetic() {
                         // TODO: Support underscore for variable names
                         let mut word_parsed = String::from(ch);
@@ -197,8 +204,13 @@ impl Scanner {
                             }
                         }
 
-                        Scanner::report_scanned_string(&word_parsed, TokenType::Word);
-                        tokens.push(Token::new(Some(word_parsed), TokenType::Word));
+                        let type_of_token = self
+                            .keywords
+                            .get(&word_parsed.as_str())
+                            .unwrap_or(&&TokenType::Word);
+
+                        Scanner::report_scanned_string(&word_parsed, &type_of_token);
+                        tokens.push(Token::new(Some(word_parsed.clone()), &type_of_token));
                     } else {
                         println!("ALERT: We found a character we can not handle, '{}'", ch);
                     }
@@ -210,11 +222,11 @@ impl Scanner {
         tokens
     }
 
-    fn report_scanned_character(ch: char, token_type: TokenType) {
+    fn report_scanned_character(ch: char, token_type: &TokenType) {
         println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
 
-    fn report_scanned_string(ch: &str, token_type: TokenType) {
+    fn report_scanned_string(ch: &str, token_type: &TokenType) {
         println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
 }
@@ -239,7 +251,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Semicolon
+                token_type: &TokenType::Semicolon
             })
         );
     }
@@ -253,7 +265,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Comma
+                token_type: &TokenType::Comma
             })
         );
     }
@@ -267,7 +279,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Pound
+                token_type: &TokenType::Pound
             })
         );
     }
@@ -282,28 +294,28 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LeftCurly
+                token_type: &TokenType::LeftCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("print")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Print
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::RightCurly
+                token_type: &TokenType::RightCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Pound
+                token_type: &TokenType::Pound
             })
         );
     }
@@ -317,7 +329,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LeftCurly
+                token_type: &TokenType::LeftCurly
             })
         );
     }
@@ -331,7 +343,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::RightCurly
+                token_type: &TokenType::RightCurly
             })
         );
     }
@@ -345,7 +357,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LeftSquareBracket
+                token_type: &TokenType::LeftSquareBracket
             })
         );
     }
@@ -359,7 +371,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::RightSquareBracket
+                token_type: &TokenType::RightSquareBracket
             })
         );
     }
@@ -373,7 +385,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LeftParenthesis
+                token_type: &TokenType::LeftParenthesis
             })
         );
     }
@@ -387,7 +399,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::RightParenthesis
+                token_type: &TokenType::RightParenthesis
             })
         );
     }
@@ -401,7 +413,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote
             })
         );
     }
@@ -415,7 +427,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::DoubleQuote
+                token_type: &TokenType::DoubleQuote
             })
         );
     }
@@ -429,7 +441,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::GreaterThan
+                token_type: &TokenType::GreaterThan
             })
         );
     }
@@ -443,7 +455,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LessThan
+                token_type: &TokenType::LessThan
             })
         );
     }
@@ -457,7 +469,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Equals
+                token_type: &TokenType::Equals
             })
         );
     }
@@ -471,7 +483,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Bang
+                token_type: &TokenType::Bang
             })
         );
     }
@@ -485,7 +497,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Sigil
+                token_type: &TokenType::Sigil
             })
         );
     }
@@ -499,7 +511,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Plus
+                token_type: &TokenType::Plus
             })
         );
     }
@@ -513,7 +525,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Minus
+                token_type: &TokenType::Minus
             })
         );
     }
@@ -527,7 +539,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Star
+                token_type: &TokenType::Star
             })
         );
     }
@@ -541,7 +553,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Slash
+                token_type: &TokenType::Slash
             })
         );
     }
@@ -555,7 +567,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Caret
+                token_type: &TokenType::Caret
             })
         );
     }
@@ -569,7 +581,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Modulus
+                token_type: &TokenType::Modulus
             })
         );
     }
@@ -583,7 +595,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Tilde
+                token_type: &TokenType::Tilde
             })
         );
     }
@@ -597,7 +609,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -611,7 +623,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("123")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -625,7 +637,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("01")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -639,7 +651,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.0")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -653,7 +665,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("987.2")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -667,7 +679,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.09876")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -681,7 +693,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -696,21 +708,21 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::GreaterThan
+                token_type: &TokenType::GreaterThan
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("0")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -725,21 +737,21 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Comma
+                token_type: &TokenType::Comma
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("000")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
     }
@@ -753,7 +765,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("print")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Print
             })
         );
     }
@@ -767,7 +779,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("h3ll0")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Word
             })
         );
     }
@@ -781,7 +793,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("hello_world")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Word
             })
         );
     }
@@ -795,7 +807,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Word
             })
         );
     }
@@ -810,14 +822,14 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Word
             })
         );
     }
@@ -832,70 +844,70 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::GreaterThan
+                token_type: &TokenType::GreaterThan
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("0")),
-                token_type: TokenType::Number
+                token_type: &TokenType::Number
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::LeftCurly
+                token_type: &TokenType::LeftCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("print")),
-                token_type: TokenType::Word
+                token_type: &TokenType::Print
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Semicolon
+                token_type: &TokenType::Semicolon
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::RightCurly
+                token_type: &TokenType::RightCurly
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: TokenType::Pound
+                token_type: &TokenType::Pound
             })
         );
     }
