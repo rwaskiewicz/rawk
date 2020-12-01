@@ -27,7 +27,7 @@ pub enum TokenType {
 
     // Variable Character Tokens
     Number,
-    Word,
+    Identifier,
 
     // Keywords
     Print,

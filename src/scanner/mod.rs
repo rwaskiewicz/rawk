@@ -76,6 +76,7 @@ impl Scanner {
                     tokens.push(Token::new(None, &TokenType::SingleQuote));
                 }
                 '\"' => {
+                    // TODO: Update this to find full strings
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
                     tokens.push(Token::new(None, &TokenType::DoubleQuote));
                 }
@@ -207,7 +208,7 @@ impl Scanner {
                         let type_of_token = self
                             .keywords
                             .get(&word_parsed.as_str())
-                            .unwrap_or(&&TokenType::Word);
+                            .unwrap_or(&&TokenType::Identifier);
 
                         Scanner::report_scanned_string(&word_parsed, &type_of_token);
                         tokens.push(Token::new(Some(word_parsed.clone()), &type_of_token));
@@ -779,7 +780,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("h3ll0")),
-                token_type: &TokenType::Word
+                token_type: &TokenType::Identifier
             })
         );
     }
@@ -793,7 +794,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("hello_world")),
-                token_type: &TokenType::Word
+                token_type: &TokenType::Identifier
             })
         );
     }
@@ -807,7 +808,7 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: &TokenType::Word
+                token_type: &TokenType::Identifier
             })
         );
     }
@@ -829,7 +830,7 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: &TokenType::Word
+                token_type: &TokenType::Identifier
             })
         );
     }
