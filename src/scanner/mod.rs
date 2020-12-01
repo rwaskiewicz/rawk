@@ -758,7 +758,7 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_word() {
+    fn it_parses_a_keyword() {
         let tokens = Scanner::new().scan("print");
 
         assert_eq!(tokens.len(), 1);
@@ -772,7 +772,21 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_word_with_numbers() {
+    fn it_parses_case_sensitive_keyboards_as_identifiers() {
+        let tokens = Scanner::new().scan("PRINT");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: Some(String::from("PRINT")),
+                token_type: &TokenType::Identifier
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_an_identifier_with_numbers() {
         let tokens = Scanner::new().scan("h3ll0");
 
         assert_eq!(tokens.len(), 1);
@@ -786,7 +800,7 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_word_with_underscores() {
+    fn it_parses_an_identifier_with_underscores() {
         let tokens = Scanner::new().scan("hello_world");
 
         assert_eq!(tokens.len(), 1);
@@ -800,7 +814,7 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_word_with_uppercase_letters() {
+    fn it_parses_an_identifier_with_uppercase_letters() {
         let tokens = Scanner::new().scan("Hello");
 
         assert_eq!(tokens.len(), 1);
@@ -814,7 +828,7 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_word_with_numbers_separately() {
+    fn it_parses_an_identifier_with_numbers_separately() {
         let tokens = Scanner::new().scan("1Hello");
         let mut token_iter = tokens.iter();
 
