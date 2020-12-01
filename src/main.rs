@@ -1,10 +1,13 @@
+mod parser;
 mod scanner;
 mod token;
 
 use clap::{App, Arg};
+use parser::Parser;
 use scanner::Scanner;
 use std::io;
 use std::io::Write;
+use crate::token::token::Token;
 
 fn main() {
     let matches = App::new("r-awk")
@@ -36,6 +39,7 @@ fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
     let scanner = Scanner::new();
+    let parser = Parser::new();
     let mut awk_line = String::new();
     let mut awk_input = String::new();
 
@@ -47,7 +51,8 @@ fn run_prompt() {
             .read_line(&mut awk_line)
             .expect("failed to get r-awk line");
         print!("r-awk line to process: {}", awk_line);
-        scanner.scan(&awk_line);
+        let tokens: Vec<Token> = scanner.scan(&awk_line);
+        parser.parse(tokens);
         while !awk_input.contains("STOP!") {
             print!("Input Data (type STOP! to end data input) >> ");
             io::stdout().flush().expect("Unable to flush STDOUT!");
