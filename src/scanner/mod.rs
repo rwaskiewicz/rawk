@@ -161,6 +161,18 @@ impl Scanner {
                     Scanner::report_scanned_character(ch, &TokenType::Tilde);
                     tokens.push(Token::new(None, &TokenType::Tilde));
                 }
+                '|' => {
+                    Scanner::report_scanned_character(ch, &TokenType::Pipe);
+                    tokens.push(Token::new(None, &TokenType::Pipe));
+                }
+                '?' => {
+                    Scanner::report_scanned_character(ch, &TokenType::Question);
+                    tokens.push(Token::new(None, &TokenType::Question));
+                }
+                ':' => {
+                    Scanner::report_scanned_character(ch, &TokenType::Colon);
+                    tokens.push(Token::new(None, &TokenType::Colon));
+                }
                 // TODO: Array membership
                 // TODO: Logical AND
                 // TODO: Logical OR
@@ -600,6 +612,48 @@ mod lexing {
             Some(&Token {
                 lexeme: None,
                 token_type: &TokenType::Modulus
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_pipe() {
+        let tokens = Scanner::new().scan("|");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::Pipe
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_question() {
+        let tokens = Scanner::new().scan("?");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::Question
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_colon() {
+        let tokens = Scanner::new().scan(":");
+
+        assert_eq!(tokens.len(), 1);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::Colon
             })
         );
     }

@@ -1,34 +1,5 @@
 #[derive(Debug, PartialEq)]
 pub enum TokenType {
-    // Single Character Tokens
-    LeftCurly,
-    RightCurly,
-    LeftSquareBracket,
-    RightSquareBracket,
-    LeftParenthesis,
-    RightParenthesis,
-    SingleQuote,
-    DoubleQuote,
-    Sigil,
-    Bang,
-    Equals,
-    GreaterThan,
-    LessThan,
-    Plus,
-    Minus,
-    Star,
-    Slash,
-    Caret,
-    Modulus,
-    Tilde,
-    Semicolon,
-    Comma,
-    Pound,
-
-    // Variable Character Tokens
-    Number,
-    Identifier,
-
     // Keywords
     Begin, // 'BEGIN'
     End,   // 'END'
@@ -52,6 +23,43 @@ pub enum TokenType {
     While,  // 'while'
 
     // TODO: built in fn
-
     GetLine, // 'GETLINE'
+
+    // TODO: Two-character tokens.
+    // %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN POW_ASSIGN
+    /*     '+='       '-='       '*='       '/='       '%='       '^=' */
+    // Single Character Tokens
+    LeftCurly,
+    RightCurly,
+    LeftParenthesis,
+    RightParenthesis,
+    LeftSquareBracket,
+    RightSquareBracket,
+    Comma,
+    Semicolon,
+    // TODO: NEWLINE
+    Plus,
+    Minus,
+    Star,
+    Modulus,
+    Caret,
+    Bang,
+    GreaterThan,
+    LessThan,
+    Pipe,
+    Question,
+    Colon,
+    Tilde,
+    Sigil,
+    Equals,
+
+    // TODO: None of these are in the yacc spec...
+    SingleQuote,
+    DoubleQuote,
+    Slash,
+    Pound,
+
+    // Variable Character Tokens
+    Number,
+    Identifier,
 }
