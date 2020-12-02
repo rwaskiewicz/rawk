@@ -27,6 +27,7 @@ impl Scanner {
         keywords.insert("printf", &TokenType::Printf);
         keywords.insert("return", &TokenType::Return);
         keywords.insert("while", &TokenType::While);
+        keywords.insert("GETLINE", &TokenType::GetLine);
         keywords.shrink_to_fit();
 
         Scanner { keywords }
@@ -775,7 +776,7 @@ mod lexing {
 
     #[test]
     fn it_parses_keywords() {
-        let test_cases: [(&str, &TokenType); 17] = [
+        let test_cases: [(&str, &TokenType); 18] = [
             ("BEGIN", &TokenType::Begin),
             ("END", &TokenType::End),
             ("break", &TokenType::Break),
@@ -793,6 +794,7 @@ mod lexing {
             ("printf", &TokenType::Printf),
             ("return", &TokenType::Return),
             ("while", &TokenType::While),
+            ("GETLINE", &TokenType::GetLine),
         ];
 
         let scanner = Scanner::new();

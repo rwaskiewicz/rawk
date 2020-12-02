@@ -50,4 +50,8 @@ pub enum TokenType {
     Printf, // 'printf'
     Return, // 'return'
     While,  // 'while'
+
+    // TODO: built in fn
+
+    GetLine, // 'GETLINE'
 }
