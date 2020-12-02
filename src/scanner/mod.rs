@@ -273,34 +273,6 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_semicolon() {
-        let tokens = Scanner::new().scan(";");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Semicolon
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_comma() {
-        let tokens = Scanner::new().scan(",");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Comma
-            })
-        );
-    }
-
-    #[test]
     fn it_parses_a_pound() {
         let tokens = Scanner::new().scan("#");
 
@@ -351,90 +323,6 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_left_curly_brace() {
-        let tokens = Scanner::new().scan("{");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::LeftCurly
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_right_curly_brace() {
-        let tokens = Scanner::new().scan("}");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::RightCurly
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_left_square_bracket() {
-        let tokens = Scanner::new().scan("[");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::LeftSquareBracket
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_right_square_bracket() {
-        let tokens = Scanner::new().scan("]");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::RightSquareBracket
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_left_parenthesis() {
-        let tokens = Scanner::new().scan("(");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::LeftParenthesis
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_right_parenthesis() {
-        let tokens = Scanner::new().scan(")");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::RightParenthesis
-            })
-        );
-    }
-
-    #[test]
     fn it_parses_a_single_quote() {
         let tokens = Scanner::new().scan("\'");
 
@@ -463,118 +351,6 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_greater_than_caret() {
-        let tokens = Scanner::new().scan(">");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::GreaterThan
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_less_than_caret() {
-        let tokens = Scanner::new().scan("<");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::LessThan
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_an_assignment_token() {
-        let tokens = Scanner::new().scan("=");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Equals
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_bang() {
-        let tokens = Scanner::new().scan("!");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Bang
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_sigil() {
-        let tokens = Scanner::new().scan("$");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Sigil
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_plus() {
-        let tokens = Scanner::new().scan("+");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Plus
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_minus() {
-        let tokens = Scanner::new().scan("-");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Minus
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_star() {
-        let tokens = Scanner::new().scan("*");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Star
-            })
-        );
-    }
-
-    #[test]
     fn it_parses_a_slash() {
         let tokens = Scanner::new().scan("/");
 
@@ -589,87 +365,49 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_caret() {
-        let tokens = Scanner::new().scan("^");
+    fn it_parses_single_character_tokens() {
+        let test_cases: [(&str, &TokenType); 22] = [
+            ("{", &TokenType::LeftCurly),
+            ("}", &TokenType::RightCurly),
+            ("(", &TokenType::LeftParenthesis),
+            (")", &TokenType::RightParenthesis),
+            ("[", &TokenType::LeftSquareBracket),
+            ("]", &TokenType::RightSquareBracket),
+            (",", &TokenType::Comma),
+            (";", &TokenType::Semicolon),
+            // TODO: NEWLINE
+            ("+", &TokenType::Plus),
+            ("-", &TokenType::Minus),
+            ("*", &TokenType::Star),
+            ("%", &TokenType::Modulus),
+            ("^", &TokenType::Caret),
+            ("!", &TokenType::Bang),
+            (">", &TokenType::GreaterThan),
+            ("<", &TokenType::LessThan),
+            ("|", &TokenType::Pipe),
+            ("?", &TokenType::Question),
+            (":", &TokenType::Colon),
+            ("~", &TokenType::Tilde),
+            ("$", &TokenType::Sigil),
+            ("=", &TokenType::Equals),
+        ];
 
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Caret
-            })
-        );
-    }
+        let scanner = Scanner::new();
+        for test_case in test_cases.iter() {
+            let token = test_case.0;
+            let token_type = test_case.1;
 
-    #[test]
-    fn it_parses_a_modulus() {
-        let tokens = Scanner::new().scan("%");
+            let tokens = scanner.scan(token);
 
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Modulus
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_pipe() {
-        let tokens = Scanner::new().scan("|");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Pipe
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_question() {
-        let tokens = Scanner::new().scan("?");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Question
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_colon() {
-        let tokens = Scanner::new().scan(":");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Colon
-            })
-        );
-    }
-
-    #[test]
-    fn it_parses_a_tilde() {
-        let tokens = Scanner::new().scan("~");
-
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Tilde
-            })
-        );
+            assert_eq!(tokens.len(), 1);
+            assert_eq!(
+                tokens.iter().next(),
+                Some(&Token {
+                    lexeme: None,
+                    token_type
+                })
+            );
+        }
     }
 
     #[test]
@@ -855,13 +593,15 @@ mod lexing {
         for test_case in test_cases.iter() {
             let token = test_case.0;
             let token_type = test_case.1;
+
             let tokens = scanner.scan(token);
+
             assert_eq!(tokens.len(), 1);
             assert_eq!(
                 tokens.iter().next(),
                 Some(&Token {
                     lexeme: Some(String::from(token)),
-                    token_type: token_type
+                    token_type
                 })
             );
         }
