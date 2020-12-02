@@ -2,12 +2,12 @@ mod parser;
 mod scanner;
 mod token;
 
+use crate::token::token::Token;
 use clap::{App, Arg};
 use parser::Parser;
 use scanner::Scanner;
 use std::io;
 use std::io::Write;
-use crate::token::token::Token;
 
 fn main() {
     let matches = App::new("r-awk")

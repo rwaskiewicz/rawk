@@ -4,7 +4,7 @@ pub struct Parser {}
 
 impl Parser {
     pub fn new() -> Parser {
-        Parser{}
+        Parser {}
     }
 
     pub fn parse(&self, tokens: Vec<Token>) {

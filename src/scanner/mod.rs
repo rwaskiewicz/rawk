@@ -10,7 +10,23 @@ pub struct Scanner {
 impl Scanner {
     pub fn new() -> Scanner {
         let mut keywords: HashMap<&str, &TokenType> = HashMap::new();
+        keywords.insert("BEGIN", &TokenType::Begin);
+        keywords.insert("END", &TokenType::End);
+        keywords.insert("break", &TokenType::Break);
+        keywords.insert("continue", &TokenType::Continue);
+        keywords.insert("delete", &TokenType::Delete);
+        keywords.insert("do", &TokenType::Do);
+        keywords.insert("else", &TokenType::Else);
+        keywords.insert("exit", &TokenType::Exit);
+        keywords.insert("for", &TokenType::For);
+        keywords.insert("function", &TokenType::Function);
+        keywords.insert("if", &TokenType::If);
+        keywords.insert("in", &TokenType::In);
+        keywords.insert("next", &TokenType::Next);
         keywords.insert("print", &TokenType::Print);
+        keywords.insert("printf", &TokenType::Printf);
+        keywords.insert("return", &TokenType::Return);
+        keywords.insert("while", &TokenType::While);
         keywords.shrink_to_fit();
 
         Scanner { keywords }
@@ -758,17 +774,41 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_keyword() {
-        let tokens = Scanner::new().scan("print");
+    fn it_parses_keywords() {
+        let test_cases: [(&str, &TokenType); 17] = [
+            ("BEGIN", &TokenType::Begin),
+            ("END", &TokenType::End),
+            ("break", &TokenType::Break),
+            ("continue", &TokenType::Continue),
+            ("delete", &TokenType::Delete),
+            ("do", &TokenType::Do),
+            ("else", &TokenType::Else),
+            ("exit", &TokenType::Exit),
+            ("for", &TokenType::For),
+            ("function", &TokenType::Function),
+            ("if", &TokenType::If),
+            ("in", &TokenType::In),
+            ("next", &TokenType::Next),
+            ("print", &TokenType::Print),
+            ("printf", &TokenType::Printf),
+            ("return", &TokenType::Return),
+            ("while", &TokenType::While),
+        ];
 
-        assert_eq!(tokens.len(), 1);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: Some(String::from("print")),
-                token_type: &TokenType::Print
-            })
-        );
+        let scanner = Scanner::new();
+        for test_case in test_cases.iter() {
+            let token = test_case.0;
+            let token_type = test_case.1;
+            let tokens = scanner.scan(token);
+            assert_eq!(tokens.len(), 1);
+            assert_eq!(
+                tokens.iter().next(),
+                Some(&Token {
+                    lexeme: Some(String::from(token)),
+                    token_type: token_type
+                })
+            );
+        }
     }
 
     #[test]

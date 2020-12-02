@@ -30,5 +30,24 @@ pub enum TokenType {
     Identifier,
 
     // Keywords
-    Print,
+    Begin, // 'BEGIN'
+    End,   // 'END'
+
+    Break,    // 'break'
+    Continue, // 'continue'
+    Delete,   // 'delete'
+    Do,       // 'do'
+    Else,     // 'else'
+
+    Exit,     // 'exit'
+    For,      // 'for'
+    Function, // 'function'
+    If,       // 'if'
+    In,       // 'in'
+
+    Next,   // 'next'
+    Print,  // 'print'
+    Printf, // 'printf'
+    Return, // 'return'
+    While,  // 'while'
 }
