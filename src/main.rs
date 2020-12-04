@@ -38,12 +38,10 @@ fn main() {
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
-    let scanner = Scanner::new();
-    let parser = Parser::new();
-    let mut awk_line = String::new();
-    let mut awk_input = String::new();
-
     loop {
+        let mut awk_line = String::new();
+        let mut awk_input = String::new();
+
         print!("r-awk > ");
         io::stdout().flush().expect("Unable to flush STDOUT!");
 
@@ -51,8 +49,11 @@ fn run_prompt() {
             .read_line(&mut awk_line)
             .expect("failed to get r-awk line");
         print!("r-awk line to process: {}", awk_line);
-        let tokens: Vec<Token> = scanner.scan(&awk_line);
-        parser.parse(tokens);
+        let scanner = Scanner::new(awk_line);
+        let tokens: Vec<Token> = scanner.scan();
+        let mut parser = Parser::new(tokens.iter());
+        parser.parse();
+
         while !awk_input.contains("STOP!") {
             print!("Input Data (type STOP! to end data input) >> ");
             io::stdout().flush().expect("Unable to flush STDOUT!");
@@ -64,7 +65,5 @@ fn run_prompt() {
                 .expect("failed to get r-awk input!");
             print!("Received Data: {}", awk_input);
         }
-        awk_input.clear();
-        awk_line.clear();
     }
 }

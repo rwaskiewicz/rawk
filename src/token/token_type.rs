@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TokenType {
     // Keywords
     Begin, // 'BEGIN'
@@ -62,4 +62,7 @@ pub enum TokenType {
     // Variable Character Tokens
     Number,
     Identifier,
+
+    // End of File
+    Eof,
 }

@@ -4,11 +4,12 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Scanner {
+    input: String,
     keywords: HashMap<&'static str, &'static TokenType>,
 }
 
 impl Scanner {
-    pub fn new() -> Scanner {
+    pub fn new(input: String) -> Scanner {
         let mut keywords: HashMap<&str, &TokenType> = HashMap::new();
         keywords.insert("BEGIN", &TokenType::Begin);
         keywords.insert("END", &TokenType::End);
@@ -30,15 +31,16 @@ impl Scanner {
         keywords.insert("GETLINE", &TokenType::GetLine);
         keywords.shrink_to_fit();
 
-        Scanner { keywords }
+        Scanner { input, keywords }
     }
 
-    pub fn scan(&self, input: &str) -> Vec<Token> {
+    pub fn scan(&self) -> Vec<Token> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut current_line = 1;
 
-        let mut char_stream = input.chars().peekable();
-        while let Some(_) = char_stream.peek() {
+        let mut char_stream = self.input.chars().peekable();
+        while char_stream.peek().is_some() {
+            // TODO: This is _technically_ OK I think, but heed the RustDoc and see if there's a better solution once the build is working again
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             match ch {
@@ -193,8 +195,10 @@ impl Scanner {
                             }
                         }
 
-                        // TODO: Support scientific (exponential) notation like 0.707E-1, 1E1, 1e6
+                        // TODO: Support scientific (exponential) notation like 0.707E-1, 1E1, 1e6, 1E
                         // Note that 'e' can be cased however, and may occur before or after the dot
+                        // I'm unsure if that belongs in the parser or the scanner TBH - 1Ehello prints
+                        // just '1' with `echo 'oo' | awk '{print 1Ehello}'`
 
                         // TODO: This still doesn't feel right
                         if let Some(maybe_dot) = char_stream.peek() {
@@ -267,14 +271,14 @@ mod lexing {
 
     #[test]
     fn it_returns_an_empty_vector_for_empty_input() {
-        let tokens = Scanner::new().scan("");
+        let tokens = Scanner::new(String::from("")).scan();
 
         assert_eq!(tokens.len(), 0);
     }
 
     #[test]
     fn it_parses_a_pound() {
-        let tokens = Scanner::new().scan("#");
+        let tokens = Scanner::new(String::from("#")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -288,7 +292,7 @@ mod lexing {
 
     #[test]
     fn it_parses_comment_as_a_string() {
-        let tokens = Scanner::new().scan("{print} # this print is important");
+        let tokens = Scanner::new(String::from("{print} # this print is important")).scan();
         let mut token_iter = tokens.iter();
 
         assert_eq!(tokens.len(), 4);
@@ -324,7 +328,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_single_quote() {
-        let tokens = Scanner::new().scan("\'");
+        let tokens = Scanner::new(String::from("\'")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -338,7 +342,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_double_quote() {
-        let tokens = Scanner::new().scan("\"");
+        let tokens = Scanner::new(String::from("\"")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -352,7 +356,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_slash() {
-        let tokens = Scanner::new().scan("/");
+        let tokens = Scanner::new(String::from("/")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -392,12 +396,11 @@ mod lexing {
             ("=", &TokenType::Equals),
         ];
 
-        let scanner = Scanner::new();
         for test_case in test_cases.iter() {
             let token = test_case.0;
             let token_type = test_case.1;
 
-            let tokens = scanner.scan(token);
+            let tokens = Scanner::new(String::from(token)).scan();
 
             assert_eq!(tokens.len(), 1);
             assert_eq!(
@@ -412,7 +415,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_single_digit_number() {
-        let tokens = Scanner::new().scan("1");
+        let tokens = Scanner::new(String::from("1")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -426,7 +429,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_double_digit_number() {
-        let tokens = Scanner::new().scan("123");
+        let tokens = Scanner::new(String::from("123")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -440,7 +443,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_number_with_leading_zero() {
-        let tokens = Scanner::new().scan("01");
+        let tokens = Scanner::new(String::from("01")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -454,7 +457,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_floating_point_number() {
-        let tokens = Scanner::new().scan("1.0");
+        let tokens = Scanner::new(String::from("1.0")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -468,7 +471,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_floating_point_number_with_many_base_digits() {
-        let tokens = Scanner::new().scan("987.2");
+        let tokens = Scanner::new(String::from("987.2")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -482,7 +485,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_floating_point_number_with_many_fractional_digits() {
-        let tokens = Scanner::new().scan("1.09876");
+        let tokens = Scanner::new(String::from("1.09876")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -496,7 +499,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_number_without_a_fraction() {
-        let tokens = Scanner::new().scan("1.");
+        let tokens = Scanner::new(String::from("1.")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -510,7 +513,7 @@ mod lexing {
 
     #[test]
     fn it_stops_parsing_a_number_at_whitespace() {
-        let tokens = Scanner::new().scan("1 > 0");
+        let tokens = Scanner::new(String::from("1 > 0")).scan();
         let mut token_iter = tokens.iter();
 
         assert_eq!(tokens.len(), 3);
@@ -539,7 +542,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_number_with_a_comma_into_two() {
-        let tokens = Scanner::new().scan("1,000");
+        let tokens = Scanner::new(String::from("1,000")).scan();
         let mut token_iter = tokens.iter();
 
         assert_eq!(tokens.len(), 3);
@@ -589,12 +592,11 @@ mod lexing {
             ("GETLINE", &TokenType::GetLine),
         ];
 
-        let scanner = Scanner::new();
         for test_case in test_cases.iter() {
             let token = test_case.0;
             let token_type = test_case.1;
 
-            let tokens = scanner.scan(token);
+            let tokens = Scanner::new(String::from(token)).scan();
 
             assert_eq!(tokens.len(), 1);
             assert_eq!(
@@ -609,7 +611,7 @@ mod lexing {
 
     #[test]
     fn it_parses_case_sensitive_keyboards_as_identifiers() {
-        let tokens = Scanner::new().scan("PRINT");
+        let tokens = Scanner::new(String::from("PRINT")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -623,7 +625,7 @@ mod lexing {
 
     #[test]
     fn it_parses_an_identifier_with_numbers() {
-        let tokens = Scanner::new().scan("h3ll0");
+        let tokens = Scanner::new(String::from("h3ll0")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -637,7 +639,7 @@ mod lexing {
 
     #[test]
     fn it_parses_an_identifier_with_underscores() {
-        let tokens = Scanner::new().scan("hello_world");
+        let tokens = Scanner::new(String::from("hello_world")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -651,7 +653,7 @@ mod lexing {
 
     #[test]
     fn it_parses_an_identifier_with_uppercase_letters() {
-        let tokens = Scanner::new().scan("Hello");
+        let tokens = Scanner::new(String::from("Hello")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
@@ -665,7 +667,7 @@ mod lexing {
 
     #[test]
     fn it_parses_an_identifier_with_numbers_separately() {
-        let tokens = Scanner::new().scan("1Hello");
+        let tokens = Scanner::new(String::from("1Hello")).scan();
         let mut token_iter = tokens.iter();
 
         assert_eq!(tokens.len(), 2);
@@ -687,7 +689,7 @@ mod lexing {
 
     #[test]
     fn it_parses_a_small_program() {
-        let tokens = Scanner::new().scan("'1 > 0 { print; }' # print is cool");
+        let tokens = Scanner::new(String::from("'1 > 0 { print; }' # print is cool")).scan();
         let mut token_iter = tokens.iter();
 
         assert_eq!(tokens.len(), 10);
