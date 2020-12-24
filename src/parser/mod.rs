@@ -3,8 +3,10 @@
 //! The parser is implemented as a Pratt Parser, and is heavily modeled after the one given in
 //! "Crafting Interpreters" in the second half of the book.
 
+use crate::chunk::{Chunk, OpCode};
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
+use crate::value::Value;
 use std::fmt::Debug;
 use std::slice::Iter;
 
@@ -69,6 +71,7 @@ pub struct Parser<'a> {
     current_token: Option<&'a Token>,
     previous_token: Option<&'a Token>,
     tokens_iter: Iter<'a, Token>,
+    compiling_chunk: &'a mut Chunk,
 }
 
 impl<'a> Parser<'a> {
@@ -76,11 +79,12 @@ impl<'a> Parser<'a> {
     ///
     /// # Arguments
     /// - `tokens` a slice iterator of [Token]s
-    pub fn new(tokens: Iter<'a, Token>) -> Parser<'a> {
+    pub fn new(tokens: Iter<'a, Token>, compiling_chunk: &'a mut Chunk) -> Parser<'a> {
         Parser {
             current_token: None,
             previous_token: None,
             tokens_iter: tokens,
+            compiling_chunk,
         }
     }
 
@@ -94,7 +98,7 @@ impl<'a> Parser<'a> {
         self.advance();
         self.expression();
         self.consume(&TokenType::Eof, "Expect end of expression token");
-
+        self.end_compiler();
         // TODO This, stop making a liar out of the doc
         true
     }
@@ -228,7 +232,7 @@ impl<'a> Parser<'a> {
         self.parse_precedence(Precedence::Unary);
 
         match operator_type {
-            TokenType::Minus => self.emit_constant('-'),
+            TokenType::Minus => self.emit_byte(OpCode::Negate),
             _ => return,
         }
     }
@@ -249,10 +253,10 @@ impl<'a> Parser<'a> {
         self.parse_precedence(Precedence::get_next_precedence(rule.infix_precedence));
 
         match operator_type {
-            TokenType::Plus => self.emit_byte(TokenType::Plus),
-            TokenType::Minus => self.emit_byte(TokenType::Minus),
-            TokenType::Star => self.emit_byte(TokenType::Star),
-            TokenType::Slash => self.emit_byte(TokenType::Slash),
+            TokenType::Plus => self.emit_byte(OpCode::Add),
+            TokenType::Minus => self.emit_byte(OpCode::Subtract),
+            TokenType::Star => self.emit_byte(OpCode::Multiply),
+            TokenType::Slash => self.emit_byte(OpCode::Divide),
             _ => return,
         }
     }
@@ -275,22 +279,17 @@ impl<'a> Parser<'a> {
     ///
     /// # Arguments
     /// - `value` the constant to emit bytes for
-    fn emit_constant<T>(&self, value: T)
-    where
-        T: Debug,
-    {
-        self.emit_byte(value);
+    fn emit_constant(&mut self, value: Value) {
+        // TODO: This is a tad different from CI
+        self.emit_byte(OpCode::OpConstant(value));
     }
 
     /// Helper function to emit bytes
     ///
     /// # Arguments
-    /// - `value` the value to emit the bytes for
-    fn emit_byte<T>(&self, value: T)
-    where
-        T: Debug,
-    {
-        println!("Need to emit {:#?}", value);
+    /// - `op_code` the value to emit the bytes for
+    fn emit_byte(&mut self, op_code: OpCode) {
+        self.compiling_chunk.write_chunk(op_code, 123);
     }
 
     // TODO: Work on error handling
@@ -309,6 +308,14 @@ impl<'a> Parser<'a> {
             *token.expect("UNKNOWN"),
             message
         )
+    }
+
+    fn emit_return(&mut self) {
+        self.emit_byte(OpCode::OpReturn);
+    }
+
+    fn end_compiler(&mut self) {
+        self.emit_return();
     }
 }
 

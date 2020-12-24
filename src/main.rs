@@ -1,8 +1,13 @@
+mod chunk;
 mod parser;
 mod scanner;
 mod token;
+mod value;
+mod vm;
 
+use crate::chunk::{Chunk, OpCode};
 use crate::token::token::Token;
+use crate::vm::VM;
 use clap::{App, Arg};
 use parser::Parser;
 use scanner::Scanner;
@@ -35,6 +40,15 @@ fn main() {
     println!("Hello, world!");
 }
 
+fn disassemble_chunk() {
+    let mut chunk = Chunk::new();
+    let constant = chunk.add_constant(1.2);
+    chunk.write_chunk(OpCode::OpConstant(constant), 123);
+
+    chunk.write_chunk(OpCode::OpReturn, 123);
+    chunk.disassemble_chunk("test chunk");
+}
+
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
@@ -49,10 +63,9 @@ fn run_prompt() {
             .read_line(&mut awk_line)
             .expect("failed to get r-awk line");
         print!("r-awk line to process: {}", awk_line);
-        let scanner = Scanner::new(awk_line);
-        let tokens: Vec<Token> = scanner.scan();
-        let mut parser = Parser::new(tokens.iter());
-        parser.parse();
+
+        let mut vm = VM::new();
+        vm.interpret(awk_line);
 
         while !awk_input.contains("STOP!") {
             print!("Input Data (type STOP! to end data input) >> ");
