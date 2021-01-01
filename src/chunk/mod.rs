@@ -36,10 +36,10 @@ impl Chunk {
         self.code.push(CodeLine { code, line });
     }
 
-    pub fn add_constant(&mut self, value: value::Value) -> value::Value {
+    pub fn add_constant(&mut self, value: value::Value) -> usize {
         self.constants.push(value);
         // return the constant where the index was appended so we can locate it later
-        return (self.constants.len() - 1) as value::Value;
+        return self.constants.len() - 1;
     }
 
     pub fn disassemble_chunk(&self, name: &str) {
@@ -81,12 +81,12 @@ impl Chunk {
 
     fn constant_instruction(&self, name: &str, offset: usize) -> usize {
         let constant = self.constants[offset]; // TODO: +1 ?
-        println!("{} {}", name, constant);
+        println!("{} {:#?}", name, constant);
         // self.print_value(self.constants[constant as usize]);
         return offset + 1; // TODO??? + 2
     }
 
     fn print_value(&self, value: value::Value) {
-        print!("{}", value);
+        print!("{:#?}", value);
     }
 }

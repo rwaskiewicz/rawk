@@ -6,8 +6,8 @@ A subset of [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://w
 The project is currently compiled using `rustc 1.48.0 (7eac88abb 2020-11-16)`
 
 At this time, only running the REPL is supported as the project is in active development.
-```shell
-$ cargo run
+```commandline
+cargo run
 r-awk - a subset of awk written in Rust
 r-awk >
 ```

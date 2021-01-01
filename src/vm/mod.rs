@@ -2,7 +2,7 @@ use crate::chunk::{Chunk, OpCode};
 use crate::parser::Parser;
 use crate::scanner::Scanner;
 use crate::token::token::Token;
-use crate::value::Value;
+use crate::value::{As, Value, ValueType};
 
 pub enum InterpretResult {
     Ok,
@@ -35,7 +35,7 @@ impl VM {
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {
                     Some(val) => {
-                        println!("{}", val);
+                        println!("{:#?}", val);
                         return InterpretResult::Ok;
                     }
                     None => {
@@ -71,19 +71,65 @@ impl VM {
     }
 
     fn binary_op(&mut self, op_code: &OpCode) -> () {
-        let b: f32 = self.stack.pop().expect("This should be a number!");
-        let a: f32 = self.stack.pop().expect("This should be a number!");
-        match op_code {
-            &OpCode::Add => self.stack.push(a + b),
-            &OpCode::Subtract => self.stack.push(a - b),
-            &OpCode::Multiply => self.stack.push(a * b),
-            &OpCode::Divide => self.stack.push(a / b),
-            _ => panic!("Unknown op code given for binary {:?}", op_code),
+        if self.peek(0).value_type != ValueType::Number
+            || self.peek(1).value_type != ValueType::Number
+        {
+            eprintln!("Both operands must be numbers.");
+            panic!("Both operands must be numbers."); // TODO: Return Runtime Error
+        }
+        unsafe {
+            let b: f32 = self
+                .stack
+                .pop()
+                .expect("This should be a number!")
+                .type_as
+                .number;
+            let a: f32 = self
+                .stack
+                .pop()
+                .expect("This should be a number!")
+                .type_as
+                .number;
+            match op_code {
+                &OpCode::Add => self
+                    .stack
+                    .push(Value::new(ValueType::Number, As { number: a + b })),
+                &OpCode::Subtract => self
+                    .stack
+                    .push(Value::new(ValueType::Number, As { number: a - b })),
+                &OpCode::Multiply => self
+                    .stack
+                    .push(Value::new(ValueType::Number, As { number: a * b })),
+                &OpCode::Divide => self
+                    .stack
+                    .push(Value::new(ValueType::Number, As { number: a / b })),
+                _ => panic!("Unknown op code given for binary {:?}", op_code),
+            }
         }
     }
 
     fn unary_op(&mut self) -> () {
-        let a: f32 = self.stack.pop().expect("This should be a number!");
-        self.stack.push(-a);
+        if self.peek(0).value_type != ValueType::Number {
+            eprintln!("Unary operand must be a number.");
+            panic!("Unary operand must be a number.");
+        }
+        unsafe {
+            let a: f32 = self
+                .stack
+                .pop()
+                .expect("This should be a number!")
+                .type_as
+                .number;
+            self.stack
+                .push(Value::new(ValueType::Number, As { number: -a }));
+        }
+    }
+
+    fn peek(&mut self, distance: usize) -> &Value {
+        let last_index = self.stack.len() - 1;
+        return self
+            .stack
+            .get(last_index - distance)
+            .expect("Unable to peek at stack!");
     }
 }
