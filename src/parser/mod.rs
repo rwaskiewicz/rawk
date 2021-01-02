@@ -6,7 +6,7 @@
 use crate::chunk::{Chunk, OpCode};
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
-use crate::value::{As, Value, ValueType};
+use crate::value::Value;
 use std::fmt::Debug;
 use std::slice::Iter;
 
@@ -216,7 +216,7 @@ impl<'a> Parser<'a> {
             .expect("No lexeme for number found!");
         let number: f32 = str::parse(raw_lexeme.as_str())
             .expect(&format!("Unable to convert {} to f32", raw_lexeme));
-        self.emit_constant(Value::new(ValueType::Number, As { number }));
+        self.emit_constant(Value::Number(number));
     }
 
     // TODO: Update this

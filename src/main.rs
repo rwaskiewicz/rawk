@@ -5,12 +5,8 @@ mod token;
 mod value;
 mod vm;
 
-use crate::chunk::{Chunk, OpCode};
-use crate::token::token::Token;
 use crate::vm::VM;
 use clap::{App, Arg};
-use parser::Parser;
-use scanner::Scanner;
 use std::io;
 use std::io::Write;
 
