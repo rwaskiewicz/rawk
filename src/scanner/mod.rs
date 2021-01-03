@@ -108,7 +108,6 @@ impl Scanner {
                                 // TODO: Handle EOF/unterminated string
                                 ch = next_ch;
                                 string_parsed.push(ch);
-                                char_stream.next();
                                 break;
                             }
                             ch = next_ch;
@@ -370,6 +369,28 @@ mod lexing {
             Some(&Token {
                 lexeme: Some(String::from("\"Hello World!\"")),
                 token_type: &TokenType::DoubleQuote
+            })
+        );
+    }
+
+    #[test]
+    fn it_does_not_swallow_items_after_closing_a_double_quote() {
+        let tokens = Scanner::new(String::from("\"Hello World!\"42")).scan();
+        let mut token_iter = tokens.iter();
+
+        assert_eq!(token_iter.len(), 2);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("\"Hello World!\"")),
+                token_type: &TokenType::DoubleQuote
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("42")),
+                token_type: &TokenType::Number
             })
         );
     }
