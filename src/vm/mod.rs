@@ -49,14 +49,13 @@ impl VM {
                 OpCode::Divide => self.binary_op(&instruction),
                 OpCode::Negate => self.unary_op(),
                 OpCode::OpConstant(val) => self.stack.push(val),
-                _ => (),
             }
         }
-        return InterpretResult::Ok;
+        InterpretResult::Ok
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-        let mut scanner = Scanner::new(source);
+        let scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan();
 
         // TODO: This feels dirty
@@ -67,10 +66,10 @@ impl VM {
             return InterpretResult::CompileError;
         }
 
-        return self.run();
+        self.run()
     }
 
-    fn binary_op(&mut self, op_code: &OpCode) -> () {
+    fn binary_op(&mut self, op_code: &OpCode) {
         if !matches!(self.peek(0), Value::Number(_)) || !matches!(self.peek(1), Value::Number(_)) {
             eprintln!("Both operands must be numbers.");
             panic!("Both operands must be numbers."); // TODO: Return Runtime Error
@@ -78,18 +77,18 @@ impl VM {
 
         if let Value::Number(b) = self.stack.pop().unwrap() {
             if let Value::Number(a) = self.stack.pop().unwrap() {
-                match op_code {
-                    &OpCode::Add => self.stack.push(Value::Number(a + b)),
-                    &OpCode::Subtract => self.stack.push(Value::Number(a - b)),
-                    &OpCode::Multiply => self.stack.push(Value::Number(a * b)),
-                    &OpCode::Divide => self.stack.push(Value::Number(a / b)),
+                match *op_code {
+                    OpCode::Add => self.stack.push(Value::Number(a + b)),
+                    OpCode::Subtract => self.stack.push(Value::Number(a - b)),
+                    OpCode::Multiply => self.stack.push(Value::Number(a * b)),
+                    OpCode::Divide => self.stack.push(Value::Number(a / b)),
                     _ => panic!("Unknown op code given for binary {:?}", op_code),
                 }
             }
         }
     }
 
-    fn unary_op(&mut self) -> () {
+    fn unary_op(&mut self) {
         if !matches!(self.peek(0), Value::Number(_)) {
             eprintln!("Unary operand must be a number.");
             panic!("Unary operand must be a number.");

@@ -39,7 +39,7 @@ impl Chunk {
     pub fn add_constant(&mut self, value: value::Value) -> usize {
         self.constants.push(value);
         // return the constant where the index was appended so we can locate it later
-        return self.constants.len() - 1;
+        self.constants.len() - 1
     }
 
     pub fn disassemble_chunk(&self, name: &str) {
@@ -61,15 +61,11 @@ impl Chunk {
 
         let instruction: &OpCode = &self.code.get(offset).unwrap().code;
         match instruction {
-            OpCode::OpConstant(_) => {
-                return self.constant_instruction("OP_CONSTANT", offset);
-            }
-            OpCode::OpReturn => {
-                return Chunk::simple_instruction("OP_RETURN", offset);
-            }
+            OpCode::OpConstant(_) => self.constant_instruction("OP_CONSTANT", offset),
+            OpCode::OpReturn => Chunk::simple_instruction("OP_RETURN", offset),
             _ => {
                 println!("Unknown opcode {:#?}!", instruction);
-                return offset + 1;
+                offset + 1
             }
         }
     }
@@ -82,7 +78,7 @@ impl Chunk {
     fn constant_instruction(&self, name: &str, offset: usize) -> usize {
         let constant = &self.constants[offset]; // TODO: +1 ?
         println!("{} {:#?}", name, constant);
-        return offset + 1; // TODO??? + 2
+        offset + 1 // TODO??? + 2
     }
 
     fn print_value(&self, value: value::Value) {

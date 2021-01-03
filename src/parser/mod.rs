@@ -122,10 +122,12 @@ impl<'a> Parser<'a> {
         let prefix_rule = self
             .get_rule(self.previous_token.expect("missing token").token_type)
             .prefix_parse_fn
-            .expect(&format!(
-                "No function found for {:#?}!",
-                self.previous_token.unwrap().token_type
-            ));
+            .unwrap_or_else(|| {
+                panic!(
+                    "No function found for {:#?}!",
+                    self.previous_token.unwrap().token_type
+                )
+            });
         // if the parse rule does not exist, we should do something when we unwrap
         prefix_rule(self);
 
@@ -138,10 +140,12 @@ impl<'a> Parser<'a> {
             let infix_rule = self
                 .get_rule(self.previous_token.expect("No Token was found!").token_type)
                 .infix_parse_fn
-                .expect(&format!(
-                    "No function found for {:#?}!",
-                    self.previous_token.unwrap().token_type
-                ));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "No function found for {:#?}!",
+                        self.previous_token.unwrap().token_type
+                    )
+                });
             infix_rule(self);
         }
     }
@@ -166,17 +170,15 @@ impl<'a> Parser<'a> {
     fn advance(&mut self) {
         self.previous_token = self.current_token;
 
-        loop {
-            // TODO: This loop assumes that calling the error message fn will be non-blocking
-            self.current_token = self.tokens_iter.next().or(Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Eof,
-            }));
-            break;
-            // TODO: We break because we assume we didn't find a TOKEN_ERROR, which does not exist
-            // in this implementation at this time.  Report the `start` value
-            // self.error_at_current()
-        }
+        // TODO: Restore `loop` that assumes that calling the error message fn will be non-blocking
+        self.current_token = self.tokens_iter.next().or(Some(&Token {
+            lexeme: None,
+            token_type: &TokenType::Eof,
+        }));
+        // TODO: We break because we assume we didn't find a TOKEN_ERROR, which does not exist
+        // in this implementation at this time.  Report the `start` value
+        // break;
+        // self.error_at_current()
     }
 
     /// Determines whether the pointer to the `current_token` is of some expected type or not
@@ -215,7 +217,7 @@ impl<'a> Parser<'a> {
             .as_ref()
             .expect("No lexeme for number found!");
         let number: f32 = str::parse(raw_lexeme.as_str())
-            .expect(&format!("Unable to convert {} to f32", raw_lexeme));
+            .unwrap_or_else(|err| panic!("Unable to convert {} to f32 - {}", raw_lexeme, err));
         self.emit_constant(Value::Number(number));
     }
 
@@ -246,9 +248,8 @@ impl<'a> Parser<'a> {
         // this also allows for nesting unary expressions, like `--2`
         self.parse_precedence(Precedence::Unary);
 
-        match operator_type {
-            TokenType::Minus => self.emit_byte(OpCode::Negate),
-            _ => return,
+        if let TokenType::Minus = operator_type {
+            self.emit_byte(OpCode::Negate)
         }
     }
 
@@ -272,7 +273,7 @@ impl<'a> Parser<'a> {
             TokenType::Minus => self.emit_byte(OpCode::Subtract),
             TokenType::Star => self.emit_byte(OpCode::Multiply),
             TokenType::Slash => self.emit_byte(OpCode::Divide),
-            _ => return,
+            _ => {}
         }
     }
 
