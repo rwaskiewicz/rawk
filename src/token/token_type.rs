@@ -65,4 +65,7 @@ pub enum TokenType {
 
     // End of File
     Eof,
+
+    // Synthetic Error
+    Error,
 }

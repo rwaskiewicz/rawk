@@ -123,17 +123,15 @@ impl<'a> Parser<'a> {
         self.advance();
         // the first token is always going to belong to some kind of prefix expression, by
         // definition - although it may be nested as an operand in 1+ infix expressions
-        let prefix_rule = self
+        let maybe_prefix_rule = &self
             .get_rule(self.previous_token.expect("missing token").token_type)
-            .prefix_parse_fn
-            .unwrap_or_else(|| {
-                self.error_at_previous("Expect expression.");
-                panic!(
-                    "No function found for {:#?}!",
-                    self.previous_token.unwrap().token_type
-                )
-            });
-        // if the parse rule does not exist, we should do something when we unwrap
+            .prefix_parse_fn;
+        if maybe_prefix_rule.is_none() {
+            self.error_at_previous("Expect expression.");
+            return;
+        }
+
+        let prefix_rule = maybe_prefix_rule.unwrap();
         prefix_rule(self);
 
         while precedence
@@ -142,15 +140,11 @@ impl<'a> Parser<'a> {
                 .infix_precedence
         {
             self.advance();
-            let infix_rule = self
+            let infix_rule = &self
                 .get_rule(self.previous_token.expect("No Token was found!").token_type)
                 .infix_parse_fn
-                .unwrap_or_else(|| {
-                    panic!(
-                        "No function found for {:#?}!",
-                        self.previous_token.unwrap().token_type
-                    )
-                });
+                .unwrap();
+
             infix_rule(self);
         }
     }
@@ -175,15 +169,21 @@ impl<'a> Parser<'a> {
     fn advance(&mut self) {
         self.previous_token = self.current_token;
 
-        // TODO: Restore `loop` that assumes that calling the error message fn will be non-blocking
-        self.current_token = self.tokens_iter.next().or(Some(&Token {
-            lexeme: None,
-            token_type: &TokenType::Eof,
-        }));
-        // TODO: We break because we assume we didn't find a TOKEN_ERROR, which does not exist
-        // in this implementation at this time.  Report the `start` value
-        // break;
-        // self.error_at_current()
+        // our scanner will emit 'EOF' tokens once, so if we've detected it, don't try to consume
+        // anything else
+        if self.current_token.is_some() && self.current_token.unwrap().token_type == &TokenType::Eof
+        {
+            return;
+        }
+
+        loop {
+            self.current_token = self.tokens_iter.next();
+
+            if self.current_token.unwrap().token_type != &TokenType::Error {
+                break;
+            }
+            self.error_at_current("An error token was discovered.");
+        }
     }
 
     /// Determines whether the pointer to the `current_token` is of some expected type or not
@@ -241,7 +241,6 @@ impl<'a> Parser<'a> {
         ));
     }
 
-    // TODO: Update this
     /// Emits the correct token while parsing a unary expression - e.g. `-42`
     ///
     /// Assumes that a [Token#structfield_token_type] that can be used within a unary expression has
@@ -310,43 +309,63 @@ impl<'a> Parser<'a> {
     /// # Arguments
     /// - `op_code` the value to emit the bytes for
     fn emit_byte(&mut self, op_code: OpCode) {
-        // TODO: Line numbers
-        self.compiling_chunk.write_chunk(op_code, 123);
+        self.compiling_chunk
+            .write_chunk(op_code, self.previous_token.unwrap().line);
     }
 
+    /// Helper function for reporting an error at the current token
+    ///
+    /// # Arguments
+    /// - `message` the message to relay to the user
     fn error_at_current(&mut self, message: &str) {
         // TODO: This clone does not seem like the right thing to do
         self.error_at(&self.current_token.clone(), message)
     }
 
+    /// Helper function for reporting an error at the previous token
+    ///
+    /// # Arguments
+    /// - `message` the message to relay to the user
     fn error_at_previous(&mut self, message: &str) {
         // TODO: This clone does not seem like the right thing to do
         self.error_at(&self.previous_token.clone(), message)
     }
 
+    /// Reports an error found for a provided token
+    ///
+    /// Information from the provided token will be extracted as a part of the error message, making
+    /// it imperative that the line number, token type, etc. are accurately set
+    ///
+    /// Sets [Parser#structfield.had_error]
+    ///
+    /// If the compiler is currently in [Parser#structfield.panic_mode], error messages will be
+    /// suppressed
+    ///
+    /// # Arguments
+    /// - `token` the token that the error was reported to have occurred on
+    /// - `message` the message to relay to the user
     fn error_at(&mut self, token: &Option<&Token>, message: &str) {
         if self.panic_mode {
             return;
         }
         self.panic_mode = true;
 
-        // TODO: Line numbers - this would come from the token
-        let mut error_msg = format!("[line {}] Error", 123);
-        match token.unwrap().token_type {
+        let unwrapped_token = token.unwrap();
+        let mut error_msg = format!("[line {}] Error", unwrapped_token.line);
+        match unwrapped_token.token_type {
             TokenType::Eof => {
                 error_msg.push_str(" at end");
             }
             _ => {
                 error_msg.push_str(&format!(
-                    " at {}",
-                    token
-                        .unwrap()
-                        .lexeme
-                        .as_ref()
-                        .unwrap_or(&String::from("IDK"))
+                    " at '{}'", // TODO: This is not exactly graceful on newlines
+                    unwrapped_token.lexeme.as_ref().unwrap_or(&String::from(
+                        "TODO: This is a shortsighted part of the lexeme"
+                    ))
                 ));
             }
         }
+
         error_msg.push_str(&format!(": {}", message));
         eprintln!("{}", error_msg.as_str());
 
@@ -367,7 +386,7 @@ impl<'a> Parser<'a> {
 ///
 /// When an infix expression function from this table is called, it's left hand side (LHS) has
 /// already been compiled and the infix operator consumed.
-const PARSE_RULES: [ParseRule; 47] = [
+const PARSE_RULES: [ParseRule; 48] = [
     // BEGIN
     ParseRule {
         prefix_parse_fn: None,
@@ -645,6 +664,12 @@ const PARSE_RULES: [ParseRule; 47] = [
         infix_precedence: Precedence::None,
     },
     // eof
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // error
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,

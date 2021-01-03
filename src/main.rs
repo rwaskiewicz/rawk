@@ -5,7 +5,7 @@ mod token;
 mod value;
 mod vm;
 
-use crate::vm::VM;
+use crate::vm::{InterpretResult, VM};
 use clap::{App, Arg};
 use std::io;
 use std::io::Write;
@@ -41,7 +41,7 @@ fn run_prompt() {
 
     loop {
         let mut awk_line = String::new();
-        let mut awk_input = String::new();
+        let mut data_input = String::new();
 
         print!("r-awk > ");
         io::stdout().flush().expect("Unable to flush STDOUT!");
@@ -52,18 +52,18 @@ fn run_prompt() {
         print!("r-awk line to process: {}", awk_line);
 
         let mut vm = VM::new();
-        vm.interpret(awk_line);
+        let result = vm.interpret(awk_line);
 
-        while !awk_input.contains("STOP!") {
+        while result == InterpretResult::Ok && !data_input.contains("STOP!") {
             print!("Input Data (type STOP! to end data input) >> ");
             io::stdout().flush().expect("Unable to flush STDOUT!");
 
-            awk_input.clear();
+            data_input.clear();
 
             io::stdin()
-                .read_line(&mut awk_input)
+                .read_line(&mut data_input)
                 .expect("failed to get r-awk input!");
-            print!("Received Data: {}", awk_input);
+            print!("Received Data: {}", data_input);
         }
     }
 }

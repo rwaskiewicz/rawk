@@ -40,7 +40,8 @@ impl Scanner {
 
         let mut char_stream = self.input.chars().peekable();
         while char_stream.peek().is_some() {
-            // TODO: This is _technically_ OK I think, but heed the RustDoc and see if there's a better solution once the build is working again
+            // TODO: This is _technically_ OK I think, but heed the RustDoc and see if there's a
+            // better solution once the build is working again
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             match ch {
@@ -54,45 +55,53 @@ impl Scanner {
                 }
                 ';' => {
                     Scanner::report_scanned_character(ch, &TokenType::Semicolon);
-                    tokens.push(Token::new(None, &TokenType::Semicolon));
+                    tokens.push(Token::new(None, &TokenType::Semicolon, current_line));
                 }
                 ',' => {
                     Scanner::report_scanned_character(ch, &TokenType::Comma);
-                    tokens.push(Token::new(None, &TokenType::Comma));
+                    tokens.push(Token::new(None, &TokenType::Comma, current_line));
                 }
                 '#' => {
                     // consume the rest of the line, as we've found a comment
                     char_stream.find(|x| x == &'\n');
                     Scanner::report_scanned_character(ch, &TokenType::Pound);
-                    tokens.push(Token::new(None, &TokenType::Pound));
+                    tokens.push(Token::new(None, &TokenType::Pound, current_line));
                 }
                 '{' => {
                     Scanner::report_scanned_character(ch, &TokenType::LeftCurly);
-                    tokens.push(Token::new(None, &TokenType::LeftCurly));
+                    tokens.push(Token::new(None, &TokenType::LeftCurly, current_line));
                 }
                 '}' => {
                     Scanner::report_scanned_character(ch, &TokenType::RightCurly);
-                    tokens.push(Token::new(None, &TokenType::RightCurly));
+                    tokens.push(Token::new(None, &TokenType::RightCurly, current_line));
                 }
                 '[' => {
                     Scanner::report_scanned_character(ch, &TokenType::LeftSquareBracket);
-                    tokens.push(Token::new(None, &TokenType::LeftSquareBracket));
+                    tokens.push(Token::new(
+                        None,
+                        &TokenType::LeftSquareBracket,
+                        current_line,
+                    ));
                 }
                 ']' => {
                     Scanner::report_scanned_character(ch, &TokenType::RightSquareBracket);
-                    tokens.push(Token::new(None, &TokenType::RightSquareBracket));
+                    tokens.push(Token::new(
+                        None,
+                        &TokenType::RightSquareBracket,
+                        current_line,
+                    ));
                 }
                 '(' => {
                     Scanner::report_scanned_character(ch, &TokenType::LeftParenthesis);
-                    tokens.push(Token::new(None, &TokenType::LeftParenthesis));
+                    tokens.push(Token::new(None, &TokenType::LeftParenthesis, current_line));
                 }
                 ')' => {
                     Scanner::report_scanned_character(ch, &TokenType::RightParenthesis);
-                    tokens.push(Token::new(None, &TokenType::RightParenthesis));
+                    tokens.push(Token::new(None, &TokenType::RightParenthesis, current_line));
                 }
                 '\'' => {
                     Scanner::report_scanned_character(ch, &TokenType::SingleQuote);
-                    tokens.push(Token::new(None, &TokenType::SingleQuote));
+                    tokens.push(Token::new(None, &TokenType::SingleQuote, current_line));
                 }
                 '\"' => {
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
@@ -114,85 +123,86 @@ impl Scanner {
                             string_parsed.push(ch);
                         }
                     }
-                    let string_token = Token::new(Some(string_parsed), &TokenType::DoubleQuote);
+                    let string_token =
+                        Token::new(Some(string_parsed), &TokenType::DoubleQuote, current_line);
 
                     tokens.push(string_token);
                 }
                 '>' => {
                     // TODO: Support greater than or equal to '>='
                     Scanner::report_scanned_character(ch, &TokenType::GreaterThan);
-                    tokens.push(Token::new(None, &TokenType::GreaterThan));
+                    tokens.push(Token::new(None, &TokenType::GreaterThan, current_line));
                 }
                 '<' => {
                     // TODO: Support less than or equal to '<='
                     Scanner::report_scanned_character(ch, &TokenType::LessThan);
-                    tokens.push(Token::new(None, &TokenType::LessThan));
+                    tokens.push(Token::new(None, &TokenType::LessThan, current_line));
                 }
                 '=' => {
                     // TODO: Support equal to '=='
                     Scanner::report_scanned_character(ch, &TokenType::Equals);
-                    tokens.push(Token::new(None, &TokenType::Equals));
+                    tokens.push(Token::new(None, &TokenType::Equals, current_line));
                 }
                 '!' => {
                     // TODO: Support not equal to '!='
                     // TODO: Support ERE non-match '!~'
                     Scanner::report_scanned_character(ch, &TokenType::Bang);
-                    tokens.push(Token::new(None, &TokenType::Bang));
+                    tokens.push(Token::new(None, &TokenType::Bang, current_line));
                 }
                 '$' => {
                     Scanner::report_scanned_character(ch, &TokenType::Sigil);
-                    tokens.push(Token::new(None, &TokenType::Sigil));
+                    tokens.push(Token::new(None, &TokenType::Sigil, current_line));
                 }
                 '+' => {
                     // TODO: Support addition assignment '+='
                     // TODO: Support post-increment '++'
                     // TODO: Support pre-increment '++'
                     Scanner::report_scanned_character(ch, &TokenType::Plus);
-                    tokens.push(Token::new(None, &TokenType::Plus));
+                    tokens.push(Token::new(None, &TokenType::Plus, current_line));
                 }
                 '-' => {
                     // TODO: Support subtraction assignment '-='
                     // TODO: Support post-decrement '--'
                     // TODO: Support pre-decrement '--'
                     Scanner::report_scanned_character(ch, &TokenType::Minus);
-                    tokens.push(Token::new(None, &TokenType::Minus));
+                    tokens.push(Token::new(None, &TokenType::Minus, current_line));
                 }
                 '*' => {
                     // TODO: Support multiplication assignment '*='
                     Scanner::report_scanned_character(ch, &TokenType::Star);
-                    tokens.push(Token::new(None, &TokenType::Star));
+                    tokens.push(Token::new(None, &TokenType::Star, current_line));
                 }
                 '/' => {
                     // TODO: Support division assignment '/='
                     Scanner::report_scanned_character(ch, &TokenType::Slash);
-                    tokens.push(Token::new(None, &TokenType::Slash));
+                    tokens.push(Token::new(None, &TokenType::Slash, current_line));
                 }
                 '^' => {
                     // TODO: Support exponentiation assignment '^='
                     // super::report_scanned_token();
                     Scanner::report_scanned_character(ch, &TokenType::Caret);
-                    tokens.push(Token::new(None, &TokenType::Caret));
+                    tokens.push(Token::new(None, &TokenType::Caret, current_line));
                 }
                 '%' => {
                     // TODO: Support modulus assignment '%='
                     Scanner::report_scanned_character(ch, &TokenType::Modulus);
-                    tokens.push(Token::new(None, &TokenType::Modulus));
+                    tokens.push(Token::new(None, &TokenType::Modulus, current_line));
                 }
                 '~' => {
                     Scanner::report_scanned_character(ch, &TokenType::Tilde);
-                    tokens.push(Token::new(None, &TokenType::Tilde));
+                    tokens.push(Token::new(None, &TokenType::Tilde, current_line));
                 }
                 '|' => {
                     Scanner::report_scanned_character(ch, &TokenType::Pipe);
-                    tokens.push(Token::new(None, &TokenType::Pipe));
+                    tokens.push(Token::new(None, &TokenType::Pipe, current_line));
                 }
                 '?' => {
                     Scanner::report_scanned_character(ch, &TokenType::Question);
-                    tokens.push(Token::new(None, &TokenType::Question));
+                    tokens.push(Token::new(None, &TokenType::Question, current_line));
                 }
                 ':' => {
                     Scanner::report_scanned_character(ch, &TokenType::Colon);
-                    tokens.push(Token::new(None, &TokenType::Colon));
+                    tokens.push(Token::new(None, &TokenType::Colon, current_line));
                 }
                 // TODO: Array membership
                 // TODO: Logical AND
@@ -241,7 +251,11 @@ impl Scanner {
 
                         Scanner::report_scanned_string(&num_parsed, &TokenType::Number);
                         // TODO: Store this value in floating point
-                        tokens.push(Token::new(Some(num_parsed), &TokenType::Number));
+                        tokens.push(Token::new(
+                            Some(num_parsed),
+                            &TokenType::Number,
+                            current_line,
+                        ));
                     } else if ch.is_alphabetic() {
                         // TODO: Support underscore for variable names
                         let mut word_parsed = String::from(ch);
@@ -263,13 +277,28 @@ impl Scanner {
                             .unwrap_or(&&TokenType::Identifier);
 
                         Scanner::report_scanned_string(&word_parsed, &type_of_token);
-                        tokens.push(Token::new(Some(word_parsed.clone()), &type_of_token));
+                        tokens.push(Token::new(
+                            Some(word_parsed.clone()),
+                            &type_of_token,
+                            current_line,
+                        ));
                     } else {
-                        println!("ALERT: We found a character we can not handle, '{}'", ch);
+                        eprintln!("ALERT: We found a character we can not handle, '{}'", ch);
+                        tokens.push(Token::error_token(
+                            String::from("Unexpected character."),
+                            current_line,
+                        ));
                     }
                 }
             }
         }
+
+        // Add the EOF token
+        tokens.push(Token::new(
+            Some(String::from("")),
+            &TokenType::Eof,
+            current_line,
+        ));
 
         println!("This is the final list of Tokens {:?}", tokens);
         tokens
@@ -289,22 +318,24 @@ mod lexing {
     use super::*;
 
     #[test]
-    fn it_returns_an_empty_vector_for_empty_input() {
+    fn it_returns_an_end_of_file_token_for_empty_input() {
         let tokens = Scanner::new(String::from("")).scan();
 
-        assert_eq!(tokens.len(), 0);
+        assert_eq!(tokens.len(), 1);
     }
 
     #[test]
     fn it_parses_a_pound() {
         let tokens = Scanner::new(String::from("#")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Pound
+                token_type: &TokenType::Pound,
+                line: 1,
             })
         );
     }
@@ -314,33 +345,38 @@ mod lexing {
         let tokens = Scanner::new(String::from("{print} # this print is important")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 4);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 5);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::LeftCurly
+                token_type: &TokenType::LeftCurly,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("print")),
-                token_type: &TokenType::Print
+                token_type: &TokenType::Print,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::RightCurly
+                token_type: &TokenType::RightCurly,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Pound
+                token_type: &TokenType::Pound,
+                line: 1,
             })
         );
     }
@@ -349,12 +385,14 @@ mod lexing {
     fn it_parses_a_single_quote() {
         let tokens = Scanner::new(String::from("\'")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote,
+                line: 1,
             })
         );
     }
@@ -363,12 +401,14 @@ mod lexing {
     fn it_parses_a_double_quote() {
         let tokens = Scanner::new(String::from("\"Hello World!\"")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("\"Hello World!\"")),
-                token_type: &TokenType::DoubleQuote
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
             })
         );
     }
@@ -378,19 +418,22 @@ mod lexing {
         let tokens = Scanner::new(String::from("\"Hello World!\"42")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(token_iter.len(), 2);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 3);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("\"Hello World!\"")),
-                token_type: &TokenType::DoubleQuote
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("42")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -399,12 +442,14 @@ mod lexing {
     fn it_parses_a_slash() {
         let tokens = Scanner::new(String::from("/")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Slash
+                token_type: &TokenType::Slash,
+                line: 1,
             })
         );
     }
@@ -443,12 +488,14 @@ mod lexing {
 
             let tokens = Scanner::new(String::from(token)).scan();
 
-            assert_eq!(tokens.len(), 1);
+            // +1 for EOF token
+            assert_eq!(tokens.len(), 2);
             assert_eq!(
                 tokens.iter().next(),
                 Some(&Token {
                     lexeme: None,
-                    token_type
+                    token_type,
+                    line: 1,
                 })
             );
         }
@@ -458,26 +505,30 @@ mod lexing {
     fn it_parses_a_single_digit_number() {
         let tokens = Scanner::new(String::from("1")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
 
     #[test]
     fn it_parses_a_double_digit_number() {
-        let tokens = Scanner::new(String::from("123")).scan();
+        let tokens = Scanner::new(String::from("54")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
-                lexeme: Some(String::from("123")),
-                token_type: &TokenType::Number
+                lexeme: Some(String::from("54")),
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -486,12 +537,14 @@ mod lexing {
     fn it_parses_a_number_with_leading_zero() {
         let tokens = Scanner::new(String::from("01")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("01")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -500,12 +553,14 @@ mod lexing {
     fn it_parses_a_floating_point_number() {
         let tokens = Scanner::new(String::from("1.0")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.0")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -514,12 +569,14 @@ mod lexing {
     fn it_parses_a_floating_point_number_with_many_base_digits() {
         let tokens = Scanner::new(String::from("987.2")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("987.2")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -528,12 +585,14 @@ mod lexing {
     fn it_parses_a_floating_point_number_with_many_fractional_digits() {
         let tokens = Scanner::new(String::from("1.09876")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.09876")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -542,12 +601,14 @@ mod lexing {
     fn it_parses_a_number_without_a_fraction() {
         let tokens = Scanner::new(String::from("1.")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("1.")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -557,26 +618,30 @@ mod lexing {
         let tokens = Scanner::new(String::from("1 > 0")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 3);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 4);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::GreaterThan
+                token_type: &TokenType::GreaterThan,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("0")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -586,26 +651,30 @@ mod lexing {
         let tokens = Scanner::new(String::from("1,000")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 3);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 4);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Comma
+                token_type: &TokenType::Comma,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("000")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
     }
@@ -639,12 +708,14 @@ mod lexing {
 
             let tokens = Scanner::new(String::from(token)).scan();
 
-            assert_eq!(tokens.len(), 1);
+            // +1 for EOF token
+            assert_eq!(tokens.len(), 2);
             assert_eq!(
                 tokens.iter().next(),
                 Some(&Token {
                     lexeme: Some(String::from(token)),
-                    token_type
+                    token_type,
+                    line: 1,
                 })
             );
         }
@@ -654,12 +725,14 @@ mod lexing {
     fn it_parses_case_sensitive_keyboards_as_identifiers() {
         let tokens = Scanner::new(String::from("PRINT")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("PRINT")),
-                token_type: &TokenType::Identifier
+                token_type: &TokenType::Identifier,
+                line: 1,
             })
         );
     }
@@ -668,12 +741,14 @@ mod lexing {
     fn it_parses_an_identifier_with_numbers() {
         let tokens = Scanner::new(String::from("h3ll0")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("h3ll0")),
-                token_type: &TokenType::Identifier
+                token_type: &TokenType::Identifier,
+                line: 1,
             })
         );
     }
@@ -682,12 +757,14 @@ mod lexing {
     fn it_parses_an_identifier_with_underscores() {
         let tokens = Scanner::new(String::from("hello_world")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("hello_world")),
-                token_type: &TokenType::Identifier
+                token_type: &TokenType::Identifier,
+                line: 1,
             })
         );
     }
@@ -696,12 +773,14 @@ mod lexing {
     fn it_parses_an_identifier_with_uppercase_letters() {
         let tokens = Scanner::new(String::from("Hello")).scan();
 
-        assert_eq!(tokens.len(), 1);
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: &TokenType::Identifier
+                token_type: &TokenType::Identifier,
+                line: 1,
             })
         );
     }
@@ -711,19 +790,22 @@ mod lexing {
         let tokens = Scanner::new(String::from("1Hello")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 2);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 3);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello")),
-                token_type: &TokenType::Identifier
+                token_type: &TokenType::Identifier,
+                line: 1,
             })
         );
     }
@@ -733,75 +815,102 @@ mod lexing {
         let tokens = Scanner::new(String::from("'1 > 0 { print; }' # print is cool")).scan();
         let mut token_iter = tokens.iter();
 
-        assert_eq!(tokens.len(), 10);
+        // +1 for EOF token
+        assert_eq!(token_iter.len(), 11);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::GreaterThan
+                token_type: &TokenType::GreaterThan,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("0")),
-                token_type: &TokenType::Number
+                token_type: &TokenType::Number,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::LeftCurly
+                token_type: &TokenType::LeftCurly,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("print")),
-                token_type: &TokenType::Print
+                token_type: &TokenType::Print,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Semicolon
+                token_type: &TokenType::Semicolon,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::RightCurly
+                token_type: &TokenType::RightCurly,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::SingleQuote
+                token_type: &TokenType::SingleQuote,
+                line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::Pound
+                token_type: &TokenType::Pound,
+                line: 1,
+            })
+        );
+    }
+
+    #[test]
+    fn it_emits_an_error_token_for_unknowns() {
+        let tokens = Scanner::new(String::from("€")).scan();
+
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: Some(String::from("Unexpected character.")),
+                token_type: &TokenType::Error,
+                line: 1,
             })
         );
     }

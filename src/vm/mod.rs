@@ -4,6 +4,7 @@ use crate::scanner::Scanner;
 use crate::token::token::Token;
 use crate::value::Value;
 
+#[derive(PartialEq)]
 pub enum InterpretResult {
     Ok,
     CompileError,
