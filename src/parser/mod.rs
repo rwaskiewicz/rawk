@@ -72,6 +72,8 @@ pub struct Parser<'a> {
     previous_token: Option<&'a Token>,
     tokens_iter: Iter<'a, Token>,
     compiling_chunk: &'a mut Chunk,
+    had_error: bool,
+    panic_mode: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -85,6 +87,8 @@ impl<'a> Parser<'a> {
             previous_token: None,
             tokens_iter: tokens,
             compiling_chunk,
+            had_error: false,
+            panic_mode: false,
         }
     }
 
@@ -99,8 +103,8 @@ impl<'a> Parser<'a> {
         self.expression();
         self.consume(&TokenType::Eof, "Expect end of expression token");
         self.end_compiler();
-        // TODO This, stop making a liar out of the doc
-        true
+
+        !self.had_error
     }
 
     /// Parses a series of tokens, based on the precedence associated with them.
@@ -123,6 +127,7 @@ impl<'a> Parser<'a> {
             .get_rule(self.previous_token.expect("missing token").token_type)
             .prefix_parse_fn
             .unwrap_or_else(|| {
+                self.error_at_previous("Expect expression.");
                 panic!(
                     "No function found for {:#?}!",
                     self.previous_token.unwrap().token_type
@@ -305,25 +310,47 @@ impl<'a> Parser<'a> {
     /// # Arguments
     /// - `op_code` the value to emit the bytes for
     fn emit_byte(&mut self, op_code: OpCode) {
+        // TODO: Line numbers
         self.compiling_chunk.write_chunk(op_code, 123);
     }
 
-    // TODO: Work on error handling
-    fn error_at_current(&mut self, _message: &str) {
-        // self.error_at(&self.current_token, message)
+    fn error_at_current(&mut self, message: &str) {
+        // TODO: This clone does not seem like the right thing to do
+        self.error_at(&self.current_token.clone(), message)
     }
 
-    fn error_at_previous(&mut self, _message: &str) {
-        // self.error_at(&self.previous_token.as_mut(), message)
+    fn error_at_previous(&mut self, message: &str) {
+        // TODO: This clone does not seem like the right thing to do
+        self.error_at(&self.previous_token.clone(), message)
     }
 
     fn error_at(&mut self, token: &Option<&Token>, message: &str) {
-        // TODO: Actual error handling here
-        eprintln!(
-            "An error occurred on token {:?} with msg {}",
-            *token.expect("UNKNOWN"),
-            message
-        )
+        if self.panic_mode {
+            return;
+        }
+        self.panic_mode = true;
+
+        // TODO: Line numbers - this would come from the token
+        let mut error_msg = format!("[line {}] Error", 123);
+        match token.unwrap().token_type {
+            TokenType::Eof => {
+                error_msg.push_str(" at end");
+            }
+            _ => {
+                error_msg.push_str(&format!(
+                    " at {}",
+                    token
+                        .unwrap()
+                        .lexeme
+                        .as_ref()
+                        .unwrap_or(&String::from("IDK"))
+                ));
+            }
+        }
+        error_msg.push_str(&format!(": {}", message));
+        eprintln!("{}", error_msg.as_str());
+
+        self.had_error = true;
     }
 
     fn emit_return(&mut self) {
