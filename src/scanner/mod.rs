@@ -95,9 +95,29 @@ impl Scanner {
                     tokens.push(Token::new(None, &TokenType::SingleQuote));
                 }
                 '\"' => {
-                    // TODO: Update this to find full strings
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
-                    tokens.push(Token::new(None, &TokenType::DoubleQuote));
+
+                    // Token::new(None, &TokenType::DoubleQuote)
+                    let mut string_parsed = String::from("");
+                    string_parsed.push(ch);
+                    while let Some(_maybe_quote) = char_stream.peek() {
+                        if let Some(next_ch) = char_stream.next() {
+                            if next_ch == '\n' {
+                                current_line += 1;
+                            } else if next_ch == '\"' {
+                                // TODO: Handle EOF/unterminated string
+                                ch = next_ch;
+                                string_parsed.push(ch);
+                                char_stream.next();
+                                break;
+                            }
+                            ch = next_ch;
+                            string_parsed.push(ch);
+                        }
+                    }
+                    let string_token = Token::new(Some(string_parsed), &TokenType::DoubleQuote);
+
+                    tokens.push(string_token);
                 }
                 '>' => {
                     // TODO: Support greater than or equal to '>='
@@ -342,13 +362,13 @@ mod lexing {
 
     #[test]
     fn it_parses_a_double_quote() {
-        let tokens = Scanner::new(String::from("\"")).scan();
+        let tokens = Scanner::new(String::from("\"Hello World!\"")).scan();
 
         assert_eq!(tokens.len(), 1);
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
-                lexeme: None,
+                lexeme: Some(String::from("\"Hello World!\"")),
                 token_type: &TokenType::DoubleQuote
             })
         );

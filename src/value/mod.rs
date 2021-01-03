@@ -1,5 +1,5 @@
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     Number(f32),
-    // String(String),
+    String(String),
 }

@@ -2,7 +2,7 @@ use crate::value;
 
 // TODO: Look further into byte alignment
 /// Enum describing different operations (operation codes)
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub enum OpCode {
     OpConstant(value::Value),
     Add,
@@ -13,7 +13,7 @@ pub enum OpCode {
     OpReturn,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct CodeLine {
     pub code: OpCode,
     pub line: i32,
@@ -80,9 +80,8 @@ impl Chunk {
     }
 
     fn constant_instruction(&self, name: &str, offset: usize) -> usize {
-        let constant = self.constants[offset]; // TODO: +1 ?
+        let constant = &self.constants[offset]; // TODO: +1 ?
         println!("{} {:#?}", name, constant);
-        // self.print_value(self.constants[constant as usize]);
         return offset + 1; // TODO??? + 2
     }
 

@@ -31,7 +31,7 @@ impl VM {
             self.ip += 1;
 
             let instruction: OpCode = self.chunk.code[old_ip].code.clone();
-            dbg!("{}", instruction);
+            dbg!("{}", &instruction);
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {
                     Some(val) => {
@@ -56,7 +56,7 @@ impl VM {
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-        let scanner = Scanner::new(source);
+        let mut scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan();
 
         // TODO: This feels dirty

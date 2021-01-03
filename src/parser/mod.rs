@@ -219,6 +219,21 @@ impl<'a> Parser<'a> {
         self.emit_constant(Value::Number(number));
     }
 
+    /// Emits a string for the [TokenType::DoubleQuote] token type
+    ///
+    /// Assumes that a [Token#structfield.token_type] with value of [TokenType::DoubleQuote] has
+    /// been detected and is currently pointed to in the [Parser#structfield.previous_token]
+    fn string(&mut self) {
+        self.emit_constant(Value::String(
+            self.previous_token
+                .unwrap()
+                .lexeme
+                .as_ref()
+                .unwrap()
+                .clone(),
+        ));
+    }
+
     // TODO: Update this
     /// Emits the correct token while parsing a unary expression - e.g. `-42`
     ///
@@ -573,7 +588,7 @@ const PARSE_RULES: [ParseRule; 47] = [
     },
     // DoubleQuote
     ParseRule {
-        prefix_parse_fn: None,
+        prefix_parse_fn: Some(|parser| parser.string()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
     },
