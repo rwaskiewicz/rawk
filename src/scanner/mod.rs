@@ -140,38 +140,70 @@ impl Scanner {
                     }
                 }
                 '<' => {
-                    // TODO: Support less than or equal to '<='
-                    Scanner::report_scanned_character(ch, &TokenType::LessThan);
-                    tokens.push(Token::new(None, &TokenType::LessThan, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::LessEqual);
+                        tokens.push(Token::new(None, &TokenType::LessEqual, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::LessThan);
+                        tokens.push(Token::new(None, &TokenType::LessThan, current_line));
+                    }
                 }
                 '=' => {
-                    // TODO: Support equal to '=='
-                    Scanner::report_scanned_character(ch, &TokenType::Equals);
-                    tokens.push(Token::new(None, &TokenType::Equals, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::DoubleEqual);
+                        tokens.push(Token::new(None, &TokenType::DoubleEqual, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Equals);
+                        tokens.push(Token::new(None, &TokenType::Equals, current_line));
+                    }
                 }
                 '!' => {
-                    // TODO: Support not equal to '!='
-                    // TODO: Support ERE non-match '!~'
-                    Scanner::report_scanned_character(ch, &TokenType::Bang);
-                    tokens.push(Token::new(None, &TokenType::Bang, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::NotEqual);
+                        tokens.push(Token::new(None, &TokenType::NotEqual, current_line));
+                    } else if self.match_char('~', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::NoMatch);
+                        tokens.push(Token::new(None, &TokenType::NoMatch, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Bang);
+                        tokens.push(Token::new(None, &TokenType::Bang, current_line));
+                    }
                 }
                 '$' => {
                     Scanner::report_scanned_character(ch, &TokenType::Sigil);
                     tokens.push(Token::new(None, &TokenType::Sigil, current_line));
                 }
                 '+' => {
-                    // TODO: Support addition assignment '+='
-                    // TODO: Support post-increment '++'
-                    // TODO: Support pre-increment '++'
-                    Scanner::report_scanned_character(ch, &TokenType::Plus);
-                    tokens.push(Token::new(None, &TokenType::Plus, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::AddAssign);
+                        tokens.push(Token::new(None, &TokenType::AddAssign, current_line));
+                    } else if self.match_char('+', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::Incr);
+                        tokens.push(Token::new(None, &TokenType::Incr, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Plus);
+                        tokens.push(Token::new(None, &TokenType::Plus, current_line));
+                    }
                 }
                 '-' => {
-                    // TODO: Support subtraction assignment '-='
-                    // TODO: Support post-decrement '--'
-                    // TODO: Support pre-decrement '--'
-                    Scanner::report_scanned_character(ch, &TokenType::Minus);
-                    tokens.push(Token::new(None, &TokenType::Minus, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::SubAssign);
+                        tokens.push(Token::new(None, &TokenType::SubAssign, current_line));
+                    } else if self.match_char('-', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::Decr);
+                        tokens.push(Token::new(None, &TokenType::Decr, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Minus);
+                        tokens.push(Token::new(None, &TokenType::Minus, current_line));
+                    }
                 }
                 '*' => {
                     // TODO: Support multiplication assignment '*='
@@ -478,8 +510,18 @@ mod lexing {
 
     #[test]
     fn it_parses_double_character_tokens() {
-        let test_cases: [(&str, &TokenType); 2] =
-            [(">=", &TokenType::GreaterEqual), (">>", &TokenType::Append)];
+        let test_cases: [(&str, &TokenType); 10] = [
+            (">=", &TokenType::GreaterEqual),
+            (">>", &TokenType::Append),
+            ("<=", &TokenType::LessEqual),
+            ("==", &TokenType::DoubleEqual),
+            ("!=", &TokenType::NotEqual),
+            ("!~", &TokenType::NoMatch),
+            ("+=", &TokenType::AddAssign),
+            ("++", &TokenType::Incr),
+            ("-=", &TokenType::SubAssign),
+            ("--", &TokenType::Decr),
+        ];
 
         for test_case in test_cases.iter() {
             let token = test_case.0;
