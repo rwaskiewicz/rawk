@@ -206,25 +206,44 @@ impl Scanner {
                     }
                 }
                 '*' => {
-                    // TODO: Support multiplication assignment '*='
-                    Scanner::report_scanned_character(ch, &TokenType::Star);
-                    tokens.push(Token::new(None, &TokenType::Star, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::MulAssign);
+                        tokens.push(Token::new(None, &TokenType::MulAssign, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Star);
+                        tokens.push(Token::new(None, &TokenType::Star, current_line));
+                    }
                 }
                 '/' => {
-                    // TODO: Support division assignment '/='
-                    Scanner::report_scanned_character(ch, &TokenType::Slash);
-                    tokens.push(Token::new(None, &TokenType::Slash, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::DivAssign);
+                        tokens.push(Token::new(None, &TokenType::DivAssign, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Slash);
+                        tokens.push(Token::new(None, &TokenType::Slash, current_line));
+                    }
                 }
                 '^' => {
-                    // TODO: Support exponentiation assignment '^='
-                    // super::report_scanned_token();
-                    Scanner::report_scanned_character(ch, &TokenType::Caret);
-                    tokens.push(Token::new(None, &TokenType::Caret, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::PowAssign);
+                        tokens.push(Token::new(None, &TokenType::PowAssign, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Caret);
+                        tokens.push(Token::new(None, &TokenType::Caret, current_line));
+                    }
                 }
                 '%' => {
-                    // TODO: Support modulus assignment '%='
-                    Scanner::report_scanned_character(ch, &TokenType::Modulus);
-                    tokens.push(Token::new(None, &TokenType::Modulus, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::ModAssign);
+                        tokens.push(Token::new(None, &TokenType::ModAssign, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Modulus);
+                        tokens.push(Token::new(None, &TokenType::Modulus, current_line));
+                    }
                 }
                 '~' => {
                     Scanner::report_scanned_character(ch, &TokenType::Tilde);
@@ -510,7 +529,7 @@ mod lexing {
 
     #[test]
     fn it_parses_double_character_tokens() {
-        let test_cases: [(&str, &TokenType); 10] = [
+        let test_cases: [(&str, &TokenType); 14] = [
             (">=", &TokenType::GreaterEqual),
             (">>", &TokenType::Append),
             ("<=", &TokenType::LessEqual),
@@ -521,6 +540,10 @@ mod lexing {
             ("++", &TokenType::Incr),
             ("-=", &TokenType::SubAssign),
             ("--", &TokenType::Decr),
+            ("*=", &TokenType::MulAssign),
+            ("/=", &TokenType::DivAssign),
+            ("^=", &TokenType::PowAssign),
+            ("%=", &TokenType::ModAssign),
         ];
 
         for test_case in test_cases.iter() {
