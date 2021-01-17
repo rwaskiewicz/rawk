@@ -25,9 +25,24 @@ pub enum TokenType {
     // TODO: built in fn
     GetLine, // 'GETLINE'
 
-    // TODO: Two-character tokens.
-    // %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN POW_ASSIGN
-    /*     '+='       '-='       '*='       '/='       '%='       '^=' */
+    // Two-character tokens.
+    AddAssign,    // '+='
+    SubAssign,    // '-='
+    MulAssign,    // '*='
+    DivAssign,    // '/='
+    ModAssign,    // '%='
+    PowAssign,    // '^='
+    Or,           // '||'
+    And,          // '&&'
+    NoMatch,      // '!~'
+    DoubleEqual,  // '=='
+    LessEqual,    // '<='
+    GreaterEqual, // '>='
+    NotEqual,     // '!='
+    Incr,         // '++'
+    Decr,         // '--'
+    Append,       // '>>'
+
     // Single Character Tokens
     LeftCurly,
     RightCurly,

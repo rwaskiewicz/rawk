@@ -386,7 +386,7 @@ impl<'a> Parser<'a> {
 ///
 /// When an infix expression function from this table is called, it's left hand side (LHS) has
 /// already been compiled and the infix operator consumed.
-const PARSE_RULES: [ParseRule; 48] = [
+const PARSE_RULES: [ParseRule; 64] = [
     // BEGIN
     ParseRule {
         prefix_parse_fn: None,
@@ -490,6 +490,102 @@ const PARSE_RULES: [ParseRule; 48] = [
         infix_precedence: Precedence::None,
     },
     // GETLINE
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // AddAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // SubAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // MulAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // DivAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // ModAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // PowAssign
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // Or
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // And
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // NoMatch
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // DoubleEqual
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // LessEqual
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // GreaterEqual
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // NotEqual
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // Incr
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // Decr
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: None,
+        infix_precedence: Precedence::None,
+    },
+    // Append
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,

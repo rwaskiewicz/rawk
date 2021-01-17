@@ -40,8 +40,6 @@ impl Scanner {
 
         let mut char_stream = self.input.chars().peekable();
         while char_stream.peek().is_some() {
-            // TODO: This is _technically_ OK I think, but heed the RustDoc and see if there's a
-            // better solution once the build is working again
             let mut ch = char_stream.next().unwrap();
             println!("Inspecting Character: '{}'", ch);
             match ch {
@@ -106,7 +104,6 @@ impl Scanner {
                 '\"' => {
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
 
-                    // Token::new(None, &TokenType::DoubleQuote)
                     let mut string_parsed = String::from("");
                     string_parsed.push(ch);
                     while let Some(_maybe_quote) = char_stream.peek() {
@@ -129,9 +126,18 @@ impl Scanner {
                     tokens.push(string_token);
                 }
                 '>' => {
-                    // TODO: Support greater than or equal to '>='
-                    Scanner::report_scanned_character(ch, &TokenType::GreaterThan);
-                    tokens.push(Token::new(None, &TokenType::GreaterThan, current_line));
+                    if self.match_char('=', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::GreaterEqual);
+                        tokens.push(Token::new(None, &TokenType::GreaterEqual, current_line));
+                    } else if self.match_char('>', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::Append);
+                        tokens.push(Token::new(None, &TokenType::Append, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::GreaterThan);
+                        tokens.push(Token::new(None, &TokenType::GreaterThan, current_line));
+                    }
                 }
                 '<' => {
                     // TODO: Support less than or equal to '<='
@@ -304,6 +310,22 @@ impl Scanner {
         tokens
     }
 
+    /// Determine if the current character matches one that is expected
+    ///
+    /// # Arguments
+    /// - `expected_char` the character that is expected
+    /// - `current_char` the current character
+    ///
+    /// # Return value
+    /// `true` if the expected value matches the current one, `false` otherwise
+    fn match_char(&self, expected_char: char, current_char: Option<&char>) -> bool {
+        if current_char.is_none() {
+            return false;
+        }
+
+        &expected_char == current_char.unwrap()
+    }
+
     fn report_scanned_character(ch: char, token_type: &TokenType) {
         println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
@@ -452,6 +474,30 @@ mod lexing {
                 line: 1,
             })
         );
+    }
+
+    #[test]
+    fn it_parses_double_character_tokens() {
+        let test_cases: [(&str, &TokenType); 2] =
+            [(">=", &TokenType::GreaterEqual), (">>", &TokenType::Append)];
+
+        for test_case in test_cases.iter() {
+            let token = test_case.0;
+            let token_type = test_case.1;
+
+            let tokens = Scanner::new(String::from(token)).scan();
+
+            // +1 for EOF token
+            assert_eq!(tokens.len(), 2);
+            assert_eq!(
+                tokens.iter().next(),
+                Some(&Token {
+                    lexeme: None,
+                    token_type,
+                    line: 1,
+                })
+            );
+        }
     }
 
     #[test]
