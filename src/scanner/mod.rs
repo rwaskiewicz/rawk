@@ -250,8 +250,14 @@ impl Scanner {
                     tokens.push(Token::new(None, &TokenType::Tilde, current_line));
                 }
                 '|' => {
-                    Scanner::report_scanned_character(ch, &TokenType::Pipe);
-                    tokens.push(Token::new(None, &TokenType::Pipe, current_line));
+                    if self.match_char('|', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::Or);
+                        tokens.push(Token::new(None, &TokenType::Or, current_line));
+                    } else {
+                        Scanner::report_scanned_character(ch, &TokenType::Pipe);
+                        tokens.push(Token::new(None, &TokenType::Pipe, current_line));
+                    }
                 }
                 '?' => {
                     Scanner::report_scanned_character(ch, &TokenType::Question);
@@ -261,10 +267,14 @@ impl Scanner {
                     Scanner::report_scanned_character(ch, &TokenType::Colon);
                     tokens.push(Token::new(None, &TokenType::Colon, current_line));
                 }
+                '&' => {
+                    if self.match_char('&', char_stream.peek()) {
+                        char_stream.next();
+                        Scanner::report_scanned_character(ch, &TokenType::And);
+                        tokens.push(Token::new(None, &TokenType::And, current_line));
+                    }
+                }
                 // TODO: Array membership
-                // TODO: Logical AND
-                // TODO: Logical OR
-                // TODO: Ternary (? and :)
                 _ => {
                     if ch.is_digit(10) {
                         let mut num_parsed = String::from("");
@@ -529,7 +539,7 @@ mod lexing {
 
     #[test]
     fn it_parses_double_character_tokens() {
-        let test_cases: [(&str, &TokenType); 14] = [
+        let test_cases: [(&str, &TokenType); 16] = [
             (">=", &TokenType::GreaterEqual),
             (">>", &TokenType::Append),
             ("<=", &TokenType::LessEqual),
@@ -544,6 +554,8 @@ mod lexing {
             ("/=", &TokenType::DivAssign),
             ("^=", &TokenType::PowAssign),
             ("%=", &TokenType::ModAssign),
+            ("&&", &TokenType::And),
+            ("||", &TokenType::Or),
         ];
 
         for test_case in test_cases.iter() {
