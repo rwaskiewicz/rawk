@@ -44,6 +44,12 @@ impl VM {
                         return InterpretResult::RuntimeError;
                     }
                 },
+                OpCode::GreaterEqual => self.binary_op(&instruction),
+                OpCode::Greater => self.binary_op(&instruction),
+                OpCode::LessEqual => self.binary_op(&instruction),
+                OpCode::Less => self.binary_op(&instruction),
+                OpCode::DoubleEqual => self.binary_op(&instruction),
+                OpCode::NotEqual => self.binary_op(&instruction),
                 OpCode::Add => self.binary_op(&instruction),
                 OpCode::Subtract => self.binary_op(&instruction),
                 OpCode::Multiply => self.binary_op(&instruction),
@@ -79,11 +85,53 @@ impl VM {
         if let Value::Number(b) = self.stack.pop().unwrap() {
             if let Value::Number(a) = self.stack.pop().unwrap() {
                 match *op_code {
+                    OpCode::GreaterEqual => {
+                        let mut result: f32 = 0.0;
+                        if a >= b {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
+                    OpCode::Greater => {
+                        let mut result: f32 = 0.0;
+                        if a > b {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
+                    OpCode::LessEqual => {
+                        let mut result: f32 = 0.0;
+                        if a <= b {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
+                    OpCode::Less => {
+                        let mut result: f32 = 0.0;
+                        if a < b {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
+                    OpCode::DoubleEqual => {
+                        let mut result: f32 = 0.0;
+                        if (a - b).abs() == 0.0 {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
+                    OpCode::NotEqual => {
+                        let mut result: f32 = 0.0;
+                        if (a - b).abs() != 0.0 {
+                            result = 1.0;
+                        }
+                        self.stack.push(Value::Number(result))
+                    }
                     OpCode::Add => self.stack.push(Value::Number(a + b)),
                     OpCode::Subtract => self.stack.push(Value::Number(a - b)),
                     OpCode::Multiply => self.stack.push(Value::Number(a * b)),
                     OpCode::Divide => self.stack.push(Value::Number(a / b)),
-                    _ => panic!("Unknown op code given for binary {:?}", op_code),
+                    _ => panic!("Unknown op code given for binary '{:?}'", op_code),
                 }
             }
         }

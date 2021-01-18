@@ -5,6 +5,12 @@ use crate::value;
 #[derive(Clone, Debug)]
 pub enum OpCode {
     OpConstant(value::Value),
+    GreaterEqual,
+    Greater,
+    LessEqual,
+    Less,
+    DoubleEqual,
+    NotEqual,
     Add,
     Subtract,
     Multiply,

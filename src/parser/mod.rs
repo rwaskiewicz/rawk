@@ -20,9 +20,10 @@ use std::slice::Iter;
 enum Precedence {
     None,
     Assignment, // '='
+    Comparison, // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
     Term,       // '+' '-'
     Factor,     // '*' '/'
-    Unary,      // '!' '-'
+    Unary,      // '!' '+' '-'
     Primary,
 }
 
@@ -38,7 +39,8 @@ impl Precedence {
     pub fn get_next_precedence(p: Precedence) -> Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
-            Precedence::Assignment => Precedence::Term,
+            Precedence::Assignment => Precedence::Comparison,
+            Precedence::Comparison => Precedence::Term,
             Precedence::Term => Precedence::Factor,
             Precedence::Factor => Precedence::Unary,
             Precedence::Unary => Precedence::Primary,
@@ -273,6 +275,12 @@ impl<'a> Parser<'a> {
         self.parse_precedence(Precedence::get_next_precedence(rule.infix_precedence));
 
         match operator_type {
+            TokenType::GreaterEqual => self.emit_byte(OpCode::GreaterEqual),
+            TokenType::GreaterThan => self.emit_byte(OpCode::Greater),
+            TokenType::LessEqual => self.emit_byte(OpCode::LessEqual),
+            TokenType::LessThan => self.emit_byte(OpCode::Less),
+            TokenType::DoubleEqual => self.emit_byte(OpCode::DoubleEqual),
+            TokenType::NotEqual => self.emit_byte(OpCode::NotEqual),
             TokenType::Plus => self.emit_byte(OpCode::Add),
             TokenType::Minus => self.emit_byte(OpCode::Subtract),
             TokenType::Star => self.emit_byte(OpCode::Multiply),
@@ -552,26 +560,26 @@ const PARSE_RULES: [ParseRule; 64] = [
     // DoubleEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // LessEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // GreaterEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // NotEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // Incr
     ParseRule {
@@ -678,14 +686,14 @@ const PARSE_RULES: [ParseRule; 64] = [
     // GreaterThan
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // LessThan
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Comparison,
     },
     // Pipe
     ParseRule {
