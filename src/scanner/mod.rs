@@ -323,8 +323,7 @@ impl Scanner {
                             &TokenType::Number,
                             current_line,
                         ));
-                    } else if ch.is_alphabetic() {
-                        // TODO: Support underscore for variable names
+                    } else if ch.is_alphabetic() || ch == '_' {
                         let mut word_parsed = String::from(ch);
 
                         // TODO: This check may be too permissive
@@ -886,6 +885,22 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("hello_world")),
+                token_type: &TokenType::Identifier,
+                line: 1,
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_an_identifier_with_a_leading_underscore() {
+        let tokens = Scanner::new(String::from("_hello")).scan();
+
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: Some(String::from("_hello")),
                 token_type: &TokenType::Identifier,
                 line: 1,
             })
