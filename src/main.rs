@@ -1,20 +1,13 @@
-mod chunk;
-mod parser;
-mod scanner;
-mod token;
-mod value;
-mod vm;
-
-use crate::vm::VM;
 use clap::{App, Arg};
 use env_logger::Builder;
-use log::LevelFilter;
+use log::{error, LevelFilter};
 use std::io;
 use std::io::Write;
 
 fn main() {
-    let mut loggerBuilder = Builder::from_default_env();
-    loggerBuilder.filter(None, LevelFilter::Info).init();
+    let mut logger_builder = Builder::from_default_env();
+    // TODO: This isn't overridable
+    logger_builder.filter(None, LevelFilter::Info).init();
 
     let matches = App::new("r-awk")
         .version("0.0.1")
@@ -34,41 +27,25 @@ fn main() {
             run_prompt();
         }
         Some(s) => {
-            println!("TODO: Implement file parsing. Got file_name {}", s);
+            error!("TODO: Implement file parsing. Got file_name {}", s);
         }
     }
-
-    println!("Hello, world!");
 }
 
 fn run_prompt() {
     println!("r-awk - a subset of awk written in Rust");
 
-    loop {
-        let mut awk_line = String::new();
-        let mut _data_input = String::new();
+    let mut awk_line = String::new();
 
-        print!("r-awk > ");
-        io::stdout().flush().expect("Unable to flush STDOUT!");
+    print!("r-awk > ");
+    io::stdout().flush().expect("Unable to flush STDOUT!");
 
-        io::stdin()
-            .read_line(&mut awk_line)
-            .expect("failed to get r-awk line");
-        print!("r-awk line to process: {}", awk_line);
+    io::stdin()
+        .read_line(&mut awk_line)
+        .expect("failed to get r-awk line");
+    print!("r-awk line to process: {}", awk_line);
 
-        let mut vm = VM::new();
-        let _result = vm.interpret(awk_line);
-
-        // while result == InterpretResult::Ok && !data_input.contains("STOP!") {
-        //     print!("Input Data (type STOP! to end data input) >> ");
-        //     io::stdout().flush().expect("Unable to flush STDOUT!");
-        //
-        //     data_input.clear();
-        //
-        //     io::stdin()
-        //         .read_line(&mut data_input)
-        //         .expect("failed to get r-awk input!");
-        //     print!("Received Data: {}", data_input);
-        // }
-    }
+    // When we had one, we would init a new VM on every loop. This won't be feasible long term, but
+    // for now we can avoid the scary monsters under the bed with resetting state...
+    rawk::startup_and_interpret_awk_line(awk_line);
 }
