@@ -7,6 +7,7 @@ use crate::chunk::{Chunk, OpCode};
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 use crate::value::Value;
+use log::error;
 use std::fmt::Debug;
 use std::slice::Iter;
 
@@ -375,7 +376,7 @@ impl<'a> Parser<'a> {
         }
 
         error_msg.push_str(&format!(": {}", message));
-        eprintln!("{}", error_msg.as_str());
+        error!("{}", error_msg.as_str());
 
         self.had_error = true;
     }

@@ -5,12 +5,17 @@ mod token;
 mod value;
 mod vm;
 
-use crate::vm::{InterpretResult, VM};
+use crate::vm::VM;
 use clap::{App, Arg};
+use env_logger::Builder;
+use log::LevelFilter;
 use std::io;
 use std::io::Write;
 
 fn main() {
+    let mut loggerBuilder = Builder::from_default_env();
+    loggerBuilder.filter(None, LevelFilter::Info).init();
+
     let matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")

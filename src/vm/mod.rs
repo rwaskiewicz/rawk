@@ -4,6 +4,8 @@ use crate::scanner::Scanner;
 use crate::token::token::Token;
 use crate::value::Value;
 
+use log::{debug, error, info};
+
 #[derive(PartialEq)]
 pub enum InterpretResult {
     Ok,
@@ -32,15 +34,15 @@ impl VM {
             self.ip += 1;
 
             let instruction: OpCode = self.chunk.code[old_ip].code.clone();
-            dbg!("{}", &instruction);
+            debug!("{:#?}", &instruction);
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {
                     Some(val) => {
-                        println!("{:#?}", val);
+                        info!("{:#?}", val);
                         return InterpretResult::Ok;
                     }
                     None => {
-                        eprintln!("Error: Something went wrong trying to temp return");
+                        error!("Error: Something went wrong trying to temp return");
                         return InterpretResult::RuntimeError;
                     }
                 },

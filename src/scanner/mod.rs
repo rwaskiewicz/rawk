@@ -1,5 +1,6 @@
 use super::token::token::Token;
 use super::token::token_type::TokenType;
+use log::{debug, error};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -41,12 +42,12 @@ impl Scanner {
         let mut char_stream = self.input.chars().peekable();
         while char_stream.peek().is_some() {
             let mut ch = char_stream.next().unwrap();
-            println!("Inspecting Character: '{}'", ch);
+            debug!("Inspecting Character: '{}'", ch);
             match ch {
-                ' ' | '\r' | '\t' => println!("I can see and accept whitespace"),
+                ' ' | '\r' | '\t' => debug!("I can see and accept whitespace"),
                 '\n' => {
                     current_line += 1;
-                    println!(
+                    debug!(
                         "I can see the newline. The current_line number is now {}",
                         current_line
                     );
@@ -349,7 +350,7 @@ impl Scanner {
                             current_line,
                         ));
                     } else {
-                        eprintln!("ALERT: We found a character we can not handle, '{}'", ch);
+                        error!("ALERT: We found a character we can not handle, '{}'", ch);
                         tokens.push(Token::error_token(
                             String::from("Unexpected character."),
                             current_line,
@@ -366,7 +367,7 @@ impl Scanner {
             current_line,
         ));
 
-        println!("This is the final list of Tokens {:?}", tokens);
+        debug!("This is the final list of Tokens {:?}", tokens);
         tokens
     }
 
@@ -387,11 +388,11 @@ impl Scanner {
     }
 
     fn report_scanned_character(ch: char, token_type: &TokenType) {
-        println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
+        debug!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
 
     fn report_scanned_string(ch: &str, token_type: &TokenType) {
-        println!("Found a '{}', setting the type to '{:?}'", ch, token_type);
+        debug!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
 }
 
