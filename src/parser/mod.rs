@@ -11,7 +11,7 @@ use log::error;
 use std::fmt::Debug;
 use std::slice::Iter;
 
-/// Enum that create a hierarchy of precedences that are associated with a [TokenType].
+/// Enum that creates a hierarchy of precedences that are associated with a [TokenType].
 ///
 /// Variants with lower values have a lower precedence than higher value variants.
 ///
@@ -26,6 +26,14 @@ enum Precedence {
     Factor,     // '*' '/' '%'
     Unary,      // '!' '+' '-'
     Primary,
+}
+
+/// Enum describing associativity of items in the grammar
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
+enum Associativity {
+    NA,
+    Left,
+    Right,
 }
 
 impl Precedence {
@@ -63,6 +71,8 @@ struct ParseRule {
     infix_parse_fn: Option<ParseFn>,
     // the precedence of an _infix expression_ that uses a token as an operator
     infix_precedence: Precedence,
+    // the associativity of an infix expression
+    infix_associativity: Associativity,
 }
 
 /// A Pratt Parser for our awk implementation
@@ -274,7 +284,11 @@ impl<'a> Parser<'a> {
         // This only works because the operators are left-associative:
         // 1 + 2 + 3 + 4 becomes ((1 + 2) + 3) + 4
         // To enable right associativity, we'd call with the same precedence
-        self.parse_precedence(Precedence::get_next_precedence(rule.infix_precedence));
+        if rule.infix_associativity == Associativity::Right {
+            self.parse_precedence(rule.infix_precedence);
+        } else {
+            self.parse_precedence(Precedence::get_next_precedence(rule.infix_precedence));
+        }
 
         match operator_type {
             TokenType::GreaterEqual => self.emit_byte(OpCode::GreaterEqual),
@@ -403,383 +417,447 @@ const PARSE_RULES: [ParseRule; 64] = [
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // END
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // break
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // continue
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // delete
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // do
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // else
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // exit
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // for
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // function
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // if
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // in
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Left,
     },
     // next
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // print
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // printf
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // return
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // while
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // GETLINE
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // AddAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // SubAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // MulAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // DivAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // ModAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // PowAssign
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // Or
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Left,
     },
     // And
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Left,
     },
     // NoMatch
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // DoubleEqual
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // LessEqual
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // GreaterEqual
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // NotEqual
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // Incr
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Decr
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Append
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // LeftCurly
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // RightCurly
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // LeftParenthesis
     ParseRule {
         prefix_parse_fn: Some(|parser| parser.grouping()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // RightParenthesis
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // LeftSquareBracket
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // RightSquareBracket
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Comma
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Semicolon
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Plus
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Term,
+        infix_associativity: Associativity::Left,
     },
     // Minus
     ParseRule {
         prefix_parse_fn: Some(|parser| parser.unary()),
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Term,
+        infix_associativity: Associativity::Left,
     },
     // Star
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Factor,
+        infix_associativity: Associativity::Left,
     },
     // Modulus
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Factor,
+        infix_associativity: Associativity::Left,
     },
     // Caret
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // Bang
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // GreaterThan
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // LessThan
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Comparison,
+        infix_associativity: Associativity::NA,
     },
     // Pipe
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Question
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // Colon
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::Right,
     },
     // Tilde
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Sigil
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Equals
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // SingleQuote
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // DoubleQuote
     ParseRule {
         prefix_parse_fn: Some(|parser| parser.string()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // Slash
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Term,
+        infix_associativity: Associativity::Left,
     },
     // Pound
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // number
     ParseRule {
         prefix_parse_fn: Some(|parser| parser.number()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // identifier
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // eof
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
     // error
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
+        infix_associativity: Associativity::NA,
     },
 ];
