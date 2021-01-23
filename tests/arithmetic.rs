@@ -65,4 +65,28 @@ mod arithmetic_tests {
             ),
         );
     }
+
+    #[test]
+    fn it_finds_the_calculates_the_power_of_two_integers() {
+        utils::assert_input(
+            "3^2",
+            predicates::str::contains(
+                "Number(
+        9.0,
+    )",
+            ),
+        );
+    }
+
+    #[test]
+    fn it_finds_the_calculates_the_power_of_three_integers() {
+        utils::assert_input(
+            "3^2^3",
+            predicates::str::contains(
+                "Number(
+        6561.0,
+    )",
+            ),
+        );
+    }
 }

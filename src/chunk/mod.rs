@@ -16,6 +16,7 @@ pub enum OpCode {
     Multiply,
     Divide,
     Modulus,
+    Exponentiation,
     Negate,
     OpReturn,
 }

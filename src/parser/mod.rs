@@ -11,6 +11,14 @@ use log::error;
 use std::fmt::Debug;
 use std::slice::Iter;
 
+/// Enum describing associativity of items in the grammar
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
+enum Associativity {
+    NA,
+    Left,
+    Right,
+}
+
 /// Enum that creates a hierarchy of precedences that are associated with a [TokenType].
 ///
 /// Variants with lower values have a lower precedence than higher value variants.
@@ -20,20 +28,13 @@ use std::slice::Iter;
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 enum Precedence {
     None,
-    Assignment, // '='
-    Comparison, // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
-    Term,       // '+' '-'
-    Factor,     // '*' '/' '%'
-    Unary,      // '!' '+' '-'
+    Assignment,     // '='
+    Comparison,     // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
+    Term,           // '+' '-'
+    Factor,         // '*' '/' '%'
+    Unary,          // '!' '+' '-'
+    Exponentiation, // '^'
     Primary,
-}
-
-/// Enum describing associativity of items in the grammar
-#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
-enum Associativity {
-    NA,
-    Left,
-    Right,
 }
 
 impl Precedence {
@@ -52,7 +53,8 @@ impl Precedence {
             Precedence::Comparison => Precedence::Term,
             Precedence::Term => Precedence::Factor,
             Precedence::Factor => Precedence::Unary,
-            Precedence::Unary => Precedence::Primary,
+            Precedence::Unary => Precedence::Exponentiation,
+            Precedence::Exponentiation => Precedence::Primary,
             Precedence::Primary => Precedence::Primary,
         }
     }
@@ -302,6 +304,7 @@ impl<'a> Parser<'a> {
             TokenType::Star => self.emit_byte(OpCode::Multiply),
             TokenType::Slash => self.emit_byte(OpCode::Divide),
             TokenType::Modulus => self.emit_byte(OpCode::Modulus),
+            TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
             _ => {}
         }
     }
@@ -737,8 +740,8 @@ const PARSE_RULES: [ParseRule; 64] = [
     // Caret
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Exponentiation,
         infix_associativity: Associativity::Right,
     },
     // Bang
