@@ -56,6 +56,7 @@ impl VM {
                 OpCode::Subtract => self.binary_op(&instruction),
                 OpCode::Multiply => self.binary_op(&instruction),
                 OpCode::Divide => self.binary_op(&instruction),
+                OpCode::Modulus => self.binary_op(&instruction),
                 OpCode::Negate => self.unary_op(),
                 OpCode::OpConstant(val) => self.stack.push(val),
             }
@@ -133,6 +134,7 @@ impl VM {
                     OpCode::Subtract => self.stack.push(Value::Number(a - b)),
                     OpCode::Multiply => self.stack.push(Value::Number(a * b)),
                     OpCode::Divide => self.stack.push(Value::Number(a / b)),
+                    OpCode::Modulus => self.stack.push(Value::Number(a % b)),
                     _ => panic!("Unknown op code given for binary '{:?}'", op_code),
                 }
             }

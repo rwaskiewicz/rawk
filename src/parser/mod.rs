@@ -23,7 +23,7 @@ enum Precedence {
     Assignment, // '='
     Comparison, // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
     Term,       // '+' '-'
-    Factor,     // '*' '/'
+    Factor,     // '*' '/' '%'
     Unary,      // '!' '+' '-'
     Primary,
 }
@@ -287,6 +287,7 @@ impl<'a> Parser<'a> {
             TokenType::Minus => self.emit_byte(OpCode::Subtract),
             TokenType::Star => self.emit_byte(OpCode::Multiply),
             TokenType::Slash => self.emit_byte(OpCode::Divide),
+            TokenType::Modulus => self.emit_byte(OpCode::Modulus),
             _ => {}
         }
     }
@@ -670,8 +671,8 @@ const PARSE_RULES: [ParseRule; 64] = [
     // Modulus
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Factor,
     },
     // Caret
     ParseRule {
