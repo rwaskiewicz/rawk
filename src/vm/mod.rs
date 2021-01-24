@@ -58,6 +58,7 @@ impl VM {
                 OpCode::Divide => self.binary_op(&instruction),
                 OpCode::Modulus => self.binary_op(&instruction),
                 OpCode::Exponentiation => self.binary_op(&instruction),
+                OpCode::UnaryPlus => self.unary_op(&instruction),
                 OpCode::UnaryMinus => self.unary_op(&instruction),
                 OpCode::LogicalNot => self.unary_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
@@ -152,6 +153,14 @@ impl VM {
 
         if let Value::Number(a) = self.stack.pop().unwrap() {
             match *op_code {
+                // Unary plus will be more useful for converting a string to a number
+                OpCode::UnaryPlus => {
+                    if a == 0.0 {
+                        self.stack.push(Value::Number(0.0))
+                    } else {
+                        self.stack.push(Value::Number(a))
+                    }
+                }
                 OpCode::UnaryMinus => {
                     if a == 0.0 {
                         self.stack.push(Value::Number(0.0))

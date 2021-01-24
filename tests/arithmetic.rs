@@ -127,4 +127,40 @@ mod arithmetic_tests {
             ),
         )
     }
+
+    #[test]
+    fn it_keeps_a_negative_number_as_such_with_unary_plus() {
+        utils::assert_input(
+            "-+9",
+            predicates::str::contains(
+                "Number(
+        -9.0,
+    )",
+            ),
+        )
+    }
+
+    #[test]
+    fn it_keeps_a_negative_number_as_such_with_unary_plus_flipped() {
+        utils::assert_input(
+            "+-9",
+            predicates::str::contains(
+                "Number(
+        -9.0,
+    )",
+            ),
+        )
+    }
+
+    #[test]
+    fn it_does_not_alter_zero_with_unary_plus() {
+        utils::assert_input(
+            "+0",
+            predicates::str::contains(
+                "Number(
+        0.0,
+    )",
+            ),
+        )
+    }
 }

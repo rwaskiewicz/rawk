@@ -268,7 +268,9 @@ impl<'a> Parser<'a> {
         // this also allows for nesting unary expressions, like `--2`
         self.parse_precedence(Precedence::Unary);
 
-        if let TokenType::Minus = operator_type {
+        if let TokenType::Plus = operator_type {
+            self.emit_byte(OpCode::UnaryPlus)
+        } else if let TokenType::Minus = operator_type {
             self.emit_byte(OpCode::UnaryMinus)
         } else if let TokenType::Bang = operator_type {
             self.emit_byte(OpCode::LogicalNot)
@@ -713,7 +715,7 @@ const PARSE_RULES: [ParseRule; 64] = [
     },
     // Plus
     ParseRule {
-        prefix_parse_fn: None,
+        prefix_parse_fn: Some(|parser| parser.unary()),
         infix_parse_fn: Some(|parser| parser.binary()),
         infix_precedence: Precedence::Term,
         infix_associativity: Associativity::Left,
