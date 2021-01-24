@@ -89,4 +89,42 @@ mod arithmetic_tests {
             ),
         );
     }
+
+    #[test]
+    fn it_negates_a_positive_number_with_unary_minus() {
+        utils::assert_input(
+            "9",
+            predicates::str::contains(
+                "Number(
+        9.0,
+    )",
+            ),
+        )
+    }
+
+    #[test]
+    fn it_negates_a_negative_number_with_unary_minus() {
+        utils::assert_input(
+            "-9",
+            predicates::str::contains(
+                "Number(
+        -9.0,
+    )",
+            ),
+        )
+    }
+
+    #[test]
+    fn it_does_not_negate_zero_with_unary_minus() {
+        // echo '-0' | awk '{print -0}' yields 0 BUT
+        // echo '-0' | awk '{print -$1}' yields -0
+        utils::assert_input(
+            "-0",
+            predicates::str::contains(
+                "Number(
+        0.0,
+    )",
+            ),
+        )
+    }
 }

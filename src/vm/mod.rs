@@ -152,7 +152,13 @@ impl VM {
 
         if let Value::Number(a) = self.stack.pop().unwrap() {
             match *op_code {
-                OpCode::UnaryMinus => self.stack.push(Value::Number(-a)),
+                OpCode::UnaryMinus => {
+                    if a == 0.0 {
+                        self.stack.push(Value::Number(0.0))
+                    } else {
+                        self.stack.push(Value::Number(-a))
+                    }
+                }
                 OpCode::LogicalNot => {
                     let mut result: f32 = 1.0;
                     if a > 0.0 {
