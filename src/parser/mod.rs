@@ -269,7 +269,9 @@ impl<'a> Parser<'a> {
         self.parse_precedence(Precedence::Unary);
 
         if let TokenType::Minus = operator_type {
-            self.emit_byte(OpCode::Negate)
+            self.emit_byte(OpCode::UnaryMinus)
+        } else if let TokenType::Bang = operator_type {
+            self.emit_byte(OpCode::LogicalNot)
         }
     }
 
@@ -746,7 +748,7 @@ const PARSE_RULES: [ParseRule; 64] = [
     },
     // Bang
     ParseRule {
-        prefix_parse_fn: None,
+        prefix_parse_fn: Some(|parser| parser.unary()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,

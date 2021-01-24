@@ -58,7 +58,8 @@ impl VM {
                 OpCode::Divide => self.binary_op(&instruction),
                 OpCode::Modulus => self.binary_op(&instruction),
                 OpCode::Exponentiation => self.binary_op(&instruction),
-                OpCode::Negate => self.unary_op(),
+                OpCode::UnaryMinus => self.unary_op(&instruction),
+                OpCode::LogicalNot => self.unary_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
             }
         }
@@ -143,13 +144,24 @@ impl VM {
         }
     }
 
-    fn unary_op(&mut self) {
+    fn unary_op(&mut self, op_code: &OpCode) {
         if !matches!(self.peek(0), Value::Number(_)) {
             eprintln!("Unary operand must be a number.");
             panic!("Unary operand must be a number.");
         }
+
         if let Value::Number(a) = self.stack.pop().unwrap() {
-            self.stack.push(Value::Number(-a));
+            match *op_code {
+                OpCode::UnaryMinus => self.stack.push(Value::Number(-a)),
+                OpCode::LogicalNot => {
+                    let mut result: f32 = 1.0;
+                    if a > 0.0 {
+                        result = 0.0;
+                    }
+                    self.stack.push(Value::Number(result))
+                }
+                _ => panic!("Unknown op code given for unary '{:?}'", op_code),
+            }
         }
     }
 
