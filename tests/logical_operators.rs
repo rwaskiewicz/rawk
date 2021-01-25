@@ -53,4 +53,54 @@ mod logical_tests {
             ),
         );
     }
+
+    // When an expression is used in a Boolean context, ... . Otherwise, a string value of the null
+    // string shall be treated as false and any other value shall be treated as true.
+    #[test]
+    fn it_performs_unary_negation_on_empty_string() {
+        utils::assert_input(
+            "!\"\"",
+            predicates::str::contains(
+                "Number(
+        1.0,
+    )",
+            ),
+        );
+    }
+
+    #[test]
+    fn it_performs_unary_negation_on_non_empty_string() {
+        utils::assert_input(
+            "!\"Hello World\"",
+            predicates::str::contains(
+                "Number(
+        0.0,
+    )",
+            ),
+        );
+    }
+
+    #[test]
+    fn it_performs_unary_negation_on_string_0() {
+        utils::assert_input(
+            "!\"0\"",
+            predicates::str::contains(
+                "Number(
+        0.0,
+    )",
+            ),
+        );
+    }
+
+    #[test]
+    fn it_performs_unary_negation_on_string_1() {
+        utils::assert_input(
+            "!\"1\"",
+            predicates::str::contains(
+                "Number(
+        0.0,
+    )",
+            ),
+        );
+    }
 }

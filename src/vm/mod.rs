@@ -146,37 +146,53 @@ impl VM {
     }
 
     fn unary_op(&mut self, op_code: &OpCode) {
-        if !matches!(self.peek(0), Value::Number(_)) {
-            eprintln!("Unary operand must be a number.");
-            panic!("Unary operand must be a number.");
-        }
-
-        if let Value::Number(a) = self.stack.pop().unwrap() {
-            match *op_code {
-                // Unary plus will be more useful for converting a string to a number
-                OpCode::UnaryPlus => {
-                    if a == 0.0 {
-                        self.stack.push(Value::Number(0.0))
-                    } else {
-                        self.stack.push(Value::Number(a))
+        if matches!(self.peek(0), Value::Number(_)) {
+            if let Value::Number(a) = self.stack.pop().unwrap() {
+                match *op_code {
+                    // Unary plus will be more useful for converting a string to a number
+                    OpCode::UnaryPlus => {
+                        if a == 0.0 {
+                            self.stack.push(Value::Number(0.0))
+                        } else {
+                            self.stack.push(Value::Number(a))
+                        }
                     }
-                }
-                OpCode::UnaryMinus => {
-                    if a == 0.0 {
-                        self.stack.push(Value::Number(0.0))
-                    } else {
-                        self.stack.push(Value::Number(-a))
+                    OpCode::UnaryMinus => {
+                        if a == 0.0 {
+                            self.stack.push(Value::Number(0.0))
+                        } else {
+                            self.stack.push(Value::Number(-a))
+                        }
                     }
-                }
-                OpCode::LogicalNot => {
-                    let mut result: f32 = 1.0;
-                    if a > 0.0 {
-                        result = 0.0;
+                    OpCode::LogicalNot => {
+                        let mut result: f32 = 1.0;
+                        if a > 0.0 {
+                            result = 0.0;
+                        }
+                        self.stack.push(Value::Number(result))
                     }
-                    self.stack.push(Value::Number(result))
+                    _ => panic!("Unknown op code given for unary '{:?}'", op_code),
                 }
-                _ => panic!("Unknown op code given for unary '{:?}'", op_code),
             }
+        } else if matches!(self.peek(0), Value::String(_)) {
+            if let Value::String(a) = self.stack.pop().unwrap() {
+                match *op_code {
+                    OpCode::LogicalNot => {
+                        debug!("Looking at string '{}' with len {}", a, a.len());
+                        let mut result: f32 = 1.0;
+                        // TODO: ATM We store empty strings as '""' which is 2 characters...
+                        if a.len() > 2 {
+                            result = 0.0;
+                        }
+                        self.stack.push(Value::Number(result));
+                    }
+                    _ => panic!("Unknown op code given for unary '{:?}'", op_code),
+                }
+            }
+        } else {
+            let err_msg = "Unary operand must be a number or string.";
+            eprintln!("{}", err_msg);
+            panic!("{}", err_msg);
         }
     }
 
