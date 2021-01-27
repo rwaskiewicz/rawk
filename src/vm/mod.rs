@@ -34,6 +34,7 @@ impl VM {
             self.ip += 1;
 
             let instruction: OpCode = self.chunk.code[old_ip].code.clone();
+
             debug!("{:#?}", &instruction);
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {

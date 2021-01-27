@@ -1,13 +1,11 @@
 use clap::{App, Arg};
-use env_logger::Builder;
-use log::{error, LevelFilter};
+use env_logger::{Builder, Env};
+use log::error;
 use std::io;
 use std::io::Write;
 
 fn main() {
-    let mut logger_builder = Builder::from_default_env();
-    // TODO: This isn't overridable
-    logger_builder.filter(None, LevelFilter::Info).init();
+    Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let matches = App::new("r-awk")
         .version("0.0.1")

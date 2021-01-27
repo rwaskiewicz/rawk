@@ -409,6 +409,7 @@ impl<'a> Parser<'a> {
     }
 
     fn end_compiler(&mut self) {
+        self.compiling_chunk.disassemble_chunk("code");
         self.emit_return();
     }
 }
