@@ -161,7 +161,7 @@ impl Chunk {
         offset: usize,
         value: &Value,
     ) -> usize {
-        debug!("{} {} {:#?}", prelude, name, value);
+        debug!("{} {} {}", prelude, name, value);
         offset + 1
     }
 }

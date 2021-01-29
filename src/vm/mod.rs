@@ -39,7 +39,7 @@ impl VM {
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {
                     Some(val) => {
-                        info!("{:#?}", val);
+                        info!("{}", val.to_string());
                         return InterpretResult::Ok;
                     }
                     None => {

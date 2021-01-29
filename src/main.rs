@@ -5,7 +5,9 @@ use std::io;
 use std::io::Write;
 
 fn main() {
-    Builder::from_env(Env::default().default_filter_or("info")).init();
+    Builder::from_env(Env::default().default_filter_or("info"))
+        .format_timestamp(None)
+        .init();
 
     let matches = App::new("r-awk")
         .version("0.0.1")
