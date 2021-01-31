@@ -7,6 +7,7 @@ use std::fmt;
 pub enum Value {
     Number(f32),
     String(String),
+    StrNum(String),
 }
 
 /// Display trait implementation for Value
@@ -30,6 +31,7 @@ impl fmt::Display for Value {
                 write!(f, "{}", num)
             }
             Value::String(val) => write!(f, "{}", val.as_str()),
+            Value::StrNum(val) => write!(f, "{}", val.as_str()),
         }
     }
 }
@@ -52,5 +54,11 @@ mod value {
     fn it_displays_a_string() {
         let input = "Hello World";
         assert_eq!(Value::String(String::from(input)).to_string(), input);
+    }
+
+    #[test]
+    fn it_displays_a_numeric_string() {
+        let input = "   +3.14";
+        assert_eq!(Value::StrNum(String::from(input)).to_string(), input);
     }
 }

@@ -47,12 +47,12 @@ impl VM {
                         return InterpretResult::RuntimeError;
                     }
                 },
-                OpCode::GreaterEqual => self.binary_op(&instruction),
-                OpCode::Greater => self.binary_op(&instruction),
-                OpCode::LessEqual => self.binary_op(&instruction),
-                OpCode::Less => self.binary_op(&instruction),
-                OpCode::DoubleEqual => self.binary_op(&instruction),
-                OpCode::NotEqual => self.binary_op(&instruction),
+                OpCode::GreaterEqual => self.comparison_op(&instruction),
+                OpCode::Greater => self.comparison_op(&instruction),
+                OpCode::LessEqual => self.comparison_op(&instruction),
+                OpCode::Less => self.comparison_op(&instruction),
+                OpCode::DoubleEqual => self.comparison_op(&instruction),
+                OpCode::NotEqual => self.comparison_op(&instruction),
                 OpCode::Add => self.binary_op(&instruction),
                 OpCode::Subtract => self.binary_op(&instruction),
                 OpCode::Multiply => self.binary_op(&instruction),
@@ -84,6 +84,27 @@ impl VM {
     }
 
     fn binary_op(&mut self, op_code: &OpCode) {
+        if !matches!(self.peek(0), Value::Number(_)) || !matches!(self.peek(1), Value::Number(_)) {
+            eprintln!("Both operands must be numbers.");
+            panic!("Both operands must be numbers."); // TODO: Return Runtime Error
+        }
+
+        if let Value::Number(b) = self.stack.pop().unwrap() {
+            if let Value::Number(a) = self.stack.pop().unwrap() {
+                match *op_code {
+                    OpCode::Add => self.stack.push(Value::Number(a + b)),
+                    OpCode::Subtract => self.stack.push(Value::Number(a - b)),
+                    OpCode::Multiply => self.stack.push(Value::Number(a * b)),
+                    OpCode::Divide => self.stack.push(Value::Number(a / b)),
+                    OpCode::Modulus => self.stack.push(Value::Number(a % b)),
+                    OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
+                    _ => panic!("Unknown op code given for binary '{:?}'", op_code),
+                }
+            }
+        }
+    }
+
+    fn comparison_op(&mut self, op_code: &OpCode) {
         if !matches!(self.peek(0), Value::Number(_)) || !matches!(self.peek(1), Value::Number(_)) {
             eprintln!("Both operands must be numbers.");
             panic!("Both operands must be numbers."); // TODO: Return Runtime Error
@@ -134,13 +155,7 @@ impl VM {
                         }
                         self.stack.push(Value::Number(result))
                     }
-                    OpCode::Add => self.stack.push(Value::Number(a + b)),
-                    OpCode::Subtract => self.stack.push(Value::Number(a - b)),
-                    OpCode::Multiply => self.stack.push(Value::Number(a * b)),
-                    OpCode::Divide => self.stack.push(Value::Number(a / b)),
-                    OpCode::Modulus => self.stack.push(Value::Number(a % b)),
-                    OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
-                    _ => panic!("Unknown op code given for binary '{:?}'", op_code),
+                    _ => panic!("Unknown op code given for comparison '{:?}'", op_code),
                 }
             }
         }
