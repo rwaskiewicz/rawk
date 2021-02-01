@@ -106,7 +106,6 @@ impl Scanner {
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
 
                     let mut string_parsed = String::from("");
-                    string_parsed.push(ch);
                     while let Some(_maybe_quote) = char_stream.peek() {
                         if let Some(next_ch) = char_stream.next() {
                             if next_ch == '\n' {
@@ -114,7 +113,6 @@ impl Scanner {
                             } else if next_ch == '\"' {
                                 // TODO: Handle EOF/unterminated string
                                 ch = next_ch;
-                                string_parsed.push(ch);
                                 break;
                             }
                             ch = next_ch;
@@ -481,7 +479,7 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_double_quote() {
+    fn it_parses_a_string() {
         let tokens = Scanner::new(String::from("\"Hello World!\"")).scan();
 
         // +1 for EOF token
@@ -489,7 +487,7 @@ mod lexing {
         assert_eq!(
             tokens.iter().next(),
             Some(&Token {
-                lexeme: Some(String::from("\"Hello World!\"")),
+                lexeme: Some(String::from("Hello World!")),
                 token_type: &TokenType::DoubleQuote,
                 line: 1,
             })
@@ -506,7 +504,7 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
-                lexeme: Some(String::from("\"Hello World!\"")),
+                lexeme: Some(String::from("Hello World!")),
                 token_type: &TokenType::DoubleQuote,
                 line: 1,
             })

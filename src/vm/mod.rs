@@ -179,10 +179,8 @@ impl VM {
             if let Value::String(a) = self.stack.pop().unwrap() {
                 match *op_code {
                     OpCode::LogicalNot => {
-                        debug!("Looking at string '{}' with len {}", a, a.len());
                         let mut result: f32 = 1.0;
-                        // TODO: ATM We store empty strings as '""' which is 2 characters...
-                        if a.len() > 2 {
+                        if a.len() > 0 {
                             result = 0.0;
                         }
                         self.stack.push(Value::Number(result));
