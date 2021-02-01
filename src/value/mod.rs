@@ -10,6 +10,52 @@ pub enum Value {
     StrNum(String),
 }
 
+impl Value {
+    pub fn is_number(&self) -> bool {
+        return matches!(self, Value::Number(_));
+    }
+
+    pub fn is_string(&self) -> bool {
+        return matches!(self, Value::String(_));
+    }
+
+    pub fn is_string_number(&self) -> bool {
+        return matches!(self, Value::StrNum(_));
+    }
+
+    pub fn num_value(&self) -> f32 {
+        match self {
+            Value::Number(val) => *val,
+            Value::String(val) | Value::StrNum(val) => {
+                //echo 'hi' | awk '{print 2 + "-2fixx"}', echo 'hi' | awk '{print 2 + "---2fixx"}'
+                // TODO: This is basic for now, need to make this much more flexible
+                let mut end_num_index = 0;
+                for char in val.chars() {
+                    if char.is_numeric() || char == '"' {
+                        end_num_index += 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                let prelim = &val[0..end_num_index];
+                let result = str::replace(prelim, "\"", "");
+
+                result.parse().unwrap()
+            }
+        }
+    }
+
+    pub fn str_value(&self) -> String {
+        match self {
+            // TODO: This isn't 100% right yet..
+            Value::Number(val) => val.to_string(),
+            Value::String(val) => val.clone(),
+            Value::StrNum(val) => val.clone(),
+        }
+    }
+}
+
 /// Display trait implementation for Value
 impl fmt::Display for Value {
     /// Format the Value
