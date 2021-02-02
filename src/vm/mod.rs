@@ -127,17 +127,59 @@ impl VM {
         let a = self.stack.pop().unwrap();
 
         if is_string_comparison {
-            debug!("I need to implement string comp");
-            let f = a.str_value() > b.str_value();
-            let mut result = 0.0;
-            if f {
-                result = 1.0;
-            }
-            self.stack.push(Value::Number(result));
+            self.string_comparison(op_code, &*a.str_value(), &*b.str_value());
         } else {
             debug!("Hey a {}", a.num_value());
             debug!("Hey b {}", b.num_value());
             self.numeric_comparison(op_code, a.num_value(), b.num_value());
+        }
+    }
+
+    fn string_comparison(&mut self, op_code: &OpCode, a: &str, b: &str) {
+        match *op_code {
+            OpCode::GreaterEqual => {
+                let mut result: f32 = 0.0;
+                if a >= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Greater => {
+                let mut result: f32 = 0.0;
+                if a > b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::LessEqual => {
+                let mut result: f32 = 0.0;
+                if a <= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Less => {
+                let mut result: f32 = 0.0;
+                if a < b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::DoubleEqual => {
+                let mut result: f32 = 0.0;
+                if a.eq(b) {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::NotEqual => {
+                let mut result: f32 = 0.0;
+                if a.ne(b) {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            _ => panic!("Unknown op code given for comparison '{:?}'", op_code),
         }
     }
 
