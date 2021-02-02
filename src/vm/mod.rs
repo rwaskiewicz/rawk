@@ -105,26 +105,6 @@ impl VM {
     }
 
     fn comparison_op(&mut self, op_code: &OpCode) {
-        // if !matches!(self.peek(0), Value::Number(_)) || !matches!(self.peek(1), Value::Number(_)) {
-        //     eprintln!("Both operands must be numbers.");
-        //     panic!("Both operands must be numbers."); // TODO: Return Runtime Error
-        // }
-
-        // let mut b: Value;
-        // match self.stack.pop().unwrap() {
-        //     Value::Number(num_b) => b = Value::Number(num_b),
-        //     Value::String(str_b) => b = Value::String(str_b),
-        //     Value::StrNum(str_num_b) => b = Value::StrNum(str_num_b),
-        // }
-        //
-        // let mut a: Value;
-        // match self.stack.pop().unwrap() {
-        //     Value::Number(num_a) => a = Value::Number(num_a),
-        //     Value::String(str_a) => a = Value::String(str_a),
-        //     Value::StrNum(str_num_a) => a = Value::StrNum(str_num_a),
-        // }
-
-        // https://www.gnu.org/software/gawk/manual/html_node/Variable-Typing.html
         // When two operands are compared, either string comparison or numeric comparison may be
         // used. This depends upon the attributes of the operands, according to the following
         // symmetric matrix:
@@ -138,32 +118,30 @@ impl VM {
         //         |
         // STRNUM  |       string          numeric         numeric
         // --------+----------------------------------------------
-        // let is_string_comparison = matches!(self.stack.peek(0), Value::String(_))
-        //     || matches!(self.stack.peek(1), Value::String(_));
+        // via https://www.gnu.org/software/gawk/manual/html_node/Variable-Typing.html
 
-        let mut b: Value;
-        match self.stack.pop().unwrap() {
-            Value::Number(num_b) => b = Value::Number(num_b),
-            Value::String(str_b) => b = Value::String(str_b),
-            Value::StrNum(str_num_b) => b = Value::StrNum(str_num_b),
-        }
+        let is_string_comparison =
+            matches!(self.peek(0), Value::String(_)) || matches!(self.peek(1), Value::String(_));
 
-        let mut a: Value;
-        match self.stack.pop().unwrap() {
-            Value::Number(num_a) => a = Value::Number(num_a),
-            Value::String(str_a) => a = Value::String(str_a),
-            Value::StrNum(str_num_a) => a = Value::StrNum(str_num_a),
-        }
+        let b = self.stack.pop().unwrap();
+        let a = self.stack.pop().unwrap();
 
-        if true {
+        if is_string_comparison {
+            debug!("I need to implement string comp");
+            let f = a.str_value() > b.str_value();
+            let mut result = 0.0;
+            if f {
+                result = 1.0;
+            }
+            self.stack.push(Value::Number(result));
+        } else {
             debug!("Hey a {}", a.num_value());
             debug!("Hey b {}", b.num_value());
+            self.numeric_comparison(op_code, a.num_value(), b.num_value());
         }
-
-        self.numeric_comparison(op_code, a, b);
     }
 
-    fn numeric_comparison(&mut self, op_code: &OpCode, a: Value::Number, b: Value::Number) {
+    fn numeric_comparison(&mut self, op_code: &OpCode, a: f32, b: f32) {
         match *op_code {
             OpCode::GreaterEqual => {
                 let mut result: f32 = 0.0;
