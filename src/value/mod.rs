@@ -1,5 +1,6 @@
 //! Module to describe Values under the hood in r-awk
 
+use crate::chunk::OpCode;
 use std::fmt;
 
 /// Enum whose variants are underlying data types
