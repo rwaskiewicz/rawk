@@ -265,7 +265,7 @@ impl VM {
                 match *op_code {
                     OpCode::LogicalNot => {
                         let mut result: f32 = 1.0;
-                        if a.len() > 0 {
+                        if !a.is_empty() {
                             result = 0.0;
                         }
                         self.stack.push(Value::Number(result));
