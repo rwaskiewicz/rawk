@@ -112,7 +112,6 @@ impl Scanner {
                                 current_line += 1;
                             } else if next_ch == '\"' {
                                 // TODO: Handle EOF/unterminated string
-                                ch = next_ch;
                                 break;
                             }
                             ch = next_ch;
