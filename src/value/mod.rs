@@ -69,13 +69,7 @@ impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Value::Number(val) => {
-                // TODO: This is a hack as I can't understand formatter docs
-                // https://stackoverflow.com/questions/37506672/convert-float-to-integer-in-rust?rq=1
-                let mut num = val.to_string();
-                if val.fract() == 0.0 {
-                    num.push_str(".0");
-                }
-                write!(f, "{}", num)
+                write!(f, "{}", val.to_string())
             }
             Value::String(val) => write!(f, "{}", val.as_str()),
             Value::StrNum(val) => write!(f, "{}", val.as_str()),
@@ -88,8 +82,8 @@ mod value {
     use crate::value::Value;
 
     #[test]
-    fn it_displays_a_number_with_one_decimal_point() {
-        assert_eq!(Value::Number(4.0).to_string(), "4.0");
+    fn it_displays_a_number_with_no_decimal_points() {
+        assert_eq!(Value::Number(4.0).to_string(), "4");
     }
 
     #[test]
