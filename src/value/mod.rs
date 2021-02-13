@@ -63,9 +63,7 @@ impl fmt::Display for Value {
     /// The resulting formatted string
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Value::Number(val) => {
-                write!(f, "{}", val.to_string())
-            }
+            Value::Number(val) => write!(f, "{}", val.to_string()),
             Value::String(val) => write!(f, "{}", val.as_str()),
             Value::StrNum(val) => write!(f, "{}", val.as_str()),
         }
