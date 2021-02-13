@@ -35,7 +35,7 @@ impl VM {
 
             let instruction: OpCode = self.chunk.code[old_ip].code.clone();
 
-            debug!("{:#?}", &instruction);
+            debug!("VM switching on instruction '{:#?}'", &instruction);
             match instruction {
                 OpCode::OpReturn => match self.stack.pop() {
                     Some(val) => {
@@ -47,12 +47,12 @@ impl VM {
                         return InterpretResult::RuntimeError;
                     }
                 },
-                OpCode::GreaterEqual => self.binary_op(&instruction),
-                OpCode::Greater => self.binary_op(&instruction),
-                OpCode::LessEqual => self.binary_op(&instruction),
-                OpCode::Less => self.binary_op(&instruction),
-                OpCode::DoubleEqual => self.binary_op(&instruction),
-                OpCode::NotEqual => self.binary_op(&instruction),
+                OpCode::GreaterEqual => self.comparison_op(&instruction),
+                OpCode::Greater => self.comparison_op(&instruction),
+                OpCode::LessEqual => self.comparison_op(&instruction),
+                OpCode::Less => self.comparison_op(&instruction),
+                OpCode::DoubleEqual => self.comparison_op(&instruction),
+                OpCode::NotEqual => self.comparison_op(&instruction),
                 OpCode::Add => self.binary_op(&instruction),
                 OpCode::Subtract => self.binary_op(&instruction),
                 OpCode::Multiply => self.binary_op(&instruction),
@@ -92,48 +92,6 @@ impl VM {
         if let Value::Number(b) = self.stack.pop().unwrap() {
             if let Value::Number(a) = self.stack.pop().unwrap() {
                 match *op_code {
-                    OpCode::GreaterEqual => {
-                        let mut result: f32 = 0.0;
-                        if a >= b {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    OpCode::Greater => {
-                        let mut result: f32 = 0.0;
-                        if a > b {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    OpCode::LessEqual => {
-                        let mut result: f32 = 0.0;
-                        if a <= b {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    OpCode::Less => {
-                        let mut result: f32 = 0.0;
-                        if a < b {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    OpCode::DoubleEqual => {
-                        let mut result: f32 = 0.0;
-                        if (a - b).abs() == 0.0 {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    OpCode::NotEqual => {
-                        let mut result: f32 = 0.0;
-                        if (a - b).abs() != 0.0 {
-                            result = 1.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
                     OpCode::Add => self.stack.push(Value::Number(a + b)),
                     OpCode::Subtract => self.stack.push(Value::Number(a - b)),
                     OpCode::Multiply => self.stack.push(Value::Number(a * b)),
@@ -143,6 +101,147 @@ impl VM {
                     _ => panic!("Unknown op code given for binary '{:?}'", op_code),
                 }
             }
+        }
+    }
+
+    /// Perform a relational comparison between two operators on the stack
+    ///
+    /// When two operands are compared, either string comparison or numeric comparison may be
+    /// used. This depends upon the attributes of the operands, according to the following
+    /// symmetric matrix:
+    ///         +----------------------------------------------
+    ///         |       STRING          NUMERIC         STRNUM
+    /// --------+----------------------------------------------
+    ///         |
+    /// STRING  |       string          string          string
+    ///         |
+    /// NUMERIC |       string          numeric         numeric
+    ///         |
+    /// STRNUM  |       string          numeric         numeric
+    /// --------+----------------------------------------------
+    /// [Source - GNU Awk Manual](https://www.gnu.org/software/gawk/manual/html_node/Variable-Typing.html)
+    fn comparison_op(&mut self, op_code: &OpCode) {
+        let is_string_comparison =
+            matches!(self.peek(0), Value::String(_)) || matches!(self.peek(1), Value::String(_));
+
+        let b = self.stack.pop().unwrap();
+        let a = self.stack.pop().unwrap();
+
+        if is_string_comparison {
+            self.string_comparison(op_code, &*a.str_value(), &*b.str_value());
+        } else {
+            self.numeric_comparison(op_code, a.num_value(), b.num_value());
+        }
+    }
+
+    /// Perform a relational comparison between two strings, and push the result onto the stack
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
+    /// - `a` the first argument of the comparison. Is placed on the left hand side of the expression
+    /// - `b` the second argument of the comparison. Is placed on the right hand side of the expression
+    fn string_comparison(&mut self, op_code: &OpCode, a: &str, b: &str) {
+        match *op_code {
+            OpCode::GreaterEqual => {
+                let mut result: f32 = 0.0;
+                if a >= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Greater => {
+                let mut result: f32 = 0.0;
+                if a > b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::LessEqual => {
+                let mut result: f32 = 0.0;
+                if a <= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Less => {
+                let mut result: f32 = 0.0;
+                if a < b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::DoubleEqual => {
+                let mut result: f32 = 0.0;
+                if a.eq(b) {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::NotEqual => {
+                let mut result: f32 = 0.0;
+                if a.ne(b) {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            _ => panic!(
+                "Unknown op code given for string comparison '{:?}'",
+                op_code
+            ),
+        }
+    }
+
+    /// Perform a relational comparison between two numbers, and push the result onto the stack
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
+    /// - `a` the first argument of the comparison. Is placed on the left hand side of the expression
+    /// - `b` the second argument of the comparison. Is placed on the right hand side of the expression
+    fn numeric_comparison(&mut self, op_code: &OpCode, a: f32, b: f32) {
+        match *op_code {
+            OpCode::GreaterEqual => {
+                let mut result: f32 = 0.0;
+                if a >= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Greater => {
+                let mut result: f32 = 0.0;
+                if a > b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::LessEqual => {
+                let mut result: f32 = 0.0;
+                if a <= b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::Less => {
+                let mut result: f32 = 0.0;
+                if a < b {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::DoubleEqual => {
+                let mut result: f32 = 0.0;
+                if (a - b).abs() == 0.0 {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            OpCode::NotEqual => {
+                let mut result: f32 = 0.0;
+                if (a - b).abs() != 0.0 {
+                    result = 1.0;
+                }
+                self.stack.push(Value::Number(result))
+            }
+            _ => panic!("Unknown op code given for comparison '{:?}'", op_code),
         }
     }
 
@@ -180,7 +279,7 @@ impl VM {
                 match *op_code {
                     OpCode::LogicalNot => {
                         let mut result: f32 = 1.0;
-                        if a.len() > 0 {
+                        if !a.is_empty() {
                             result = 0.0;
                         }
                         self.stack.push(Value::Number(result));
