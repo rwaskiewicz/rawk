@@ -1,6 +1,5 @@
 //! Module to describe Values under the hood in r-awk
 
-use crate::chunk::OpCode;
 use std::fmt;
 
 /// Enum whose variants are underlying data types
@@ -12,18 +11,6 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn is_number(&self) -> bool {
-        return matches!(self, Value::Number(_));
-    }
-
-    pub fn is_string(&self) -> bool {
-        return matches!(self, Value::String(_));
-    }
-
-    pub fn is_string_number(&self) -> bool {
-        return matches!(self, Value::StrNum(_));
-    }
-
     pub fn num_value(&self) -> f32 {
         match self {
             Value::Number(val) => *val,
