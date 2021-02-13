@@ -11,11 +11,15 @@ pub enum Value {
 }
 
 impl Value {
+    /// Convert a Value to a number
+    ///
+    /// # Return value
+    /// The value converted to a number
     pub fn num_value(&self) -> f32 {
         match self {
             Value::Number(val) => *val,
             Value::String(val) | Value::StrNum(val) => {
-                //echo 'hi' | awk '{print 2 + "-2fixx"}', echo 'hi' | awk '{print 2 + "---2fixx"}'
+                // echo 'hi' | awk '{print 2 + "-2fixx"}', echo 'hi' | awk '{print 2 + "---2fixx"}'
                 // TODO: This is basic for now, need to make this much more flexible
                 let mut end_num_index = 0;
                 for char in val.chars() {
@@ -34,6 +38,10 @@ impl Value {
         }
     }
 
+    /// Convert a Value to a string
+    ///
+    /// # Return value
+    /// The value converted to a string
     pub fn str_value(&self) -> String {
         match self {
             // TODO: This isn't 100% right yet..
