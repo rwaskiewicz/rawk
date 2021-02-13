@@ -295,4 +295,54 @@ mod relational_tests {
     fn compares_two_strings_less_than_empty_rhs() {
         utils::assert_input("\"a\"<\"\"", predicates::str::contains("0"));
     }
+
+    #[test]
+    fn compares_a_number_and_string_double_equal() {
+        utils::assert_input("\"a\"==1", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_not_equal() {
+        utils::assert_input("\"a\"!=1", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_greater_equal() {
+        utils::assert_input("\"a\">=1", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_greater_equal_symmetric() {
+        utils::assert_input("1>=\"a\"", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_greater() {
+        utils::assert_input("\"a\">1", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_greater_symmetric() {
+        utils::assert_input("1>\"a\"", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_less_than_equal() {
+        utils::assert_input("\"a\"<=1", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_less_than_equal_symmetric() {
+        utils::assert_input("1<=\"a\"", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_less_than() {
+        utils::assert_input("\"a\"<1", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn compares_a_number_and_string_less_than_symmetric() {
+        utils::assert_input("1<\"a\"", predicates::str::contains("1"));
+    }
 }
