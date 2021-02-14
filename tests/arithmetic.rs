@@ -72,4 +72,124 @@ mod arithmetic_tests {
     fn it_does_not_alter_zero_with_unary_plus() {
         utils::assert_input("+0", predicates::str::contains("0"))
     }
+
+    #[test]
+    fn it_sums_an_integer_and_a_string() {
+        utils::assert_input("2.14 + \"1Hello\"", predicates::str::contains("3.14"))
+    }
+
+    #[test]
+    fn it_sums_a_float_and_a_string() {
+        utils::assert_input("2.14 + \"1.24Hello\"", predicates::str::contains("3.38"))
+    }
+
+    #[test]
+    fn it_sums_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" + 2", predicates::str::contains("4"))
+    }
+
+    #[test]
+    fn it_sums_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" + 1.21", predicates::str::contains("6.76"))
+    }
+
+    #[test]
+    fn it_subtracts_an_integer_and_a_string() {
+        utils::assert_input("2.14 - \"1Hello\"", predicates::str::contains("1.14"))
+    }
+
+    #[test]
+    fn it_subtracts_a_float_and_a_string() {
+        utils::assert_input("2.14 - \"1.24Hello\"", predicates::str::contains(".9"))
+    }
+
+    #[test]
+    fn it_subtracts_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" - 2", predicates::str::contains("0"))
+    }
+
+    #[test]
+    fn it_subtracts_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" - 1.21", predicates::str::contains("4.34"))
+    }
+
+    #[test]
+    fn it_multiplies_an_integer_and_a_string() {
+        utils::assert_input("2.14 * \"1Hello\"", predicates::str::contains("2.14"))
+    }
+
+    #[test]
+    fn it_multiplies_a_float_and_a_string() {
+        utils::assert_input("2.14 * \"1.24Hello\"", predicates::str::contains("2.6536"))
+    }
+
+    #[test]
+    fn it_multiplies_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" * 2", predicates::str::contains("4"))
+    }
+
+    #[test]
+    fn it_multiplies_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" * 1.21", predicates::str::contains("6.7155"))
+    }
+
+    #[test]
+    fn it_divides_an_integer_and_a_string() {
+        utils::assert_input("2.14 / \"1Hello\"", predicates::str::contains("2.14"))
+    }
+
+    #[test]
+    fn it_divides_a_float_and_a_string() {
+        utils::assert_input("2.14 / \"1.24Hello\"", predicates::str::contains("1.7258"))
+    }
+
+    #[test]
+    fn it_divides_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" / 2", predicates::str::contains("1"))
+    }
+
+    #[test]
+    fn it_divides_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" / 1.21", predicates::str::contains("4.5867"))
+    }
+
+    #[test]
+    fn it_modulos_an_integer_and_a_string() {
+        utils::assert_input("2.14 % \"1Hello\"", predicates::str::contains("0.14"))
+    }
+
+    #[test]
+    fn it_modulos_a_float_and_a_string() {
+        utils::assert_input("2.14 % \"1.24Hello\"", predicates::str::contains("0.9"))
+    }
+
+    #[test]
+    fn it_modulos_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" % 2", predicates::str::contains("0"))
+    }
+
+    #[test]
+    fn it_modulos_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" % 1.21", predicates::str::contains("0.71"))
+    }
+
+    #[test]
+    fn it_exponentiates_an_integer_and_a_string() {
+        utils::assert_input("2.14 ^ \"1Hello\"", predicates::str::contains("2.14"))
+    }
+
+    #[test]
+    fn it_exponentiates_a_float_and_a_string() {
+        utils::assert_input("2.14 ^ \"1.24Hello\"", predicates::str::contains("2.568"))
+    }
+
+    #[test]
+    fn it_exponentiates_a_string_and_an_integer() {
+        utils::assert_input("\"02Hello\" ^ 2", predicates::str::contains("4"))
+    }
+
+    #[test]
+    fn it_exponentiates_a_string_and_a_float() {
+        utils::assert_input("\"5.55Hello\" ^ 1.21", predicates::str::contains("7.9541"))
+    }
 }

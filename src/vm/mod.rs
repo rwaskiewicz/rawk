@@ -53,19 +53,18 @@ impl VM {
                 OpCode::Less => self.comparison_op(&instruction),
                 OpCode::DoubleEqual => self.comparison_op(&instruction),
                 OpCode::NotEqual => self.comparison_op(&instruction),
-                OpCode::Add => self.binary_op(&instruction),
-                OpCode::Subtract => self.binary_op(&instruction),
-                OpCode::Multiply => self.binary_op(&instruction),
-                OpCode::Divide => self.binary_op(&instruction),
-                OpCode::Modulus => self.binary_op(&instruction),
-                OpCode::Exponentiation => self.binary_op(&instruction),
+                OpCode::Add => self.arithmetic_op(&instruction),
+                OpCode::Subtract => self.arithmetic_op(&instruction),
+                OpCode::Multiply => self.arithmetic_op(&instruction),
+                OpCode::Divide => self.arithmetic_op(&instruction),
+                OpCode::Modulus => self.arithmetic_op(&instruction),
+                OpCode::Exponentiation => self.arithmetic_op(&instruction),
                 OpCode::UnaryPlus => self.unary_op(&instruction),
                 OpCode::UnaryMinus => self.unary_op(&instruction),
                 OpCode::LogicalNot => self.unary_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
             }
         }
-        InterpretResult::Ok
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
@@ -83,28 +82,32 @@ impl VM {
         self.run()
     }
 
-    fn binary_op(&mut self, op_code: &OpCode) {
-        if !matches!(self.peek(0), Value::Number(_)) || !matches!(self.peek(1), Value::Number(_)) {
-            eprintln!("Both operands must be numbers.");
-            panic!("Both operands must be numbers."); // TODO: Return Runtime Error
-        }
+    /// Perform an arithmetic operation on two values on the stack, placing the result on the stack
+    ///
+    /// The values on the stack shall be implicitly converted into their string representations for
+    /// the operations supported by this method immediately following popping them from the stack
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
+    fn arithmetic_op(&mut self, op_code: &OpCode) {
+        let b = self.stack.pop().unwrap().num_value();
+        let a = self.stack.pop().unwrap().num_value();
 
-        if let Value::Number(b) = self.stack.pop().unwrap() {
-            if let Value::Number(a) = self.stack.pop().unwrap() {
-                match *op_code {
-                    OpCode::Add => self.stack.push(Value::Number(a + b)),
-                    OpCode::Subtract => self.stack.push(Value::Number(a - b)),
-                    OpCode::Multiply => self.stack.push(Value::Number(a * b)),
-                    OpCode::Divide => self.stack.push(Value::Number(a / b)),
-                    OpCode::Modulus => self.stack.push(Value::Number(a % b)),
-                    OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
-                    _ => panic!("Unknown op code given for binary '{:?}'", op_code),
-                }
-            }
+        match *op_code {
+            OpCode::Add => self.stack.push(Value::Number(a + b)),
+            OpCode::Subtract => self.stack.push(Value::Number(a - b)),
+            OpCode::Multiply => self.stack.push(Value::Number(a * b)),
+            OpCode::Divide => self.stack.push(Value::Number(a / b)),
+            OpCode::Modulus => self.stack.push(Value::Number(a % b)),
+            OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
+            _ => panic!(
+                "Unknown op code given for arithmetic operation '{:?}'",
+                op_code
+            ),
         }
     }
 
-    /// Perform a relational comparison between two operators on the stack
+    /// Perform a relational comparison between two values on the stack
     ///
     /// When two operands are compared, either string comparison or numeric comparison may be
     /// used. This depends upon the attributes of the operands, according to the following
@@ -120,6 +123,9 @@ impl VM {
     /// STRNUM  |       string          numeric         numeric
     /// --------+----------------------------------------------
     /// [Source - GNU Awk Manual](https://www.gnu.org/software/gawk/manual/html_node/Variable-Typing.html)
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
     fn comparison_op(&mut self, op_code: &OpCode) {
         let is_string_comparison =
             matches!(self.peek(0), Value::String(_)) || matches!(self.peek(1), Value::String(_));
