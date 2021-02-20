@@ -29,7 +29,12 @@ impl VM {
     }
 
     pub fn run(&mut self) -> InterpretResult {
+        let mut ret_ok = false;
         loop {
+            if ret_ok {
+                return InterpretResult::Ok;
+            }
+
             let old_ip = self.ip;
             self.ip += 1;
 
@@ -37,16 +42,16 @@ impl VM {
 
             debug!("VM switching on instruction '{:#?}'", &instruction);
             match instruction {
-                OpCode::OpReturn => match self.stack.pop() {
+                OpCode::OpPrint => match self.stack.pop() {
                     Some(val) => {
                         info!("{}", val.to_string());
-                        return InterpretResult::Ok;
                     }
                     None => {
-                        error!("Error: Something went wrong trying to temp return");
-                        return InterpretResult::RuntimeError;
+                        error!("Error: The stack was empty when trying to print");
+                        panic!(InterpretResult::RuntimeError);
                     }
                 },
+                OpCode::OpReturn => ret_ok = true,
                 OpCode::GreaterEqual => self.comparison_op(&instruction),
                 OpCode::Greater => self.comparison_op(&instruction),
                 OpCode::LessEqual => self.comparison_op(&instruction),

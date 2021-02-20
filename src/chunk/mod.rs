@@ -4,8 +4,6 @@ use crate::value;
 use crate::value::Value;
 use log::debug;
 
-// TODO: Fix output of Value
-
 // TODO: Look further into byte alignment
 /// Enum describing different operations (operation codes)
 #[derive(Clone, Debug)]
@@ -27,6 +25,7 @@ pub enum OpCode {
     UnaryMinus,
     LogicalNot,
     OpReturn,
+    OpPrint,
 }
 
 /// Struct describing an OpCode and the line in the original corpus it appears in
@@ -119,6 +118,7 @@ impl Chunk {
                 Chunk::simple_instruction(&instruction_info, "LogicalNot", offset)
             }
             OpCode::OpReturn => Chunk::simple_instruction(&instruction_info, "OpReturn", offset),
+            OpCode::OpPrint => Chunk::simple_instruction(&instruction_info, "OpPrint", offset),
             _ => {
                 debug!("Unknown opcode {:#?}!", instruction);
                 offset + 1

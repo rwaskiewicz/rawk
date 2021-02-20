@@ -115,8 +115,11 @@ impl<'a> Parser<'a> {
     pub fn parse(&mut self) -> bool {
         // prime the pump, so that the `current_token` is defined
         self.advance();
-        self.expression();
-        self.consume(&TokenType::Eof, "Expect end of expression token");
+
+        while !self.match_token(&TokenType::Eof) {
+            self.statement();
+        }
+
         self.end_compiler();
 
         !self.had_error
@@ -217,6 +220,47 @@ impl<'a> Parser<'a> {
         }
         // the `current_token` didn't match, report the error
         self.error_at_current(error_msg);
+    }
+
+    /// Helper function for determining whether or not the current token is of the same type as the
+    /// one provided
+    ///
+    /// If the provided token type matches, advance the current token
+    ///
+    /// # Arguments
+    /// - `token_type` the token type to match
+    ///
+    /// # Return value
+    /// - `true` if the current token type matches
+    /// - `false` otherwise
+    fn match_token(&mut self, token_type: &TokenType) -> bool {
+        if token_type == self.current_token.unwrap().token_type {
+            self.advance();
+            return true;
+        }
+        false
+    }
+
+    /// Function for parsing a statement
+    fn statement(&mut self) {
+        if self.match_token(&TokenType::Print) {
+            self.print_statement();
+        } else {
+            panic!(
+                "Unimplemented statement! '{:?}'",
+                self.current_token.unwrap()
+            );
+        }
+    }
+
+    /// Function for parsing a print statement
+    fn print_statement(&mut self) {
+        self.expression();
+        self.consume(
+            &TokenType::Semicolon,
+            "Expect ';' at the end of a statement.",
+        );
+        self.emit_byte(OpCode::OpPrint);
     }
 
     fn expression(&mut self) {
