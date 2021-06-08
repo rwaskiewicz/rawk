@@ -30,6 +30,7 @@ enum Precedence {
     None,
     Assignment,     // '='
     Comparison,     // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
+    Concatenation,  // String concatenation, left associative
     Term,           // '+' '-'
     Factor,         // '*' '/' '%'
     Unary,          // '!' '+' '-'
@@ -50,7 +51,8 @@ impl Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
             Precedence::Assignment => Precedence::Comparison,
-            Precedence::Comparison => Precedence::Term,
+            Precedence::Comparison => Precedence::Concatenation,
+            Precedence::Concatenation => Precedence::Term,
             Precedence::Term => Precedence::Factor,
             Precedence::Factor => Precedence::Unary,
             Precedence::Unary => Precedence::Exponentiation,
@@ -254,13 +256,41 @@ impl<'a> Parser<'a> {
     }
 
     /// Function for parsing a print statement
+    ///
+    /// TODO: output_redirection support
     fn print_statement(&mut self) {
-        self.expression();
+        self.simple_print_statement();
         self.consume(
             &TokenType::Semicolon,
             "Expect ';' at the end of a statement.",
         );
         self.emit_byte(OpCode::OpPrint);
+    }
+
+    fn simple_print_statement(&mut self) {
+        self.print_expr_list_opt();
+        // TODO:
+        // | Print  '(' multiple_expr_list ')'
+        // | Printf print_expr_list
+        // | Printf '(' multiple_expr_list ')'
+    }
+
+    fn print_expr_list_opt(&mut self) {
+        // TODO: Support empty
+        self.print_expr_list();
+    }
+
+    fn print_expr_list(&mut self) {
+        self.print_expr();
+        // TODO: | print_expr_list ',' newline_opt print_expr
+    }
+
+    fn print_expr(&mut self) {
+        // TODO: These rules don't align with the grammar. We'll need to move that over and support
+        // the who shebang at some point
+        // print_expr       : unary_print_expr
+        //                  | non_unary_print_expr
+        self.expression();
     }
 
     fn expression(&mut self) {
@@ -323,7 +353,7 @@ impl<'a> Parser<'a> {
 
     /// Function for parsing a binary infix expression.
     ///
-    /// Parses '+', '-', '*', and '/' based infix expressions.
+    /// Parses '+', '-', '*', '/' and string-concatenation based infix expressions.
     fn binary(&mut self) {
         let operator_type = self.previous_token.expect("Missing token!").token_type;
 
@@ -353,6 +383,7 @@ impl<'a> Parser<'a> {
             TokenType::Slash => self.emit_byte(OpCode::Divide),
             TokenType::Modulus => self.emit_byte(OpCode::Modulus),
             TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
+            TokenType::StringConcat => self.emit_byte(OpCode::Concatenate),
             _ => {}
         }
     }
@@ -463,7 +494,7 @@ impl<'a> Parser<'a> {
 ///
 /// When an infix expression function from this table is called, it's left hand side (LHS) has
 /// already been compiled and the infix operator consumed.
-const PARSE_RULES: [ParseRule; 64] = [
+const PARSE_RULES: [ParseRule; 65] = [
     // BEGIN
     ParseRule {
         prefix_parse_fn: None,
@@ -911,5 +942,12 @@ const PARSE_RULES: [ParseRule; 64] = [
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
+    },
+    // string concatenation (synthetic)
+    ParseRule {
+        prefix_parse_fn: None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::Concatenation,
+        infix_associativity: Associativity::Left,
     },
 ];

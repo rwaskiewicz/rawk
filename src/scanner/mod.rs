@@ -103,6 +103,7 @@ impl Scanner {
                     tokens.push(Token::new(None, &TokenType::SingleQuote, current_line));
                 }
                 '\"' => {
+                    Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
 
                     let mut string_parsed = String::from("");
@@ -275,6 +276,7 @@ impl Scanner {
                 // TODO: Array membership
                 _ => {
                     if ch.is_digit(10) {
+                        Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                         let mut num_parsed = String::from("");
                         num_parsed.push(ch);
 
@@ -384,6 +386,24 @@ impl Scanner {
         &expected_char == current_char.unwrap()
     }
 
+    /// Checks to see if a synthetic concatenation token should be emitted or not
+    ///
+    /// # Arguments
+    /// - `tokens` the stream of tokens that have been emitter thus far
+    /// - `current_line` the current line number
+    fn check_and_emit_concatenation(tokens: &mut Vec<Token>, current_line: i32) {
+        if let Some(last_token_type) = tokens.last() {
+            match &last_token_type.token_type {
+                TokenType::Number | TokenType::DoubleQuote => tokens.push(Token {
+                    lexeme: None,
+                    token_type: &TokenType::StringConcat,
+                    line: current_line,
+                }),
+                _ => (),
+            }
+        }
+    }
+
     fn report_scanned_character(ch: char, token_type: &TokenType) {
         debug!("Found a '{}', setting the type to '{:?}'", ch, token_type);
     }
@@ -488,31 +508,6 @@ mod lexing {
             Some(&Token {
                 lexeme: Some(String::from("Hello World!")),
                 token_type: &TokenType::DoubleQuote,
-                line: 1,
-            })
-        );
-    }
-
-    #[test]
-    fn it_does_not_swallow_items_after_closing_a_double_quote() {
-        let tokens = Scanner::new(String::from("\"Hello World!\"42")).scan();
-        let mut token_iter = tokens.iter();
-
-        // +1 for EOF token
-        assert_eq!(token_iter.len(), 3);
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: Some(String::from("Hello World!")),
-                token_type: &TokenType::DoubleQuote,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: Some(String::from("42")),
-                token_type: &TokenType::Number,
                 line: 1,
             })
         );

@@ -83,4 +83,7 @@ pub enum TokenType {
 
     // Synthetic Error
     Error,
+
+    // Synthetic Concatenation
+    StringConcat,
 }

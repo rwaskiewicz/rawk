@@ -246,4 +246,39 @@ mod arithmetic_tests {
             predicates::str::contains("7.9541"),
         )
     }
+
+    #[test]
+    fn it_concatenates_two_strings() {
+        utils::assert_input(
+            "print \"Hello\" \" World!\";",
+            predicates::str::contains("Hello World"),
+        );
+    }
+
+    #[test]
+    fn it_concatenates_multiple_strings() {
+        utils::assert_input(
+            "print \"Hello\" \" World!\" \" \" \"I come in peace!\";",
+            predicates::str::contains("Hello World! I come in peace!"),
+        );
+    }
+
+    #[test]
+    fn it_concatenates_a_number_and_string() {
+        utils::assert_input("print 1 \" World!\";", predicates::str::contains("1 World"));
+    }
+
+    #[test]
+    fn it_concatenates_a_string_and_number() {
+        utils::assert_input("print \"Hell\" 0;", predicates::str::contains("Hell0"));
+    }
+
+    #[test]
+    fn it_concatenates_with_binary_str_addition() {
+        utils::assert_input("print 3 + \"Hello\" 4;", predicates::str::contains("34"));
+    }
+
+    // TODO: When identifiers are implemented, test:
+    // - `awk '{zlol=3;print "z" lol"z";}'`  # zz
+    // - `awk '{zlol=3;print "z" zlol"z";}'` # z3z
 }

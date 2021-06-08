@@ -64,6 +64,7 @@ impl VM {
                 OpCode::Divide => self.arithmetic_op(&instruction),
                 OpCode::Modulus => self.arithmetic_op(&instruction),
                 OpCode::Exponentiation => self.arithmetic_op(&instruction),
+                OpCode::Concatenate => self.concatenation_op(&instruction),
                 OpCode::UnaryPlus => self.unary_op(&instruction),
                 OpCode::UnaryMinus => self.unary_op(&instruction),
                 OpCode::LogicalNot => self.unary_op(&instruction),
@@ -107,6 +108,30 @@ impl VM {
             OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
             _ => panic!(
                 "Unknown op code given for arithmetic operation '{:?}'",
+                op_code
+            ),
+        }
+    }
+
+    /// Perform an a concatenation operation on two values on the stack, placing the result on the stack
+    ///
+    /// The values on the stack shall be implicitly converted into their string representations for
+    /// the operations supported by this method immediately following popping them from the stack
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
+    fn concatenation_op(&mut self, op_code: &OpCode) {
+        let b = self.stack.pop().unwrap().str_value();
+        let a = self.stack.pop().unwrap().str_value();
+
+        match *op_code {
+            OpCode::Concatenate => {
+                let mut concat_str = a;
+                concat_str.push_str(&b);
+                self.stack.push(Value::String(concat_str));
+            }
+            _ => panic!(
+                "Unknown op code given for concatenation operation '{:?}'",
                 op_code
             ),
         }
