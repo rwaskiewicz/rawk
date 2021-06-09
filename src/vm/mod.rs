@@ -68,6 +68,7 @@ impl VM {
                 OpCode::UnaryPlus => self.unary_op(&instruction),
                 OpCode::UnaryMinus => self.unary_op(&instruction),
                 OpCode::LogicalNot => self.unary_op(&instruction),
+                OpCode::LogicalAnd => self.logical_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
             }
         }
@@ -132,6 +133,27 @@ impl VM {
             }
             _ => panic!(
                 "Unknown op code given for concatenation operation '{:?}'",
+                op_code
+            ),
+        }
+    }
+
+    /// Perform logical comparison between two values on the stack
+    ///
+    /// # Arguments
+    /// - `op_code` the operation to perform
+    fn logical_op(&mut self, op_code: &OpCode) {
+        let b = self.stack.pop().unwrap();
+        let a = self.stack.pop().unwrap();
+
+        match *op_code {
+            OpCode::LogicalAnd => {
+                // TODO: Look into lazy evaluation further
+                let result = a.truthy_value() && b.truthy_value();
+                self.stack.push(Value::Number(result as i32 as f32));
+            }
+            _ => panic!(
+                "Unknown op code given for logical operation '{:?}'",
                 op_code
             ),
         }

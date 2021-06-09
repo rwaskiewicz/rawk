@@ -60,6 +60,22 @@ impl Value {
             Value::StrNum(val) => val.clone(),
         }
     }
+
+    /// Get the truthiness of a value.
+    ///
+    /// The truthiness of a value is determined by how it is represented at a given point in time.
+    /// - A value that is a number whose content is 0 is `false`, and `true` otherwise
+    /// - A value that is a non-empty string is `true`, and `false otherwise
+    ///
+    /// # Return value
+    /// `true` if the value is 'truthy', `false` otherwise.
+    pub fn truthy_value(&self) -> bool {
+        match self {
+            Value::Number(val) => *val != 0.0,
+            Value::String(val) => !val.is_empty(),
+            Value::StrNum(val) => !val.is_empty(),
+        }
+    }
 }
 
 /// Display trait implementation for Value
@@ -111,6 +127,16 @@ mod value {
         let expected_number = 9.09;
 
         assert_eq!(Value::Number(expected_number).num_value(), expected_number);
+    }
+
+    #[test]
+    fn num_value_converts_empty_str_to_zero() {
+        assert_eq!(Value::String(String::from("")).num_value(), 0.0);
+    }
+
+    #[test]
+    fn num_value_converts_str_with_zero_to_zero() {
+        assert_eq!(Value::String(String::from("0")).num_value(), 0.0);
     }
 
     #[test]
@@ -192,5 +218,51 @@ mod value {
             Value::StrNum(String::from("3.21")).str_value(),
             String::from("3.21")
         );
+    }
+
+    #[test]
+    fn truthy_value_returns_true_for_nonzero_number() {
+        assert_eq!(Value::Number(1.0).truthy_value(), true);
+    }
+
+    #[test]
+    fn truthy_value_returns_false_for_zero() {
+        assert_eq!(Value::Number(0.0).truthy_value(), false);
+    }
+
+    #[test]
+    fn truthy_value_returns_true_for_non_empty_string() {
+        assert_eq!(
+            Value::String(String::from("hello world")).truthy_value(),
+            true
+        );
+    }
+
+    #[test]
+    fn truthy_value_returns_true_for_string_containing_zero() {
+        assert_eq!(Value::String(String::from("0")).truthy_value(), true);
+    }
+
+    #[test]
+    fn truthy_value_returns_false_for_empty_string() {
+        assert_eq!(Value::String(String::from("")).truthy_value(), false);
+    }
+
+    #[test]
+    fn truthy_value_returns_true_for_non_empty_strnum() {
+        assert_eq!(
+            Value::StrNum(String::from("hello world")).truthy_value(),
+            true
+        );
+    }
+
+    #[test]
+    fn truthy_value_returns_true_for_strnum_containing_zero() {
+        assert_eq!(Value::StrNum(String::from("0")).truthy_value(), true);
+    }
+
+    #[test]
+    fn truthy_value_returns_false_for_empty_strnum() {
+        assert_eq!(Value::StrNum(String::from("")).truthy_value(), false);
     }
 }

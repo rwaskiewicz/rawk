@@ -29,6 +29,7 @@ enum Associativity {
 enum Precedence {
     None,
     Assignment,     // '='
+    LogicalAnd,     // '&&'
     Comparison,     // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
     Concatenation,  // String concatenation, left associative
     Term,           // '+' '-'
@@ -50,7 +51,8 @@ impl Precedence {
     pub fn get_next_precedence(p: Precedence) -> Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
-            Precedence::Assignment => Precedence::Comparison,
+            Precedence::Assignment => Precedence::LogicalAnd,
+            Precedence::LogicalAnd => Precedence::Comparison,
             Precedence::Comparison => Precedence::Concatenation,
             Precedence::Concatenation => Precedence::Term,
             Precedence::Term => Precedence::Factor,
@@ -352,8 +354,6 @@ impl<'a> Parser<'a> {
     }
 
     /// Function for parsing a binary infix expression.
-    ///
-    /// Parses '+', '-', '*', '/' and string-concatenation based infix expressions.
     fn binary(&mut self) {
         let operator_type = self.previous_token.expect("Missing token!").token_type;
 
@@ -384,6 +384,7 @@ impl<'a> Parser<'a> {
             TokenType::Modulus => self.emit_byte(OpCode::Modulus),
             TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
             TokenType::StringConcat => self.emit_byte(OpCode::Concatenate),
+            TokenType::And => self.emit_byte(OpCode::LogicalAnd),
             _ => {}
         }
     }
@@ -673,8 +674,8 @@ const PARSE_RULES: [ParseRule; 65] = [
     // And
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::LogicalAnd,
         infix_associativity: Associativity::Left,
     },
     // NoMatch
