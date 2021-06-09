@@ -49,32 +49,62 @@ mod logical_tests {
     }
 
     #[test]
-    fn it_performs_logical_and_truthy() {
+    fn it_performs_logical_and_truthy_returns_true() {
         utils::assert_input("print 1 && 1;", predicates::str::contains("1"));
     }
 
     #[test]
-    fn it_performs_logical_and_falsy_lhs() {
+    fn it_performs_logical_and_falsy_lhs_returns_false() {
         utils::assert_input("print 0 && 1;", predicates::str::contains("0"));
     }
 
     #[test]
-    fn it_performs_logical_and_falsy_rhs() {
+    fn it_performs_logical_and_falsy_rhs_returns_false() {
         utils::assert_input("print 1 && 0;", predicates::str::contains("0"));
     }
 
     #[test]
-    fn it_performs_logical_and_with_str() {
+    fn it_performs_logical_and_with_str_returns_true() {
         utils::assert_input("print 1 && \"0\";", predicates::str::contains("1"));
     }
 
     #[test]
-    fn it_performs_logical_and_with_empty_str() {
+    fn it_performs_logical_and_with_empty_str_returns_false() {
         utils::assert_input("print 1 && \"\";", predicates::str::contains("0"));
     }
 
     #[test]
-    fn it_performs_logical_and_with_expr() {
+    fn it_performs_logical_and_with_expr_returns_false() {
         utils::assert_input("print 1 && 1 - 1;", predicates::str::contains("0"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_truthy() {
+        utils::assert_input("print 1 || 1;", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_falsy_lhs_returns_true() {
+        utils::assert_input("print 0 || 1;", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_falsy_rhs_returns_true() {
+        utils::assert_input("print 1 || 0;", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_with_str_returns_true() {
+        utils::assert_input("print 1 || \"0\";", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_with_empty_str_returns_true() {
+        utils::assert_input("print 1 || \"\";", predicates::str::contains("1"));
+    }
+
+    #[test]
+    fn it_performs_logical_or_with_expr_returns_false() {
+        utils::assert_input("print 0 || 1 - 1;", predicates::str::contains("0"));
     }
 }

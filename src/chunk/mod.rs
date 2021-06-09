@@ -28,6 +28,7 @@ pub enum OpCode {
     OpPrint,
     Concatenate,
     LogicalAnd,
+    LogicalOr,
 }
 
 /// Struct describing an OpCode and the line in the original corpus it appears in
@@ -127,6 +128,7 @@ impl Chunk {
             OpCode::LogicalAnd => {
                 Chunk::simple_instruction(&instruction_info, "LogicalAnd", offset)
             }
+            OpCode::LogicalOr => Chunk::simple_instruction(&instruction_info, "LogicalOr", offset),
             _ => {
                 debug!("Unknown opcode {:#?}!", instruction);
                 offset + 1

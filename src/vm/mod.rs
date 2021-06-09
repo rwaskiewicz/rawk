@@ -69,6 +69,7 @@ impl VM {
                 OpCode::UnaryMinus => self.unary_op(&instruction),
                 OpCode::LogicalNot => self.unary_op(&instruction),
                 OpCode::LogicalAnd => self.logical_op(&instruction),
+                OpCode::LogicalOr => self.logical_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
             }
         }
@@ -151,6 +152,14 @@ impl VM {
                 // TODO: Look into lazy evaluation further
                 let result = a.truthy_value() && b.truthy_value();
                 self.stack.push(Value::Number(result as i32 as f32));
+            }
+            OpCode::LogicalOr => {
+                if a.truthy_value() {
+                    self.stack.push(Value::Number(1.0));
+                    return;
+                }
+                self.stack
+                    .push(Value::Number(b.truthy_value() as i32 as f32));
             }
             _ => panic!(
                 "Unknown op code given for logical operation '{:?}'",

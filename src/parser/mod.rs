@@ -29,6 +29,7 @@ enum Associativity {
 enum Precedence {
     None,
     Assignment,     // '='
+    LogicalOr,      // '||'
     LogicalAnd,     // '&&'
     Comparison,     // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
     Concatenation,  // String concatenation, left associative
@@ -51,7 +52,8 @@ impl Precedence {
     pub fn get_next_precedence(p: Precedence) -> Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
-            Precedence::Assignment => Precedence::LogicalAnd,
+            Precedence::Assignment => Precedence::LogicalOr,
+            Precedence::LogicalOr => Precedence::LogicalAnd,
             Precedence::LogicalAnd => Precedence::Comparison,
             Precedence::Comparison => Precedence::Concatenation,
             Precedence::Concatenation => Precedence::Term,
@@ -385,6 +387,7 @@ impl<'a> Parser<'a> {
             TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
             TokenType::StringConcat => self.emit_byte(OpCode::Concatenate),
             TokenType::And => self.emit_byte(OpCode::LogicalAnd),
+            TokenType::Or => self.emit_byte(OpCode::LogicalOr),
             _ => {}
         }
     }
@@ -664,14 +667,14 @@ const PARSE_RULES: [ParseRule; 65] = [
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::Right,
     },
-    // Or
+    // (Logical) Or
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_precedence: Precedence::LogicalOr,
         infix_associativity: Associativity::Left,
     },
-    // And
+    // (Logical) And
     ParseRule {
         prefix_parse_fn: None,
         infix_parse_fn: Some(|parser| parser.binary()),
