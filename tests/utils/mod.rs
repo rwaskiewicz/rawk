@@ -6,10 +6,10 @@ use assert_cmd::Command;
 ///
 /// # Arguments:
 /// - `input` the input that would have been received by the user
-/// - `expected_text` the expected result to appear in stderr
+/// - `expected_value` the expected result to appear in stderr
 ///
 /// # Panics:
-/// If the `expected_text` cannot be found in stderr, causing a test to fail
+/// If the `expected_value` cannot be found in stderr, the assertion (and test) will fail
 pub fn assert_input(input: &str, expected_value: &str) {
     let mut expected_text = String::new();
     expected_text.push_str("^\\[INFO  rawk::vm\\] ");
