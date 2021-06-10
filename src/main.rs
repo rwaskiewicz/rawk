@@ -1,12 +1,13 @@
 use clap::{App, Arg};
 use env_logger::{Builder, Env};
-use log::error;
-use std::io;
-use std::io::Write;
+use log::{debug, error, LevelFilter};
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
 
 fn main() {
     Builder::from_env(Env::default().default_filter_or("info"))
         .format_timestamp(None)
+        .filter_module("rustyline", LevelFilter::Error)
         .init();
 
     let matches = App::new("r-awk")
@@ -33,19 +34,19 @@ fn main() {
 }
 
 fn run_prompt() {
-    println!("r-awk - a subset of awk written in Rust");
+    let mut rl = Editor::<()>::new();
 
-    let mut awk_line = String::new();
-
-    print!("r-awk > ");
-    io::stdout().flush().expect("Unable to flush STDOUT!");
-
-    io::stdin()
-        .read_line(&mut awk_line)
-        .expect("failed to get r-awk line");
-    print!("r-awk line to process: {}", awk_line);
-
-    // When we had one, we would init a new VM on every loop. This won't be feasible long term, but
-    // for now we can avoid the scary monsters under the bed with resetting state...
-    rawk::startup_and_interpret_awk_line(awk_line);
+    let user_input = rl.readline("r-awk > ");
+    match user_input {
+        Ok(awk_line) => {
+            debug!("r-awk line to process: {}", awk_line);
+            // When we had one, we would init a new VM on every loop. This won't be feasible long
+            // term, but for now we can avoid the scary monsters under the bed with resetting
+            // state...
+            rawk::startup_and_interpret_awk_line(awk_line);
+        }
+        Err(ReadlineError::Eof) => println!("Eof received, exiting."),
+        Err(ReadlineError::Interrupted) => println!("Interrupt received, exiting."),
+        Err(err) => error!("An error occurred: '{:?}'", err),
+    }
 }
