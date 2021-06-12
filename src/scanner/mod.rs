@@ -64,7 +64,6 @@ impl Scanner {
                     // consume the rest of the line, as we've found a comment
                     char_stream.find(|x| x == &'\n');
                     Scanner::report_scanned_character(ch, &TokenType::Pound);
-                    tokens.push(Token::new(None, &TokenType::Pound, current_line));
                 }
                 '{' => {
                     Scanner::report_scanned_character(ch, &TokenType::LeftCurly);
@@ -426,27 +425,19 @@ mod lexing {
 
     #[test]
     fn it_parses_a_pound() {
-        let tokens = Scanner::new(String::from("#")).scan();
+        let tokens = Scanner::new(String::from("# This is a comment")).scan();
 
         // +1 for EOF token
-        assert_eq!(tokens.len(), 2);
-        assert_eq!(
-            tokens.iter().next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Pound,
-                line: 1,
-            })
-        );
+        assert_eq!(tokens.len(), 1);
     }
 
     #[test]
-    fn it_parses_comment_as_a_string() {
+    fn it_parses_comment_a_statement_with_a_comment() {
         let tokens = Scanner::new(String::from("{print} # this print is important")).scan();
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token
-        assert_eq!(token_iter.len(), 5);
+        assert_eq!(token_iter.len(), 4);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -468,14 +459,6 @@ mod lexing {
             Some(&Token {
                 lexeme: None,
                 token_type: &TokenType::RightCurly,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Pound,
                 line: 1,
             })
         );
@@ -947,7 +930,7 @@ mod lexing {
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token
-        assert_eq!(token_iter.len(), 11);
+        assert_eq!(token_iter.len(), 10);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -1017,14 +1000,6 @@ mod lexing {
             Some(&Token {
                 lexeme: None,
                 token_type: &TokenType::SingleQuote,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Pound,
                 line: 1,
             })
         );
