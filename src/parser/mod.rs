@@ -147,9 +147,9 @@ impl<'a> Parser<'a> {
         self.advance();
         // the first token is always going to belong to some kind of prefix expression, by
         // definition - although it may be nested as an operand in 1+ infix expressions
-        let maybe_prefix_rule = &self
+        let maybe_prefix_rule =
             // TODO: This errors when we have empty input 'Error at end: Expect expression'
-            .get_rule(self.previous_token.expect("missing token").token_type)
+            get_rule(self.previous_token.expect("missing token").token_type)
             .prefix_parse_fn;
         if maybe_prefix_rule.is_none() {
             self.error_at_previous("Expect expression.");
@@ -160,31 +160,15 @@ impl<'a> Parser<'a> {
         prefix_rule(self);
 
         while precedence
-            <= self
-                .get_rule(self.current_token.expect("Missing token!").token_type)
-                .infix_precedence
+            <= get_rule(self.current_token.expect("Missing token!").token_type).infix_precedence
         {
             self.advance();
-            let infix_rule = &self
-                .get_rule(self.previous_token.expect("No Token was found!").token_type)
+            let infix_rule = get_rule(self.previous_token.expect("No Token was found!").token_type)
                 .infix_parse_fn
                 .unwrap();
 
             infix_rule(self);
         }
-    }
-
-    // TODO: May not need this, its all about access to the table, which could have if I can figure
-    // out how to reference some of these things....
-    /// Helper function for indexing the table of parse rules
-    ///
-    /// # Arguments
-    /// - `token_type` the type of the token to use as a part of the lookup
-    ///
-    /// # Return value
-    /// - A reference to the [ParseRule] for the given token type
-    fn get_rule(&self, token_type: &TokenType) -> &ParseRule {
-        &PARSE_RULES[(*token_type).clone() as usize]
     }
 
     /// Advances the pointers the parser has to the current and the previous token
@@ -360,7 +344,7 @@ impl<'a> Parser<'a> {
         let operator_type = self.previous_token.expect("Missing token!").token_type;
 
         // Compile the right operand
-        let rule = self.get_rule(operator_type);
+        let rule = get_rule(operator_type);
         // Note: We _could_ define a function for each of the operators and not have to do the
         // calculation for the next precedence, calling `parse_precedence` with the correct level.
         // This only works because the operators are left-associative:
@@ -491,6 +475,19 @@ impl<'a> Parser<'a> {
         self.compiling_chunk.disassemble_chunk("code");
         self.emit_return();
     }
+}
+
+// TODO: May not need this, its all about access to the table, which could have if I can figure
+// out how to reference some of these things....
+/// Helper function for indexing the table of parse rules
+///
+/// # Arguments
+/// - `token_type` the type of the token to use as a part of the lookup
+///
+/// # Return value
+/// - A reference to the [ParseRule] for the given token type
+fn get_rule(token_type: &TokenType) -> &ParseRule {
+    &PARSE_RULES[token_type.clone() as usize]
 }
 
 /// Table of rules associating a [TokenType] to a prefix expression function pointer, infix
