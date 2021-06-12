@@ -1,5 +1,5 @@
-use super::token::Token;
 use super::token::token_type::TokenType;
+use super::token::Token;
 use log::{debug, error};
 use std::collections::HashMap;
 

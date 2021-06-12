@@ -6,7 +6,7 @@ use crate::value::Value;
 
 use log::{debug, error, info};
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum InterpretResult {
     Ok,
     CompileError,
@@ -48,7 +48,7 @@ impl VM {
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");
-                        panic!(InterpretResult::RuntimeError);
+                        panic!("{:?}", InterpretResult::RuntimeError);
                     }
                 },
                 OpCode::OpReturn => ret_ok = true,
