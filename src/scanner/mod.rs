@@ -323,6 +323,7 @@ impl Scanner {
                             current_line,
                         ));
                     } else if ch.is_alphabetic() || ch == '_' {
+                        Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                         let mut word_parsed = String::from(ch);
 
                         // TODO: This check may be too permissive
@@ -393,11 +394,13 @@ impl Scanner {
     fn check_and_emit_concatenation(tokens: &mut Vec<Token>, current_line: i32) {
         if let Some(last_token_type) = tokens.last() {
             match &last_token_type.token_type {
-                TokenType::Number | TokenType::DoubleQuote => tokens.push(Token {
-                    lexeme: None,
-                    token_type: &TokenType::StringConcat,
-                    line: current_line,
-                }),
+                TokenType::Number | TokenType::DoubleQuote | TokenType::Identifier => {
+                    tokens.push(Token {
+                        lexeme: None,
+                        token_type: &TokenType::StringConcat,
+                        line: current_line,
+                    })
+                }
                 _ => (),
             }
         }
@@ -905,12 +908,20 @@ mod lexing {
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token
-        assert_eq!(token_iter.len(), 3);
+        assert_eq!(token_iter.len(), 4);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
                 lexeme: Some(String::from("1")),
                 token_type: &TokenType::Number,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::StringConcat,
                 line: 1,
             })
         );

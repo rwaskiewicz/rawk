@@ -29,6 +29,10 @@ pub enum OpCode {
     Concatenate,
     LogicalAnd,
     LogicalOr,
+    Pop,
+    GetGlobal(usize),
+    SetGlobal(usize),
+    DefineGlobal(usize),
 }
 
 /// Struct describing an OpCode and the line in the original corpus it appears in
@@ -41,12 +45,16 @@ pub struct CodeLine {
 /// Representation of a series of operations
 pub struct Chunk {
     pub code: Vec<CodeLine>, // TODO: Make this a pointer to a series of bytes. That way it's dense (cache friendly) and has constant time lookup and appending. Neat.
+    pub constants: Vec<String>,
 }
 
 impl Chunk {
     /// Instantiates a new chunk
     pub fn new() -> Chunk {
-        Chunk { code: vec![] }
+        Chunk {
+            code: vec![],
+            constants: vec![],
+        }
     }
 
     /// Writes an opcode and its associated line to the chunk
@@ -56,6 +64,18 @@ impl Chunk {
     /// - `line` the line number associated with the op code
     pub fn write_chunk(&mut self, code: OpCode, line: i32) {
         self.code.push(CodeLine { code, line });
+    }
+
+    /// Adds a constant to the chunk's constant table
+    ///
+    /// # Arguments
+    /// - `constant` the value to add to the table
+    ///
+    /// # Return value
+    /// the index of the item in the constant table
+    pub fn add_constant(&mut self, constant: String) -> usize {
+        self.constants.push(constant);
+        self.constants.len() - 1
     }
 
     /// Disassembles the chunk to debugging purposes
@@ -129,6 +149,16 @@ impl Chunk {
                 Chunk::simple_instruction(&instruction_info, "LogicalAnd", offset)
             }
             OpCode::LogicalOr => Chunk::simple_instruction(&instruction_info, "LogicalOr", offset),
+            OpCode::Pop => Chunk::simple_instruction(&instruction_info, "Pop", offset),
+            OpCode::GetGlobal(_chunk_index) => {
+                Chunk::simple_instruction(&instruction_info, "GetGlobal", offset)
+            }
+            OpCode::SetGlobal(_chunk_index) => {
+                Chunk::simple_instruction(&instruction_info, "SetGlobal", offset)
+            }
+            OpCode::DefineGlobal(_chunk_index) => {
+                Chunk::simple_instruction(&instruction_info, "DefineGlobal", offset)
+            }
             _ => {
                 debug!("Unknown opcode {:#?}!", instruction);
                 offset + 1

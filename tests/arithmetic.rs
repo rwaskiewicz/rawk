@@ -216,7 +216,23 @@ mod arithmetic_tests {
         utils::assert_input("print 3 + \"Hello\" 4;", "34");
     }
 
-    // TODO: When identifiers are implemented, test:
-    // - `awk '{zlol=3;print "z" lol"z";}'`  # zz
-    // - `awk '{zlol=3;print "z" zlol"z";}'` # z3z
+    #[test]
+    fn it_coerces_a_variable_to_number() {
+        utils::assert_input("foo = \"3\"; print foo * 3;", "9");
+    }
+
+    #[test]
+    fn it_coerces_a_variable_to_string() {
+        utils::assert_input("foo = 3; print foo \"3\";", "33");
+    }
+
+    #[test]
+    fn it_ignores_unknown_variables_for_concatenation() {
+        utils::assert_input("zfoo=3; print \"z\" foo\"z\";", "zz");
+    }
+
+    #[test]
+    fn it_uses_variables_in_concatenation() {
+        utils::assert_input("zfoo=3; print \"z\" zfoo\"z\";", "z3z");
+    }
 }

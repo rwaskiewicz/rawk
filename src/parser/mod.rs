@@ -65,7 +65,15 @@ impl Precedence {
     }
 }
 
-type ParseFn = fn(&mut Parser) -> ();
+/// Type describing functions that will be invoked at parse time.
+///
+/// The function that is invoked is predicated on a token that is read from the input stream. Some
+/// functions shall require the `can_assign` variable to be plumbed to them to act appropriately in
+/// the presence of a [`TokenType::Equals`] tokens.
+///
+/// # Arguments
+/// - `can_assign` whether or not assignment to a variable is permitted
+type ParseFn = fn(&mut Parser, can_assign: bool) -> ();
 
 // TODO: We may need to track the precedence of the prefix for awk
 #[derive(Copy, Clone)]
@@ -122,7 +130,7 @@ impl<'a> Parser<'a> {
         self.advance();
 
         while !self.match_token(&TokenType::Eof) {
-            self.statement();
+            self.declaration();
         }
 
         self.end_compiler();
@@ -153,8 +161,9 @@ impl<'a> Parser<'a> {
             return;
         }
 
+        let can_assign: bool = precedence <= Precedence::Assignment;
         let prefix_rule = maybe_prefix_rule.unwrap();
-        prefix_rule(self);
+        prefix_rule(self, can_assign);
 
         while precedence
             <= get_rule(self.current_token.expect("Missing token!").token_type).infix_precedence
@@ -164,7 +173,12 @@ impl<'a> Parser<'a> {
                 .infix_parse_fn
                 .unwrap();
 
-            infix_rule(self);
+            infix_rule(self, can_assign);
+        }
+
+        // if '=' is the current token, we should have consumed it somehow...report the error
+        if can_assign && self.match_token(&TokenType::Equals) {
+            self.error_at_current("Invalid assignment target.");
         }
     }
 
@@ -227,15 +241,68 @@ impl<'a> Parser<'a> {
         false
     }
 
+    /// Parse a declaration production
+    fn declaration(&mut self) {
+        if self.match_token(&TokenType::Identifier) {
+            self.variable_declaration();
+        } else {
+            self.statement();
+        }
+    }
+
+    /// Parse a variable production
+    fn variable_declaration(&mut self) {
+        // store the variable name so it can be looked up later
+        let global_variable_index = self.parse_variable();
+
+        if self.match_token(&TokenType::Equals) {
+            self.expression();
+        } else {
+            self.emit_constant(Value::String("".into()));
+        }
+        self.consume(
+            &TokenType::Semicolon,
+            "Expect ';' after a variable declaration.",
+        );
+
+        self.define_variable(global_variable_index);
+    }
+
+    /// Parses a variable's name and places it in the current chunk's constant table
+    ///
+    /// # Return value
+    /// the index of the variable name in the constant table for easy lookup
+    fn parse_variable(&mut self) -> usize {
+        self.compiling_chunk.add_constant(
+            self.previous_token
+                .expect("No token was parsed")
+                .lexeme
+                .clone()
+                .expect("Variable name was empty"),
+        )
+    }
+
+    /// Output the bytecode instructions for a new variable definition
+    ///
+    /// # Arguments
+    /// - `global_var_index` the index of the variable name in a chunk's constants table
+    fn define_variable(&mut self, global_var_index: usize) {
+        self.emit_byte(OpCode::DefineGlobal(global_var_index));
+    }
+
     /// Function for parsing a statement
     fn statement(&mut self) {
         if self.match_token(&TokenType::Print) {
             self.print_statement();
         } else {
-            panic!(
-                "Unimplemented statement! '{:?}'",
-                self.current_token.unwrap()
+            // we're looking at an expression statement (as the name of the next LoC implies)
+            self.expression();
+            self.consume(
+                &TokenType::Semicolon,
+                "Expect ';' at the end of a statement.",
             );
+            // discard the result
+            self.emit_byte(OpCode::Pop);
         }
     }
 
@@ -282,6 +349,20 @@ impl<'a> Parser<'a> {
         // of the higher ones too. If we called this with None, it could consume tokens forever
         // e.g. (1) would fail trying to find an infix operator for ')'
         self.parse_precedence(Precedence::Assignment);
+    }
+
+    /// Emits an opcode to read the value of a global variable
+    ///
+    /// # Arguments
+    /// - `can_assign` `true` if a value can be assigned back to a variable, `false` otherwise
+    fn variable(&mut self, can_assign: bool) {
+        let chunk_index = self.parse_variable();
+        if can_assign && self.match_token(&TokenType::Equals) {
+            self.expression();
+            self.emit_byte(OpCode::SetGlobal(chunk_index))
+        } else {
+            self.emit_byte(OpCode::GetGlobal(chunk_index));
+        }
     }
 
     /// Emits a number for the [TokenType::Number] token type
@@ -662,14 +743,14 @@ const PARSE_RULES: [ParseRule; 65] = [
     // (Logical) Or
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::LogicalOr,
         infix_associativity: Associativity::Left,
     },
     // (Logical) And
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::LogicalAnd,
         infix_associativity: Associativity::Left,
     },
@@ -683,28 +764,28 @@ const PARSE_RULES: [ParseRule; 65] = [
     // DoubleEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
     // LessEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
     // GreaterEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
     // NotEqual
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
@@ -745,7 +826,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     },
     // LeftParenthesis
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.grouping()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.grouping()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
@@ -787,42 +868,42 @@ const PARSE_RULES: [ParseRule; 65] = [
     },
     // Plus
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.unary()),
-        infix_parse_fn: Some(|parser| parser.binary()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.unary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Term,
         infix_associativity: Associativity::Left,
     },
     // Minus
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.unary()),
-        infix_parse_fn: Some(|parser| parser.binary()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.unary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Term,
         infix_associativity: Associativity::Left,
     },
     // Star
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Factor,
         infix_associativity: Associativity::Left,
     },
     // Modulus
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Factor,
         infix_associativity: Associativity::Left,
     },
     // Caret
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Exponentiation,
         infix_associativity: Associativity::Right,
     },
     // Bang
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.unary()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.unary()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
@@ -830,14 +911,14 @@ const PARSE_RULES: [ParseRule; 65] = [
     // GreaterThan
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
     // LessThan
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Comparison,
         infix_associativity: Associativity::NA,
     },
@@ -892,7 +973,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     },
     // DoubleQuote
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.string()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.string()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
@@ -900,7 +981,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     // Slash
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Term,
         infix_associativity: Associativity::Left,
     },
@@ -913,14 +994,14 @@ const PARSE_RULES: [ParseRule; 65] = [
     },
     // number
     ParseRule {
-        prefix_parse_fn: Some(|parser| parser.number()),
+        prefix_parse_fn: Some(|parser, _can_assign| parser.number()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
     },
     // identifier
     ParseRule {
-        prefix_parse_fn: None,
+        prefix_parse_fn: Some(|parser, can_assign| parser.variable(can_assign)),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,
@@ -942,7 +1023,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     // string concatenation (synthetic)
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
         infix_precedence: Precedence::Concatenation,
         infix_associativity: Associativity::Left,
     },

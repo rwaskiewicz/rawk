@@ -5,6 +5,7 @@ use crate::token::Token;
 use crate::value::Value;
 
 use log::{debug, error, info};
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
 pub enum InterpretResult {
@@ -17,6 +18,7 @@ pub struct VM {
     chunk: Chunk,
     ip: usize,
     stack: Vec<Value>,
+    globals: HashMap<String, Value>,
 }
 
 impl VM {
@@ -25,6 +27,7 @@ impl VM {
             chunk: Chunk::new(),
             ip: 0,
             stack: vec![],
+            globals: HashMap::new(),
         }
     }
 
@@ -71,8 +74,36 @@ impl VM {
                 OpCode::LogicalAnd => self.logical_op(&instruction),
                 OpCode::LogicalOr => self.logical_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
+                OpCode::Pop => {
+                    self.stack.pop();
+                }
+                OpCode::GetGlobal(chunk_index) => {
+                    let variable_name = self.read_variable_name(chunk_index);
+                    let default_val = &Value::String("".into());
+                    let val = self.globals.get(&*variable_name).unwrap_or(default_val);
+                    self.stack.push(val.clone());
+                }
+                OpCode::SetGlobal(chunk_index) => {
+                    let variable_name = self.read_variable_name(chunk_index);
+                    let val = self.peek(0).clone();
+                    self.globals.insert(variable_name, val);
+                }
+                OpCode::DefineGlobal(chunk_index) => {
+                    let variable_name = self.read_variable_name(chunk_index);
+                    let val = self.peek(0).clone();
+                    self.globals.insert(variable_name, val);
+                    self.stack.pop();
+                }
             }
         }
+    }
+
+    fn read_variable_name(&mut self, chunk_index: usize) -> String {
+        self.chunk
+            .constants
+            .get(chunk_index)
+            .expect("No variable found")
+            .clone()
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
