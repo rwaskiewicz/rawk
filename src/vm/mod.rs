@@ -1,7 +1,7 @@
 use crate::chunk::{Chunk, OpCode};
 use crate::parser::Parser;
 use crate::scanner::Scanner;
-use crate::token::token::Token;
+use crate::token::Token;
 use crate::value::Value;
 
 use log::{debug, error, info};

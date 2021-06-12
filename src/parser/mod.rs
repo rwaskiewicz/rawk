@@ -4,7 +4,7 @@
 //! "Crafting Interpreters" in the second half of the book.
 
 use crate::chunk::{Chunk, OpCode};
-use crate::token::token::Token;
+use crate::token::Token;
 use crate::token::token_type::TokenType;
 use crate::value::Value;
 use log::error;

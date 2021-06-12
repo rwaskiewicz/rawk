@@ -1,3 +1,5 @@
+pub mod token_type;
+
 use crate::token::token_type::TokenType;
 
 /// A representation of a Token

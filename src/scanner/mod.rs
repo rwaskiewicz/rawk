@@ -1,4 +1,4 @@
-use super::token::token::Token;
+use super::token::Token;
 use super::token::token_type::TokenType;
 use log::{debug, error};
 use std::collections::HashMap;
