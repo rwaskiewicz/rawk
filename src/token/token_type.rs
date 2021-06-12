@@ -68,7 +68,7 @@ pub enum TokenType {
     Sigil,
     Equals,
 
-    // TODO: None of these are in the yacc spec...
+    // Note: None of these are in the yacc spec in the IEEE reference
     SingleQuote,
     DoubleQuote,
     Slash,

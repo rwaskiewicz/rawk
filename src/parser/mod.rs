@@ -41,7 +41,6 @@ enum Precedence {
 }
 
 impl Precedence {
-    // TODO: Can i use FromPrimitive to remove this
     /// Retrieves the next precedence level for a given variant
     ///
     /// # Arguments
@@ -148,7 +147,6 @@ impl<'a> Parser<'a> {
         // the first token is always going to belong to some kind of prefix expression, by
         // definition - although it may be nested as an operand in 1+ infix expressions
         let maybe_prefix_rule =
-            // TODO: This errors when we have empty input 'Error at end: Expect expression'
             get_rule(self.previous_token.expect("missing token").token_type)
             .prefix_parse_fn;
         if maybe_prefix_rule.is_none() {
@@ -203,7 +201,6 @@ impl<'a> Parser<'a> {
     /// * `error_msg` - The error message that should be emitted if the `current_token`'s type does
     /// not match `token_type`
     fn consume(&mut self, token_type: &TokenType, error_msg: &str) {
-        // TODO: I wonder if this could be more Rust like...
         if self.current_token.expect("No token type").token_type == token_type {
             self.advance();
             return;
@@ -257,7 +254,7 @@ impl<'a> Parser<'a> {
 
     fn simple_print_statement(&mut self) {
         self.print_expr_list_opt();
-        // TODO:
+        // TODO: Support additional arms of this part of the grammar
         // | Print  '(' multiple_expr_list ')'
         // | Printf print_expr_list
         // | Printf '(' multiple_expr_list ')'
@@ -389,7 +386,6 @@ impl<'a> Parser<'a> {
         self.consume(&TokenType::RightParenthesis, "Expect ')' token");
     }
 
-    // TODO: Firm up emitting
     /// Helper function to emit the bytes associated with a constant
     ///
     /// # Arguments
@@ -477,7 +473,7 @@ impl<'a> Parser<'a> {
     }
 }
 
-// TODO: May not need this, its all about access to the table, which could have if I can figure
+// TODO: May not need this, it's all about access to the table, which could have if I can figure |
 // out how to reference some of these things....
 /// Helper function for indexing the table of parse rules
 ///
