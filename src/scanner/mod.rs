@@ -341,10 +341,10 @@ impl Scanner {
                             .get(&word_parsed.as_str())
                             .unwrap_or(&&TokenType::Identifier);
 
-                        Scanner::report_scanned_string(&word_parsed, &type_of_token);
+                        Scanner::report_scanned_string(&word_parsed, type_of_token);
                         tokens.push(Token::new(
                             Some(word_parsed.clone()),
-                            &type_of_token,
+                            type_of_token,
                             current_line,
                         ));
                     } else {

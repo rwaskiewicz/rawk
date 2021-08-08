@@ -147,8 +147,7 @@ impl<'a> Parser<'a> {
         // the first token is always going to belong to some kind of prefix expression, by
         // definition - although it may be nested as an operand in 1+ infix expressions
         let maybe_prefix_rule =
-            get_rule(self.previous_token.expect("missing token").token_type)
-            .prefix_parse_fn;
+            get_rule(self.previous_token.expect("missing token").token_type).prefix_parse_fn;
         if maybe_prefix_rule.is_none() {
             self.error_at_previous("Expect expression.");
             return;
