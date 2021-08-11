@@ -40,6 +40,7 @@ pub enum OpCode {
 pub struct CodeLine {
     pub code: OpCode,
     pub line: i32,
+    pub start_index: i32,
 }
 
 /// Representation of a series of operations
@@ -62,8 +63,13 @@ impl Chunk {
     /// # Arguments
     /// - `code` the op code to write
     /// - `line` the line number associated with the op code
+    /// - `start_index` TODO
     pub fn write_chunk(&mut self, code: OpCode, line: i32) {
-        self.code.push(CodeLine { code, line });
+        self.code.push(CodeLine {
+            code,
+            line,
+            start_index: 0,
+        });
     }
 
     /// Adds a constant to the chunk's constant table
