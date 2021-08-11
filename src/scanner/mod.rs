@@ -34,7 +34,12 @@ impl Scanner {
         keywords.insert("GETLINE", &TokenType::GetLine);
         keywords.shrink_to_fit();
 
-        Scanner { input, start_idx: 0, current_idx: 0, keywords }
+        Scanner {
+            input,
+            start_idx: 0,
+            current_idx: 0,
+            keywords,
+        }
     }
 
     pub fn scan(&self) -> Vec<Token> {

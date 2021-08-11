@@ -529,10 +529,11 @@ impl<'a> Parser<'a> {
             }
             _ => {
                 error_msg.push_str(&format!(
-                    " at '{}'", // TODO: This is not exactly graceful on newlines
+                    " at '{}'. Character: {}", // TODO: This is not exactly graceful on newlines
                     unwrapped_token.lexeme.as_ref().unwrap_or(&String::from(
-                        "TODO: This is a shortsighted part of the lexeme"
-                    ))
+                        "TODO: This is a shortsighted part of the Token design."
+                    )),
+                    unwrapped_token.start_idx
                 ));
             }
         }
