@@ -31,6 +31,7 @@ impl Token {
             start_idx,
         }
     }
+
     /// Constructs a new `Token` that represents a synthetic error
     ///
     /// The [Token#structfield.token_type] will automatically be assigned [TokenType::Error]
@@ -42,4 +43,8 @@ impl Token {
     pub fn error_token(message: String, line: i32, start_idx: i32) -> Token {
         Token::new(Some(message), &TokenType::Error, line, start_idx)
     }
+
+    // pub fn length(&self) -> usize {
+    //     self.lexeme.as_ref().unwrap_or("".into()).len()
+    // }
 }

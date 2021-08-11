@@ -6,6 +6,8 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct Scanner {
     input: String,
+    start_idx: i32,
+    current_idx: i32,
     keywords: HashMap<&'static str, &'static TokenType>,
 }
 
@@ -32,23 +34,25 @@ impl Scanner {
         keywords.insert("GETLINE", &TokenType::GetLine);
         keywords.shrink_to_fit();
 
-        Scanner { input, keywords }
+        Scanner { input, start_idx: 0, current_idx: 0, keywords }
     }
 
     pub fn scan(&self) -> Vec<Token> {
-        let temp_index = 0;
         let mut tokens: Vec<Token> = Vec::new();
         let mut current_line = 1;
+        let mut temp_index = 0;
 
         let mut char_stream = self.input.chars().peekable();
         while char_stream.peek().is_some() {
             let mut ch = char_stream.next().unwrap();
+            temp_index += 1;
 
             debug!("Inspecting Character: '{}'", ch);
             match ch {
                 ' ' | '\r' | '\t' => debug!("I can see and accept whitespace"),
                 '\n' => {
                     current_line += 1;
+                    temp_index = 0;
                     debug!(
                         "I can see the newline. The current_line number is now {}",
                         current_line
@@ -147,6 +151,7 @@ impl Scanner {
                     let mut string_parsed = String::from("");
                     while let Some(_maybe_quote) = char_stream.peek() {
                         if let Some(next_ch) = char_stream.next() {
+                            temp_index += 1;
                             if next_ch == '\n' {
                                 current_line += 1;
                             } else if next_ch == '\"' {
@@ -169,6 +174,7 @@ impl Scanner {
                 '>' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::GreaterEqual);
                         tokens.push(Token::new(
                             None,
@@ -178,6 +184,7 @@ impl Scanner {
                         ));
                     } else if self.match_char('>', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::Append);
                         tokens.push(Token::new(
                             None,
@@ -198,6 +205,7 @@ impl Scanner {
                 '<' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::LessEqual);
                         tokens.push(Token::new(
                             None,
@@ -218,6 +226,7 @@ impl Scanner {
                 '=' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::DoubleEqual);
                         tokens.push(Token::new(
                             None,
@@ -238,6 +247,7 @@ impl Scanner {
                 '!' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::NotEqual);
                         tokens.push(Token::new(
                             None,
@@ -247,6 +257,7 @@ impl Scanner {
                         ));
                     } else if self.match_char('~', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::NoMatch);
                         tokens.push(Token::new(
                             None,
@@ -271,6 +282,7 @@ impl Scanner {
                 '+' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::AddAssign);
                         tokens.push(Token::new(
                             None,
@@ -280,6 +292,7 @@ impl Scanner {
                         ));
                     } else if self.match_char('+', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::Incr);
                         tokens.push(Token::new(None, &TokenType::Incr, current_line, temp_index));
                     } else {
@@ -290,6 +303,7 @@ impl Scanner {
                 '-' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::SubAssign);
                         tokens.push(Token::new(
                             None,
@@ -299,6 +313,7 @@ impl Scanner {
                         ));
                     } else if self.match_char('-', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::Decr);
                         tokens.push(Token::new(None, &TokenType::Decr, current_line, temp_index));
                     } else {
@@ -314,6 +329,7 @@ impl Scanner {
                 '*' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::MulAssign);
                         tokens.push(Token::new(
                             None,
@@ -329,6 +345,7 @@ impl Scanner {
                 '/' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::DivAssign);
                         tokens.push(Token::new(
                             None,
@@ -349,6 +366,7 @@ impl Scanner {
                 '^' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::PowAssign);
                         tokens.push(Token::new(
                             None,
@@ -369,6 +387,7 @@ impl Scanner {
                 '%' => {
                     if self.match_char('=', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::ModAssign);
                         tokens.push(Token::new(
                             None,
@@ -398,6 +417,7 @@ impl Scanner {
                 '|' => {
                     if self.match_char('|', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::Or);
                         tokens.push(Token::new(None, &TokenType::Or, current_line, temp_index));
                     } else {
@@ -426,6 +446,7 @@ impl Scanner {
                 '&' => {
                     if self.match_char('&', char_stream.peek()) {
                         char_stream.next();
+                        temp_index += 1;
                         Scanner::report_scanned_character(ch, &TokenType::And);
                         tokens.push(Token::new(None, &TokenType::And, current_line, temp_index));
                     }
@@ -443,6 +464,7 @@ impl Scanner {
                                 break;
                             }
                             if let Some(next_ch) = char_stream.next() {
+                                temp_index += 1;
                                 ch = next_ch;
                                 num_parsed.push(ch);
                             }
@@ -457,6 +479,7 @@ impl Scanner {
                         if let Some(maybe_dot) = char_stream.peek() {
                             if maybe_dot == &'.' {
                                 if let Some(dot) = char_stream.next() {
+                                    temp_index += 1;
                                     ch = dot;
                                     num_parsed.push(ch);
                                 }
@@ -467,6 +490,7 @@ impl Scanner {
                                     break;
                                 }
                                 if let Some(next_ch) = char_stream.next() {
+                                    temp_index += 1;
                                     ch = next_ch;
                                     num_parsed.push(ch);
                                 }
@@ -491,6 +515,7 @@ impl Scanner {
                                 break;
                             }
                             if let Some(next_ch) = char_stream.next() {
+                                temp_index += 1;
                                 ch = next_ch;
                                 word_parsed.push(ch);
                             }
