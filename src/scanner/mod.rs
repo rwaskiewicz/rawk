@@ -54,7 +54,10 @@ impl Scanner {
 
             debug!("Inspecting Character: '{}'", ch);
             match ch {
-                ' ' | '\r' | '\t' => {temp_index += 1 - 1; debug!("I can see and accept whitespace");},
+                ' ' | '\r' | '\t' => {
+                    temp_index += 1 - 1;
+                    debug!("I can see and accept whitespace");
+                }
                 '\n' => {
                     current_line += 1;
                     temp_index = 0;
@@ -173,7 +176,7 @@ impl Scanner {
                         current_line,
                         temp_index,
                     );
-                    temp_index += string_parsed_len -1;
+                    temp_index += string_parsed_len - 1;
 
                     tokens.push(string_token);
                 }
