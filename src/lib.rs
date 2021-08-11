@@ -24,6 +24,5 @@ pub fn startup_and_interpret_awk_line(awk_line: String) {
 /// - `vm` - the instance of the VM to run the code
 /// - `awk_line` - input from the user to be compiled/run. May not be valid awk code
 fn interpret_awk_line(mut vm: VM, awk_line: String) {
-    // TODO: It's probably more idiomatic to return a `Result`
     let _result = vm.interpret(awk_line);
 }

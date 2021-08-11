@@ -8,8 +8,7 @@ use log::{debug, error, info};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-pub enum InterpretResult {
-    Ok,
+pub enum InterpretError {
     CompileError,
     RuntimeError,
 }
@@ -31,11 +30,11 @@ impl VM {
         }
     }
 
-    pub fn run(&mut self) -> InterpretResult {
+    pub fn run(&mut self) -> Result<(), InterpretError> {
         let mut ret_ok = false;
         loop {
             if ret_ok {
-                return InterpretResult::Ok;
+                return Ok(());
             }
 
             let old_ip = self.ip;
@@ -51,7 +50,7 @@ impl VM {
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");
-                        panic!("{:?}", InterpretResult::RuntimeError);
+                        panic!("{:?}", InterpretError::RuntimeError);
                     }
                 },
                 OpCode::OpReturn => ret_ok = true,
@@ -106,7 +105,7 @@ impl VM {
             .clone()
     }
 
-    pub fn interpret(&mut self, source: String) -> InterpretResult {
+    pub fn interpret(&mut self, source: String) -> Result<(), InterpretError> {
         let scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan();
 
@@ -115,7 +114,7 @@ impl VM {
         let mut parser = Parser::new(tokens.iter(), &mut self.chunk);
 
         if !parser.parse() {
-            return InterpretResult::CompileError;
+            return Err(InterpretError::CompileError);
         }
 
         self.run()
