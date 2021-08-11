@@ -54,7 +54,7 @@ impl Scanner {
 
             debug!("Inspecting Character: '{}'", ch);
             match ch {
-                ' ' | '\r' | '\t' => debug!("I can see and accept whitespace"),
+                ' ' | '\r' | '\t' => {temp_index += 1 - 1; debug!("I can see and accept whitespace");},
                 '\n' => {
                     current_line += 1;
                     temp_index = 0;
@@ -156,7 +156,6 @@ impl Scanner {
                     let mut string_parsed = String::from("");
                     while let Some(_maybe_quote) = char_stream.peek() {
                         if let Some(next_ch) = char_stream.next() {
-                            temp_index += 1;
                             if next_ch == '\n' {
                                 current_line += 1;
                             } else if next_ch == '\"' {
@@ -167,12 +166,14 @@ impl Scanner {
                             string_parsed.push(ch);
                         }
                     }
+                    let string_parsed_len = string_parsed.len() as i32;
                     let string_token = Token::new(
                         Some(string_parsed),
                         &TokenType::DoubleQuote,
                         current_line,
                         temp_index,
                     );
+                    temp_index += string_parsed_len -1;
 
                     tokens.push(string_token);
                 }
@@ -469,7 +470,6 @@ impl Scanner {
                                 break;
                             }
                             if let Some(next_ch) = char_stream.next() {
-                                temp_index += 1;
                                 ch = next_ch;
                                 num_parsed.push(ch);
                             }
@@ -484,7 +484,6 @@ impl Scanner {
                         if let Some(maybe_dot) = char_stream.peek() {
                             if maybe_dot == &'.' {
                                 if let Some(dot) = char_stream.next() {
-                                    temp_index += 1;
                                     ch = dot;
                                     num_parsed.push(ch);
                                 }
@@ -495,7 +494,6 @@ impl Scanner {
                                     break;
                                 }
                                 if let Some(next_ch) = char_stream.next() {
-                                    temp_index += 1;
                                     ch = next_ch;
                                     num_parsed.push(ch);
                                 }
@@ -504,12 +502,14 @@ impl Scanner {
 
                         Scanner::report_scanned_string(&num_parsed, &TokenType::Number);
                         // TODO: Store this value in floating point
+                        let length_of_number = num_parsed.len() as i32;
                         tokens.push(Token::new(
                             Some(num_parsed),
                             &TokenType::Number,
                             current_line,
                             temp_index,
                         ));
+                        temp_index += length_of_number - 1;
                     } else if ch.is_alphabetic() || ch == '_' {
                         Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                         let mut word_parsed = String::from(ch);
@@ -520,7 +520,6 @@ impl Scanner {
                                 break;
                             }
                             if let Some(next_ch) = char_stream.next() {
-                                temp_index += 1;
                                 ch = next_ch;
                                 word_parsed.push(ch);
                             }
@@ -538,6 +537,7 @@ impl Scanner {
                             current_line,
                             temp_index,
                         ));
+                        temp_index += word_parsed.len() as i32 - 1;
                     } else {
                         error!("ALERT: We found a character we can not handle, '{}'", ch);
                         tokens.push(Token::error_token(

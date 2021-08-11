@@ -522,18 +522,17 @@ impl<'a> Parser<'a> {
         self.panic_mode = true;
 
         let unwrapped_token = token.unwrap();
-        let mut error_msg = format!("[line {}] Error", unwrapped_token.line);
+        let mut error_msg = format!("[{}:{}] Error", unwrapped_token.line, unwrapped_token.start_idx);
         match unwrapped_token.token_type {
             TokenType::Eof => {
                 error_msg.push_str(" at end");
             }
             _ => {
                 error_msg.push_str(&format!(
-                    " at '{}'. Character: {}", // TODO: This is not exactly graceful on newlines
+                    " at '{}'", // TODO: This is not exactly graceful on newlines
                     unwrapped_token.lexeme.as_ref().unwrap_or(&String::from(
                         "TODO: This is a shortsighted part of the Token design"
-                    )),
-                    unwrapped_token.start_idx
+                    ))
                 ));
             }
         }
