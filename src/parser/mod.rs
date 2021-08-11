@@ -48,7 +48,7 @@ impl Precedence {
     ///
     /// # Return value
     /// - the next precedence level
-    pub fn get_next_precedence(p: Precedence) -> Precedence {
+    pub fn next_precedence(p: Precedence) -> Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
             Precedence::Assignment => Precedence::LogicalOr,
@@ -430,7 +430,7 @@ impl<'a> Parser<'a> {
         if rule.infix_associativity == Associativity::Right {
             self.parse_precedence(rule.infix_precedence);
         } else {
-            self.parse_precedence(Precedence::get_next_precedence(rule.infix_precedence));
+            self.parse_precedence(Precedence::next_precedence(rule.infix_precedence));
         }
 
         match operator_type {
