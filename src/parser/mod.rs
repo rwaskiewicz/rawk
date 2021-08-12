@@ -522,26 +522,19 @@ impl<'a> Parser<'a> {
         self.panic_mode = true;
 
         let unwrapped_token = token.unwrap();
+        // https://www.gnu.org/prep/standards/html_node/Errors.html
         let mut error_msg = format!(
-            "[{}:{}] Error",
+            "{}:{}: ",
             unwrapped_token.line, unwrapped_token.start_idx
         );
         match unwrapped_token.token_type {
             TokenType::Eof => {
                 error_msg.push_str(" at end");
             }
-            _ => {
-                error_msg.push_str(&format!(
-                    " at '{}'", // TODO: This is not exactly graceful on newlines
-                    unwrapped_token
-                        .lexeme
-                        .as_ref()
-                        .unwrap_or(&String::from("???"))
-                ));
-            }
+            _ => ()
         }
 
-        error_msg.push_str(&format!(". {}", message));
+        error_msg.push_str(&format!("{}", message));
         error!("{}", error_msg.as_str());
 
         self.had_error = true;
