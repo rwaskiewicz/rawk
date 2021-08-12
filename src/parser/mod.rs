@@ -120,6 +120,15 @@ impl<'a> Parser<'a> {
         }
     }
 
+    fn sync_panic_mode(&mut self) {
+        println!("entered panic mode - rectifiying");
+        self.panic_mode = false;
+
+        while self.current_token.unwrap().token_type != &TokenType::Eof {
+            break;
+        }
+    }
+
     /// Entrypoint for parsing tokens.
     ///
     /// # Return value
@@ -247,6 +256,10 @@ impl<'a> Parser<'a> {
             self.variable_declaration();
         } else {
             self.statement();
+        }
+
+        if self.panic_mode {
+            self.sync_panic_mode();
         }
     }
 
@@ -523,15 +536,12 @@ impl<'a> Parser<'a> {
 
         let unwrapped_token = token.unwrap();
         // https://www.gnu.org/prep/standards/html_node/Errors.html
-        let mut error_msg = format!(
-            "{}:{}: ",
-            unwrapped_token.line, unwrapped_token.start_idx
-        );
+        let mut error_msg = format!("{}:{}: ", unwrapped_token.line, unwrapped_token.start_idx);
         match unwrapped_token.token_type {
             TokenType::Eof => {
                 error_msg.push_str(" at end");
             }
-            _ => ()
+            _ => (),
         }
 
         error_msg.push_str(&format!("{}", message));
