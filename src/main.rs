@@ -1,8 +1,6 @@
 use clap::{App, Arg};
 use env_logger::{Builder, Env};
-use log::{debug, error, LevelFilter};
-use rustyline::error::ReadlineError;
-use rustyline::Editor;
+use log::{error, LevelFilter};
 
 fn main() {
     Builder::from_env(Env::default().default_filter_or("info"))
@@ -10,6 +8,7 @@ fn main() {
         .filter_module("rustyline", LevelFilter::Error)
         .init();
 
+    // https://www.gnu.org/software/gawk/manual/html_node/Options.html
     let matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")
@@ -18,35 +17,27 @@ fn main() {
                 .short("f")
                 .long("file")
                 .takes_value(true)
-                .required(false),
+                .required(false)
+                .help("Runs an awk file"),
+        )
+        .arg(
+            Arg::with_name("eval")
+                .short("k") // '-e' is taken already...
+                .long("eval")
+                .takes_value(false)
+                .required(false)
+                .help("Runs a single line of awk code, then terminates"),
         )
         .get_matches();
 
     let file_name = matches.value_of("file");
     match file_name {
         None => {
-            run_prompt();
+            let is_eval = matches.is_present("eval");
+            rawk::run_prompt(is_eval);
         }
         Some(s) => {
             error!("TODO: Implement file parsing. Got file_name {}", s);
         }
-    }
-}
-
-fn run_prompt() {
-    let mut rl = Editor::<()>::new();
-
-    let user_input = rl.readline("r-awk > ");
-    match user_input {
-        Ok(awk_line) => {
-            debug!("r-awk line to process: {}", awk_line);
-            // When we had one, we would init a new VM on every loop. This won't be feasible long
-            // term, but for now we can avoid the scary monsters under the bed with resetting
-            // state...
-            rawk::startup_and_interpret_awk_line(awk_line);
-        }
-        Err(ReadlineError::Eof) => println!("Eof received, exiting."),
-        Err(ReadlineError::Interrupted) => println!("Interrupt received, exiting."),
-        Err(err) => error!("An error occurred: '{:?}'", err),
     }
 }

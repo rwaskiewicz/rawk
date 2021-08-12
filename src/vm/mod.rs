@@ -109,8 +109,8 @@ impl VM {
         let scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan();
 
-        // TODO: This feels dirty
         self.chunk = Chunk::new();
+        self.ip = 0;
         let mut parser = Parser::new(tokens.iter(), &mut self.chunk);
 
         if !parser.parse() {

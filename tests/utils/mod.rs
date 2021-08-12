@@ -17,6 +17,7 @@ pub fn assert_input(input: &str, expected_value: &str) {
     expected_text.push_str("\n$");
     Command::cargo_bin("rawk")
         .unwrap()
+        .arg("-k")
         .write_stdin(input)
         .assert()
         .stderr(predicates::str::is_match(expected_text).unwrap());
