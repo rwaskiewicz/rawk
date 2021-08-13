@@ -120,12 +120,33 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Consumes tokens until a boundary token is found
     fn sync_panic_mode(&mut self) {
         println!("entered panic mode - rectifiying");
         self.panic_mode = false;
 
         while self.current_token.unwrap().token_type != &TokenType::Eof {
-            break;
+            if self.previous_token.unwrap().token_type == &TokenType::Semicolon {
+                return;
+            }
+
+            match &self.current_token.unwrap().token_type {
+                TokenType::Begin
+                | TokenType::End
+                | TokenType::Delete
+                | TokenType::Do
+                | TokenType::Exit
+                | TokenType::For
+                | TokenType::Function
+                | TokenType::If
+                | TokenType::Print
+                | TokenType::Printf
+                | TokenType::Return
+                | TokenType::While
+                | TokenType::GetLine => return,
+                _ => (), /* Do Nothing, we have not found a token type to sync to */
+            }
+            self.advance();
         }
     }
 
