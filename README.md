@@ -9,7 +9,13 @@ At this time, only running the REPL is supported as the project is in active dev
 ```commandline
 RUST_LOG=debug cargo run
 r-awk - a subset of awk written in Rust
-r-awk >
+r-awk > foo=2;
+r-awk > bar=3;
+r-awk > baz=4;
+r-awk > print foo + bar + baz;
+[INFO  rawk::vm] 9
+r-awk > print foo bar baz;
+[INFO  rawk::vm] 234
 ```
 
 ### Logging
