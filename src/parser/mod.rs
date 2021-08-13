@@ -558,14 +558,11 @@ impl<'a> Parser<'a> {
         let unwrapped_token = token.unwrap();
         // https://www.gnu.org/prep/standards/html_node/Errors.html
         let mut error_msg = format!("{}:{}: ", unwrapped_token.line, unwrapped_token.start_idx);
-        match unwrapped_token.token_type {
-            TokenType::Eof => {
-                error_msg.push_str(" at end");
-            }
-            _ => (),
+        if unwrapped_token.token_type == &TokenType::Eof {
+            error_msg.push_str(" at end");
         }
 
-        error_msg.push_str(&format!("{}", message));
+        error_msg.push_str(message);
         error!("{}", error_msg.as_str());
 
         self.had_error = true;
