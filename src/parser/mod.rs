@@ -294,6 +294,8 @@ impl<'a> Parser<'a> {
     fn statement(&mut self) {
         if self.match_token(&TokenType::Print) {
             self.print_statement();
+        } else if self.match_token(&TokenType::If) {
+            self.if_statement();
         } else {
             // we're looking at an expression statement (as the name of the next LoC implies)
             self.expression();
@@ -324,6 +326,84 @@ impl<'a> Parser<'a> {
         // | Print  '(' multiple_expr_list ')'
         // | Printf print_expr_list
         // | Printf '(' multiple_expr_list ')'
+    }
+
+    /// Parse an if statement
+    fn if_statement(&mut self) {
+        self.consume(&TokenType::LeftParenthesis, "Expect '(' after IF.");
+        self.expression();
+        self.consume(
+            &TokenType::RightParenthesis,
+            "Expect ')' at the end of IF statement.",
+        );
+
+        // emit a jump instruction as a placeholder to skip over the 'then' in the event the if condition is false.
+        // we'll backpatch it soon with the correct offset.
+        let if_was_false_jump = self.emit_jump(OpCode::JumpIfFalse(0xff, 0xff));
+        self.statement();
+
+        // in the event the if statement's condition is truthy, we need to jump over the else block rather than fall
+        // through. put a placeholder in that will be able to skip the else keyword & the statement(s) that follow it.
+        // there is an implicit 'else' here, even if there isn't one in the author's code.
+        let else_jump = self.emit_jump(OpCode::Jump(0xff, 0xff));
+
+        // when the if statement condition is truthy, pop the result off the stack
+        self.emit_byte(OpCode::Pop);
+
+        // we've passed through the then statement(s) backpatch the jump that was emitted for the if block. we needed
+        // to emit the pop instruction for the condition being truthy to ensure we calculated the distance for
+        // backpatching correctly.
+        self.patch_jump(if_was_false_jump);
+
+        // when the if statement condiition is falsey, pop the result off the stack.
+        self.emit_byte(OpCode::Pop);
+
+        if self.match_token(&TokenType::Else) {
+            self.statement();
+        }
+
+        // we've passed through the else block statement(s), backpatch the jump that was emitted for the else block
+        self.patch_jump(else_jump);
+    }
+
+    /// Emit a jump instruction
+    ///
+    /// # Arguments
+    /// - `instruction` the [OpCode] to emit
+    ///
+    /// # Return value
+    /// the location of the emitted jump instruction in the current chunk
+    fn emit_jump(&mut self, instruction: OpCode) -> usize {
+        self.emit_byte(instruction);
+
+        // return the offset, that is, where the instruction we'll later overwrites begins
+        self.compiling_chunk.code.len()
+    }
+
+    /// Patch a jump instruciton that was previously emitted
+    ///
+    /// # Arguments
+    /// - `offset` the location of the jump instruction that was emitted
+    fn patch_jump(&mut self, offset: usize) {
+        // pull the placeholder instruction out to be patched
+        let old_instruction = &self.compiling_chunk.code[offset - 1].code;
+
+        // calculate the jump distance
+        let jump = self.compiling_chunk.code.len() - offset;
+        let new_offset1 = (jump >> 8) & 0xff;
+        let new_offset2 = jump & 0xff;
+
+        // create a patch instruction, using the old one to avoid messiness in moving values
+        let patch_instruction = match &old_instruction {
+            OpCode::JumpIfFalse(_, _) => OpCode::JumpIfFalse(new_offset1, new_offset2),
+            OpCode::Jump(_, _) => OpCode::Jump(new_offset1, new_offset2),
+            _ => panic!(
+                "Instruction {:?} cannot be used to patch a jump!",
+                old_instruction
+            ),
+        };
+
+        self.compiling_chunk.code[offset - 1].code = patch_instruction;
     }
 
     fn print_expr_list_opt(&mut self) {

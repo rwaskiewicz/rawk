@@ -93,6 +93,17 @@ impl VM {
                     self.globals.insert(variable_name, val);
                     self.stack.pop();
                 }
+                OpCode::JumpIfFalse(offset1, offset2) => {
+                    let if_result = self.peek(0).num_value() != 0.0;
+                    if !if_result {
+                        let offset = (offset1 >> 8) | offset2;
+                        self.ip += offset;
+                    }
+                }
+                OpCode::Jump(offset1, offset2) => {
+                    let offset = (offset1 >> 8) | offset2;
+                    self.ip += offset;
+                }
             }
         }
     }

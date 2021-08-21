@@ -33,6 +33,8 @@ pub enum OpCode {
     GetGlobal(usize),
     SetGlobal(usize),
     DefineGlobal(usize),
+    JumpIfFalse(usize, usize),
+    Jump(usize, usize),
 }
 
 /// Struct describing an OpCode and the line in the original corpus it appears in
