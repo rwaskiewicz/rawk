@@ -19,12 +19,10 @@ mod control_flow {
         );
     }
 
-    // TODO: Need actual block support
     #[test]
-    #[ignore]
     fn it_supports_multiple_statements_in_the_if() {
         utils::assert_input(
-            "if (1) { foo = 2; print \"Should execute this many lines: \" foo;",
+            "if (1) { foo = 2; print \"Should execute this many lines: \" foo; }",
             "Should execute this many lines: 2",
         );
     }
@@ -83,11 +81,9 @@ mod control_flow {
         );
     }
 
-    // TODO Need actual block support
     #[test]
-    #[ignore]
     fn it_supports_multiple_statements_in_the_else() {
-        utils::assert_input("if (0) print \"I should not print\"; else { foo = 2; print \"Should execute this many lines in else: \" foo;",
+        utils::assert_input("if (0) print \"I should not print\"; else { foo = 2; print \"Should execute this many lines in else: \" foo; }",
                             "Should execute this many lines in else: 2");
     }
 
@@ -100,6 +96,20 @@ mod control_flow {
         utils::assert_input(
             "if (1) if (0) print \"should not print\"; else print \"else found\";",
             "else found",
+        );
+    }
+
+    #[test]
+    // if (0) {
+    //   if (1) {
+    //     print "should not print";
+    //   }
+    // }
+    // else { "should print"; }
+    fn it_binds_else_to_the_correct_if_statement_with_braces() {
+        utils::assert_input(
+            "if (0) { if (1) { print \"should not print\"; }} else { print \"else found for outer\";}",
+            "else found for outer",
         );
     }
 }

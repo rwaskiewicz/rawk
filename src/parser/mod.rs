@@ -296,6 +296,8 @@ impl<'a> Parser<'a> {
             self.print_statement();
         } else if self.match_token(&TokenType::If) {
             self.if_statement();
+        } else if self.match_token(&TokenType::LeftCurly) {
+            self.block();
         } else {
             // we're looking at an expression statement (as the name of the next LoC implies)
             self.expression();
@@ -306,6 +308,16 @@ impl<'a> Parser<'a> {
             // discard the result
             self.emit_byte(OpCode::Pop);
         }
+    }
+
+    /// Function for parsing a block of code contained by curly braces
+    fn block(&mut self) {
+        while self.current_token.unwrap().token_type != &TokenType::RightCurly
+            && self.current_token.unwrap().token_type != &TokenType::Eof
+        {
+            self.declaration();
+        }
+        self.consume(&TokenType::RightCurly, "Expect '}' after block.");
     }
 
     /// Function for parsing a print statement
