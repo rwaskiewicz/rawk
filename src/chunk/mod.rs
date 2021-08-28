@@ -35,6 +35,7 @@ pub enum OpCode {
     DefineGlobal(usize),
     JumpIfFalse(usize, usize),
     Jump(usize, usize),
+    JumpIfTrue(usize, usize),
 }
 
 /// Struct describing an OpCode and the line in the original corpus it appears in

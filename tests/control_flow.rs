@@ -146,4 +146,46 @@ mod control_flow {
             "0",
         );
     }
+
+    #[test]
+    fn it_supports_logical_or_in_if_statements() {
+        utils::assert_input(
+            "if (1 || 1) { print \"logical or is supported\"; }",
+            "logical or is supported",
+        );
+    }
+
+    #[test]
+    fn it_supports_logical_or_in_if_statements_to_be_falsey() {
+        utils::assert_input("if (0 || 0) { print \"logical or is supported, but this should not run\"; } else { print \"but this should\"; }", "but this should");
+    }
+
+    #[test]
+    fn it_allows_variable_assignment_in_if_with_logical_or() {
+        utils::assert_input("if (0 || foo=2) { print foo; }", "2");
+    }
+
+    #[test]
+    fn it_short_circuits_in_logical_or() {
+        utils::assert_input(
+            "if (0 || 1 || foo=123) { print foo; } else { print \"this should not run\"; }",
+            "",
+        );
+    }
+
+    #[test]
+    fn it_still_sets_var_when_assignment_is_falsy_with_logical_or_truthy() {
+        utils::assert_input(
+            "if (foo=1 || 0) { print foo; } else { print \"this should not run\"; }",
+            "1",
+        );
+    }
+
+    #[test]
+    fn it_still_sets_var_when_assignment_is_falsy_with_logical_or_falsey() {
+        utils::assert_input(
+            "if (foo=0 || 0) { print \"this should not run\"; } else { print foo; }",
+            "0",
+        );
+    }
 }

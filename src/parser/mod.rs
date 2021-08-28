@@ -408,6 +408,7 @@ impl<'a> Parser<'a> {
         // create a patch instruction, using the old one to avoid messiness in moving values
         let patch_instruction = match &old_instruction {
             OpCode::JumpIfFalse(_, _) => OpCode::JumpIfFalse(new_offset1, new_offset2),
+            OpCode::JumpIfTrue(_, _) => OpCode::JumpIfTrue(new_offset1, new_offset2),
             OpCode::Jump(_, _) => OpCode::Jump(new_offset1, new_offset2),
             _ => panic!(
                 "Instruction {:?} cannot be used to patch a jump!",
@@ -539,9 +540,27 @@ impl<'a> Parser<'a> {
             TokenType::Modulus => self.emit_byte(OpCode::Modulus),
             TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
             TokenType::StringConcat => self.emit_byte(OpCode::Concatenate),
-            TokenType::Or => self.emit_byte(OpCode::LogicalOr),
             _ => {}
         }
+    }
+
+    /// Function for parsing logical or (||) to support short circuiting.
+    ///
+    /// When this function is reached, the left hand side of the expression should have already been parsed and its
+    /// contents on the top of the stack. If that value is truthy, the entire estatement is truthy.
+    fn logical_or(&mut self) {
+        // create a placeholder to jump to the end of the or statement should it's condition be true
+        let end_jump = self.emit_jump(OpCode::JumpIfTrue(0xFF, 0xFF));
+
+        // continue parsing the right hand side of the 'or'
+        self.parse_precedence(Precedence::LogicalOr);
+
+        // the LHS and RHS are now on the stack, we'll need to evaluate them in the VM, since awk's return value for
+        // logical or is 1 or 0, not the return value of the last sub expression
+        self.emit_byte(OpCode::LogicalOr);
+
+        // we've now passed the or statement, backpatch the jump over the contents
+        self.patch_jump(end_jump);
     }
 
     /// Function for parsing logical and (&&) to support short circuiting.
@@ -853,7 +872,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     // (Logical) Or
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.logical_or()),
         infix_precedence: Precedence::LogicalOr,
         infix_associativity: Associativity::Left,
     },
