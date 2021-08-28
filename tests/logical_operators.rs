@@ -79,6 +79,17 @@ mod logical_tests {
     }
 
     #[test]
+    fn it_returns_the_result_of_chained_logical_ands_that_short_circuit() {
+        utils::assert_input("a=1; b=0; print a && b && c=3;", "0");
+    }
+
+    #[test]
+    fn it_returns_the_result_of_chained_logical_ands_that_are_all_evaluated() {
+        // result should be '1', the boolean result of the logical ands rather than one of the values assigned in the subexpr
+        utils::assert_input("a=2; b=2; print a && b && c=3;", "1");
+    }
+
+    #[test]
     fn it_performs_logical_or_truthy() {
         utils::assert_input("print 1 || 1;", "1");
     }

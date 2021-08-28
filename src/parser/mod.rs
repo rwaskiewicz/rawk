@@ -161,7 +161,7 @@ impl<'a> Parser<'a> {
             return;
         }
 
-        let can_assign: bool = precedence <= Precedence::Assignment;
+        let can_assign: bool = precedence <= Precedence::LogicalAnd;
         let prefix_rule = maybe_prefix_rule.unwrap();
         prefix_rule(self, can_assign);
 
@@ -539,10 +539,28 @@ impl<'a> Parser<'a> {
             TokenType::Modulus => self.emit_byte(OpCode::Modulus),
             TokenType::Caret => self.emit_byte(OpCode::Exponentiation),
             TokenType::StringConcat => self.emit_byte(OpCode::Concatenate),
-            TokenType::And => self.emit_byte(OpCode::LogicalAnd),
             TokenType::Or => self.emit_byte(OpCode::LogicalOr),
             _ => {}
         }
+    }
+
+    /// Function for parsing logical and (&&) to support short circuiting.
+    ///
+    /// When this function is reached, the left hand side of the expression should have already been parsed and its
+    /// contents on the top of the stack. If that value is falsey, the entire estatement is falsey.
+    fn logical_and(&mut self) {
+        // create a placeholder to jump to the end of the and statement should it's condition be false
+        let end_jump = self.emit_jump(OpCode::JumpIfFalse(0xFF, 0xFF));
+
+        // continue parsing the right hand side of the 'and'
+        self.parse_precedence(Precedence::LogicalAnd);
+
+        // the LHS and RHS are now on the stack, we'll need to evaluate them in the VM, since awk's return value for
+        // logical and is 1 or 0, not the return value of the last sub expression
+        self.emit_byte(OpCode::LogicalAnd);
+
+        // we've now passed the and statement, backpatch the jump over the contents
+        self.patch_jump(end_jump);
     }
 
     /// Function for parsing a grouping, denoted by an expression surrounded by parenthesis.
@@ -842,7 +860,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     // (Logical) And
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: Some(|parser, _can_assign| parser.binary()),
+        infix_parse_fn: Some(|parser, _can_assign| parser.logical_and()),
         infix_precedence: Precedence::LogicalAnd,
         infix_associativity: Associativity::Left,
     },
