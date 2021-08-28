@@ -296,6 +296,8 @@ impl<'a> Parser<'a> {
             self.print_statement();
         } else if self.match_token(&TokenType::If) {
             self.if_statement();
+        } else if self.match_token(&TokenType::While) {
+            self.while_statement();
         } else if self.match_token(&TokenType::LeftCurly) {
             self.block();
         } else {
@@ -376,6 +378,44 @@ impl<'a> Parser<'a> {
 
         // we've passed through the else block statement(s), backpatch the jump that was emitted for the else block
         self.patch_jump(else_jump);
+    }
+
+    /// Parsing method for while statements
+    fn while_statement(&mut self) {
+        // mark the location where the loop begins
+        let while_start = self.compiling_chunk.code.len();
+
+        self.consume(&TokenType::LeftParenthesis, "Expect '(' after 'while'.");
+        self.expression();
+        self.consume(
+            &TokenType::RightParenthesis,
+            "Expect ')' after 'while' condition.",
+        );
+
+        // emit a jump that will jump over the body of the loop should it's condition be false
+        let while_condition_false = self.emit_jump(OpCode::JumpIfFalse(0xFF, 0xFF));
+
+        // pop the result of the while condition off the stack if the condition was truthy
+        self.emit_byte(OpCode::Pop);
+
+        self.statement();
+        // now that the body of the while loop has been parsed, emit a jump back to the start of the loop
+        self.emit_loop(while_start);
+
+        // backpatch the jump for a falsy condition and pop the result off the stack
+        self.patch_jump(while_condition_false);
+        self.emit_byte(OpCode::Pop);
+    }
+
+    /// Emits a looping instruction to go backwards in the code
+    ///
+    /// # Arguments
+    /// - `loop_start` the pointer to the the instruction where the loop began
+    fn emit_loop(&mut self, loop_start: usize) {
+        let offset = self.compiling_chunk.code.len() - loop_start + 1;
+        let offset1 = (offset >> 8) & 0xff;
+        let offset2 = offset & 0xff;
+        self.emit_byte(OpCode::Loop(offset1, offset2));
     }
 
     /// Emit a jump instruction

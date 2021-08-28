@@ -115,6 +115,10 @@ impl VM {
                     let offset = (offset1 >> 8) | offset2;
                     self.ip += offset;
                 }
+                OpCode::Loop(offset1, offset2) => {
+                    let offset = (offset1 >> 8) | offset2;
+                    self.ip -= offset;
+                }
             }
         }
     }

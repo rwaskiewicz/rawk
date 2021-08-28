@@ -302,6 +302,11 @@ mod relational_tests {
     }
 
     #[test]
+    fn compares_zero_and_empty_string_double_equal() {
+        utils::assert_input("print \"\"==0;", "0");
+    }
+
+    #[test]
     fn compares_a_number_and_string_not_equal() {
         utils::assert_input("print \"a\"!=1;", "1");
     }

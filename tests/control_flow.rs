@@ -188,4 +188,29 @@ mod control_flow {
             "0",
         );
     }
+
+    #[test]
+    fn it_allows_while_to_be_first_token() {
+        utils::assert_input("while(a == 1) { a=1; } print a;", "");
+    }
+
+    #[test]
+    fn it_runs_a_valid_while_loop_to_completion() {
+        utils::assert_input("j=10; while(j > 0) { j=j-1; } print j;", "0");
+    }
+
+    #[test]
+    fn it_allows_a_while_loop_without_curly_braces() {
+        utils::assert_input("j=10; while(j > 1) j=j-1; print j;", "1");
+    }
+
+    #[test]
+    fn it_considers_an_undefined_variable_to_be_falsy_in_while_loops() {
+        utils::assert_input("while(a == 0) { a=1; } print a;", "");
+    }
+
+    #[test]
+    fn it_allows_assignment_that_breaks_a_while_loop() {
+        utils::assert_input("while(a = 0) { a=1; } print a;", "0");
+    }
 }
