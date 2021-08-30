@@ -795,7 +795,7 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
-                lexeme: Some(" ".into_string()),
+                lexeme: None,
                 token_type: &TokenType::StringConcat,
                 line: 1,
             })
@@ -803,7 +803,7 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
-                lexeme: None,
+                lexeme: Some(String::from(" ")),
                 token_type: &TokenType::DoubleQuote,
                 line: 1,
             })
