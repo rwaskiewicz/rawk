@@ -16,6 +16,11 @@ r-awk > if (baz) print "baz is defined"; else print "baz is not defined";
 [INFO  rawk::vm] baz is defined
 ```
 
+At this time, only single lines in the REPL are supported. This makes longer programs a little gross. Take 'fizzbuzz' for example:
+```awk
+i=0; while (i <= 100) { i=i+1; is_three_div = (i % 3 == 0); is_five_div = (i % 5 == 0); if (is_three_div && is_five_div) {print "fizzbuzz";} else { if (is_three_div) { print "fizz";} if (is_five_div) {print "buzz";} if (!(is_three_div || is_five_div)) {print i;}}}
+```
+
 ### Logging
 The `env_logger` crate is used as the implementation behind the `log` facade. Instructions for configuring log levels
 can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
