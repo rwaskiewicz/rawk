@@ -58,7 +58,7 @@ impl Scanner {
                 }
                 ',' => {
                     Scanner::report_scanned_character(ch, &TokenType::Comma);
-                    tokens.push(Token::new(None, &TokenType::Comma, current_line));
+                    Scanner::check_and_emit_comma_operator(&mut tokens, current_line);
                 }
                 '#' => {
                     // consume the rest of the line, as we've found a comment
@@ -386,6 +386,37 @@ impl Scanner {
         &expected_char == current_char.unwrap()
     }
 
+    /// Checks to see if a synthetic concatenation token should be emitted or not for a comma
+    ///
+    /// # Arguments
+    /// - `tokens` the stream of tokens that have been emitter thus far
+    /// - `current_line` the current line number
+    fn check_and_emit_comma_operator(tokens: &mut Vec<Token>, current_line: i32) {
+        if let Some(last_token_type) = tokens.last() {
+            match &last_token_type.token_type {
+                // something like `print ,123;` is not permitted
+                TokenType::Number | TokenType::DoubleQuote | TokenType::Identifier => {
+                    tokens.push(Token {
+                        lexeme: None,
+                        token_type: &TokenType::StringConcat,
+                        line: current_line,
+                    });
+                    tokens.push(Token {
+                        lexeme: Option::Some(String::from(" ")),
+                        token_type: &TokenType::DoubleQuote,
+                        line: current_line,
+                    });
+                    tokens.push(Token {
+                        lexeme: None,
+                        token_type: &TokenType::StringConcat,
+                        line: current_line,
+                    });
+                }
+                _ => (),
+            }
+        }
+    }
+
     /// Checks to see if a synthetic concatenation token should be emitted or not
     ///
     /// # Arguments
@@ -557,14 +588,13 @@ mod lexing {
 
     #[test]
     fn it_parses_single_character_tokens() {
-        let test_cases: [(&str, &TokenType); 22] = [
+        let test_cases: [(&str, &TokenType); 21] = [
             ("{", &TokenType::LeftCurly),
             ("}", &TokenType::RightCurly),
             ("(", &TokenType::LeftParenthesis),
             (")", &TokenType::RightParenthesis),
             ("[", &TokenType::LeftSquareBracket),
             ("]", &TokenType::RightSquareBracket),
-            (",", &TokenType::Comma),
             (";", &TokenType::Semicolon),
             // TODO: NEWLINE
             ("+", &TokenType::Plus),
@@ -748,12 +778,12 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_number_with_a_comma_into_two() {
-        let tokens = Scanner::new(String::from("1,000")).scan();
+    fn it_parses_a_comma_as_string_concatenation() {
+        let tokens = Scanner::new(String::from("1,2")).scan();
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token
-        assert_eq!(token_iter.len(), 4);
+        assert_eq!(token_iter.len(), 6);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -765,15 +795,31 @@ mod lexing {
         assert_eq!(
             token_iter.next(),
             Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::Comma,
+                lexeme: Some(" ".into_string()),
+                token_type: &TokenType::StringConcat,
                 line: 1,
             })
         );
         assert_eq!(
             token_iter.next(),
             Some(&Token {
-                lexeme: Some(String::from("000")),
+                lexeme: None,
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::StringConcat,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("2")),
                 token_type: &TokenType::Number,
                 line: 1,
             })

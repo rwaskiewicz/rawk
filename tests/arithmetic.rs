@@ -217,6 +217,21 @@ mod arithmetic_tests {
     }
 
     #[test]
+    fn it_concatenates_using_comma() {
+        utils::assert_input("print \"hello\",\"world\";", "hello world");
+    }
+
+    #[test]
+    fn it_concatenates_using_comma_with_undefined_variable() {
+        utils::assert_input("print hello,\"world\";", " world");
+    }
+
+    #[test]
+    fn it_concatenates_using_with_two_numbers() {
+        utils::assert_input("hello=23; print hello,hello;", "23 23");
+    }
+
+    #[test]
     fn it_coerces_a_variable_to_number() {
         utils::assert_input("foo = \"3\"; print foo * 3;", "9");
     }
