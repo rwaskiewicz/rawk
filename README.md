@@ -18,7 +18,25 @@ r-awk > if (baz) print "baz is defined"; else print "baz is not defined";
 
 At this time, only single lines in the REPL are supported. This makes longer programs a little gross. Take 'fizzbuzz' for example:
 ```awk
-i=0; while (i <= 100) { i=i+1; is_three_div = (i % 3 == 0); is_five_div = (i % 5 == 0); if (is_three_div && is_five_div) {print "fizzbuzz";} else { if (is_three_div) { print "fizz";} if (is_five_div) {print "buzz";} if (!(is_three_div || is_five_div)) {print i;}}}
+i=0; while (i < 100) { i=i+1; is_three_div = (i % 3 == 0); is_five_div = (i % 5 == 0); if (is_three_div && is_five_div) { print "fizzbuzz"; } else if (is_three_div) { print "fizz"; } else if (is_five_div) { print "buzz"; } else { print i; }}
+```
+which, when split into multiple lines, is:
+```awk
+i=0; 
+while (i < 100) {
+  i=i+1;
+  is_three_div = (i % 3 == 0);
+  is_five_div = (i % 5 == 0);
+  if (is_three_div && is_five_div) { 
+    print "fizzbuzz"; 
+  } else if (is_three_div) { 
+    print "fizz"; 
+  } else if (is_five_div) { 
+    print "buzz"; 
+  } else {
+    print i;
+  }
+}
 ```
 
 ### Logging

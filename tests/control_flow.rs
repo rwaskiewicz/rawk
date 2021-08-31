@@ -66,10 +66,39 @@ mod control_flow {
     }
 
     #[test]
+    fn it_supports_else_if_clauses() {
+        utils::assert_input(
+            "if (0) print \"You should not print me\"; else if (1) print \"else if hit\";",
+            "else if hit",
+        );
+    }
+
+    #[test]
+    fn it_falls_through_else_if_when_falsy_() {
+        utils::assert_input(
+            "foo = 123; if (0) foo = 456; else if (0) foo = 789; print foo;",
+            "123",
+        );
+    }
+
+    #[test]
+    fn it_supports_multiple_else_if_clauses() {
+        utils::assert_input("foo = 123; if (0) foo = 456; else if (0) foo = 789; else if (1) foo = 9999; print foo;", "9999");
+    }
+
+    #[test]
     fn it_supports_else_clauses() {
         utils::assert_input(
             "if (0) print \"should not print\"; else print \"else found\";",
             "else found",
+        );
+    }
+
+    #[test]
+    fn skips_else_when_else_if_is_truthy() {
+        utils::assert_input(
+            "foo = 123; if (0) foo = 456; else if (1) foo = 789; else foo = 9999; print foo;",
+            "789",
         );
     }
 
