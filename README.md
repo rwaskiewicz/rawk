@@ -39,6 +39,28 @@ while (i < 100) {
 }
 ```
 
+Or with string concatenation: 
+```awk
+i=0; while (i < 100) { result = ""; i=i+1; if (i % 3 == 0) { result = "fizz"; } if (i % 5 == 0) { result = result "buzz"; } if (!(i % 3 == 0) && !(i % 5 == 0)){ result=i; } print result; }
+```
+```awk
+i=0; 
+while (i < 100) {
+  result = "";
+  i=i+1;
+  if (i % 3 == 0) { 
+    result = "fizz";
+  } 
+  if (i % 5 == 0) { 
+    result = result "buzz";
+  } 
+  if (!(i % 3 == 0) && !(i % 5 == 0)){
+    result=i;
+  }
+  print result;
+}
+```
+
 ### Logging
 The `env_logger` crate is used as the implementation behind the `log` facade. Instructions for configuring log levels
 can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
