@@ -102,6 +102,7 @@ pub struct Parser<'a> {
     compiling_chunk: &'a mut Chunk,
     had_error: bool,
     panic_mode: bool,
+    inner_most_loop_start: i32,
 }
 
 impl<'a> Parser<'a> {
@@ -117,6 +118,7 @@ impl<'a> Parser<'a> {
             compiling_chunk,
             had_error: false,
             panic_mode: false,
+            inner_most_loop_start: -1,
         }
     }
 
@@ -298,6 +300,8 @@ impl<'a> Parser<'a> {
             self.if_statement();
         } else if self.match_token(&TokenType::While) {
             self.while_statement();
+        } else if self.match_token(&TokenType::Continue) {
+            self.continue_statement();
         } else if self.match_token(&TokenType::LeftCurly) {
             self.block();
         } else {
@@ -385,6 +389,13 @@ impl<'a> Parser<'a> {
         // mark the location where the loop begins
         let while_start = self.compiling_chunk.code.len();
 
+        // Store a reference to the active loop start for this call frame. The value on `self` will be mutated when the
+        // body of the while statement is parsed
+        let surrounding_loop_start = self.inner_most_loop_start;
+
+        // Store where the loop starts should we run into a `continue` statement
+        self.inner_most_loop_start = self.compiling_chunk.code.len() as i32;
+
         self.consume(&TokenType::LeftParenthesis, "Expect '(' after 'while'.");
         self.expression();
         self.consume(
@@ -405,6 +416,21 @@ impl<'a> Parser<'a> {
         // backpatch the jump for a falsy condition and pop the result off the stack
         self.patch_jump(while_condition_false);
         self.emit_byte(OpCode::Pop);
+
+        // Restore the references to the active loops start and loop scope depth after parsing the body of the while
+        self.inner_most_loop_start = surrounding_loop_start;
+    }
+
+    // Function for parsing the continue token
+    fn continue_statement(&mut self) {
+        if self.inner_most_loop_start <= -1 {
+            self.error_at_previous("Can't use 'continue' outside of a loop.");
+        }
+
+        self.consume(&TokenType::Semicolon, "Expect ';' after continue");
+
+        // casting is safer here, as we've ensure that the inner_most_loop_start >= 0 above
+        self.emit_loop(self.inner_most_loop_start as usize);
     }
 
     /// Emits a looping instruction to go backwards in the code

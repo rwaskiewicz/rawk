@@ -242,4 +242,27 @@ mod control_flow {
     fn it_allows_assignment_that_breaks_a_while_loop() {
         utils::assert_input("while(a = 0) { a=1; } print a;", "0");
     }
+
+    #[test]
+    fn it_allows_continue_to_be_place_in_while_loop() {
+        utils::assert_input("while(i<1) { i=i+2; continue; print \"This should never print\"; } print \"The value of i is\", i;", "The value of i is 2")
+    }
+
+    /// while (i < 2) {
+    ///     i=i+1;
+    ///     while (j < 3) {
+    ///         j = j+1;
+    ///         continue;
+    ///         print "This is the j loop - this should not print";
+    ///     }
+    ///     continue;
+    ///     print "This is the i loop - this should not print";
+    /// }
+    /// print "i is", i, "and j is", j;
+    /// For quick debugging (without escaping quotes):
+    /// while(i<2) { i=i+1; while (j < 3) { j = j+1; continue; print "This is the j loop - this should not print"; } continue; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
+    #[test]
+    fn it_supports_multiple_continue_blocks_in_a_while_loop() {
+        utils::assert_input("while(i<2) { i=i+1; while (j < 3) { j = j+1; continue; print \"This is the j loop - this should not print\"; } continue; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 2 and j is 3");
+    }
 }
