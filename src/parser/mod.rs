@@ -449,9 +449,6 @@ impl<'a> Parser<'a> {
     }
 
     /// Function for parsing the break token
-    ///
-    /// # Return value
-    /// the location of the jump instruction within the current chunk
     fn break_statement(&mut self) {
         if self.inner_most_loop_start <= -1 {
             self.error_at_previous("Can't use 'break outside of a loop.");
