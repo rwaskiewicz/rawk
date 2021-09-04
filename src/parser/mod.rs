@@ -103,6 +103,7 @@ pub struct Parser<'a> {
     had_error: bool,
     panic_mode: bool,
     inner_most_loop_start: i32,
+    inner_most_loop_end: i32,
 }
 
 impl<'a> Parser<'a> {
@@ -119,6 +120,7 @@ impl<'a> Parser<'a> {
             had_error: false,
             panic_mode: false,
             inner_most_loop_start: -1,
+            inner_most_loop_end: -1,
         }
     }
 
@@ -302,6 +304,8 @@ impl<'a> Parser<'a> {
             self.while_statement();
         } else if self.match_token(&TokenType::Continue) {
             self.continue_statement();
+        } else if self.match_token(&TokenType::Break) {
+            self.break_statement();
         } else if self.match_token(&TokenType::LeftCurly) {
             self.block();
         } else {
@@ -396,6 +400,10 @@ impl<'a> Parser<'a> {
         // Store where the loop starts should we run into a `continue` statement
         self.inner_most_loop_start = self.compiling_chunk.code.len() as i32;
 
+        // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
+        // the body of the while statement is parsed
+        let surrounding_loop_end = self.inner_most_loop_end;
+
         self.consume(&TokenType::LeftParenthesis, "Expect '(' after 'while'.");
         self.expression();
         self.consume(
@@ -413,6 +421,13 @@ impl<'a> Parser<'a> {
         // now that the body of the while loop has been parsed, emit a jump back to the start of the loop
         self.emit_loop(while_start);
 
+        // in the event that we see a break statement during the course of the parsing, we need to patch it now that
+        // we're at the end of the loop
+        if self.inner_most_loop_end != -1 {
+            self.patch_jump(self.inner_most_loop_end as usize);
+        }
+        self.inner_most_loop_end = surrounding_loop_end;
+
         // backpatch the jump for a falsy condition and pop the result off the stack
         self.patch_jump(while_condition_false);
         self.emit_byte(OpCode::Pop);
@@ -421,7 +436,7 @@ impl<'a> Parser<'a> {
         self.inner_most_loop_start = surrounding_loop_start;
     }
 
-    // Function for parsing the continue token
+    /// Function for parsing the continue token
     fn continue_statement(&mut self) {
         if self.inner_most_loop_start <= -1 {
             self.error_at_previous("Can't use 'continue' outside of a loop.");
@@ -431,6 +446,20 @@ impl<'a> Parser<'a> {
 
         // casting is safer here, as we've ensure that the inner_most_loop_start >= 0 above
         self.emit_loop(self.inner_most_loop_start as usize);
+    }
+
+    /// Function for parsing the break token
+    ///
+    /// # Return value
+    /// the location of the jump instruction within the current chunk
+    fn break_statement(&mut self) {
+        if self.inner_most_loop_start <= -1 {
+            self.error_at_previous("Can't use 'break outside of a loop.");
+        }
+
+        self.consume(&TokenType::Semicolon, "Expect ';' after break");
+
+        self.inner_most_loop_end = self.emit_jump(OpCode::Jump(0xFF, 0xFF)) as i32;
     }
 
     /// Emits a looping instruction to go backwards in the code
