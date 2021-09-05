@@ -271,6 +271,8 @@ mod control_flow {
         utils::assert_input("while(i<5) { i=i+3; break; print \"This should never print\"; } print \"The value of i is\", i;", "The value of i is 3")
     }
 
+    /// i = 0;
+    /// j = 0;
     /// while (i < 2) {
     ///     i=i+1;
     ///     while (j < 3) {
@@ -283,7 +285,7 @@ mod control_flow {
     /// }
     /// print "i is", i, "and j is", j;
     /// For quick debugging (without escaping quotes):
-    /// while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print "This is the j loop - this should not print"; } break; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
+    /// i = 0; j = 0; while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print "This is the j loop - this should not print"; } break; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
     #[test]
     fn it_supports_multiple_break_blocks_in_a_while_loop() {
         utils::assert_input("j=1; while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print \"This is the j loop - this should not print\"; } break; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 1 and j is 2");
