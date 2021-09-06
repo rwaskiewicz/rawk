@@ -248,6 +248,8 @@ mod control_flow {
         utils::assert_input("while(i<1) { i=i+2; continue; print \"This should never print\"; } print \"The value of i is\", i;", "The value of i is 2")
     }
 
+    /// i = 0;
+    /// j = 0;
     /// while (i < 2) {
     ///     i=i+1;
     ///     while (j < 3) {
@@ -263,7 +265,7 @@ mod control_flow {
     /// while(i<2) { i=i+1; while (j < 3) { j = j+1; continue; print "This is the j loop - this should not print"; } continue; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
     #[test]
     fn it_supports_multiple_continue_blocks_in_a_while_loop() {
-        utils::assert_input("while(i<2) { i=i+1; while (j < 3) { j = j+1; continue; print \"This is the j loop - this should not print\"; } continue; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 2 and j is 3");
+        utils::assert_input("i=0; j=0; while(i<2) { i=i+1; while (j < 3) { j = j+1; continue; print \"This is the j loop - this should not print\"; } continue; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 2 and j is 3");
     }
 
     #[test]
@@ -285,10 +287,226 @@ mod control_flow {
     /// }
     /// print "i is", i, "and j is", j;
     /// For quick debugging (without escaping quotes):
-    /// i = 0; j = 0; while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print "This is the j loop - this should not print"; } break; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
+    /// i = 0; j = 0; while(i<2) { i=i+1; while (j < 3) { j = j+2; break; print "This is the j loop - this should not print"; } break; print "This is the i loop - this should not print"; } print "i is", i, "and j is", j;
     #[test]
     fn it_supports_multiple_break_blocks_in_a_while_loop() {
-        utils::assert_input("j=1; while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print \"This is the j loop - this should not print\"; } break; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 1 and j is 2");
+        utils::assert_input("i=0; j=1; while(i<2) { i=i+1; while (j < 3) { j = j+2; break; print \"This is the j loop - this should not print\"; } break; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 1 and j is 3");
+    }
+
+    /// {
+    ///     i=1;
+    ///     while (i>=2) {
+    ///         break;
+    ///         i = 2;
+    ///         continue;
+    ///     }
+    ///     print i;
+    /// } # EXPECT: 1
+    /// { i=1; while (i>=2) { break; i = 2; continue; } print i; }'
+    #[test]
+    fn it_respects_break_before_continue_in_while() {
+        utils::assert_input(
+            "i=1; while (i>=2) { break; i = 2; continue; } print i;",
+            "1",
+        );
+    }
+
+    /// {
+    ///     i=0;
+    ///     while (i<=2) {
+    ///         i = i + 2;
+    ///         continue;
+    ///         break;
+    ///     }
+    ///     print i;
+    /// } # EXPECT: 4
+    /// { i=0; while (i<=2) { i = i + 2; continue; break; } print i; }
+    #[test]
+    fn it_respects_continue_before_break_in_while() {
+        utils::assert_input(
+            "i=0; while (i<=2) { i = i + 2; continue; break; } print i;",
+            "4",
+        );
+    }
+
+    #[test]
+    fn it_supports_do_while_loops() {
+        utils::assert_input("i=0; do { i=i+3; } while(i<10); print i;", "12");
+    }
+
+    #[test]
+    fn it_supports_break_in_do_while_loops() {
+        utils::assert_input(
+            "i=0; do { i=i+3; if (i == 6) { break; } } while(i<10); print i;",
+            "6",
+        );
+    }
+
+    /// i=0;
+    /// j=0;
+    /// do {
+    ///     i=i+1;
+    ///     do {
+    ///         j = j+2;
+    ///         break;
+    ///         print "This is the j loop - this should not print";
+    ///     } while (j < 3);
+    ///     break;
+    ///     print "This is the i loop - this should not print";
+    /// } while (i < 2);
+    /// print "i is", i, "and j is", j;
+    /// For quick debugging (without escaping quotes):
+    /// i=0; j=0; do { i=i+1; do { j = j+2; break; print "This is the j loop - this should not print"; } while (j < 3); break; print "This is the i loop - this should not print"; } while(i<2); print "i is", i, "and j is", j;;
+    #[test]
+    fn it_supports_multiple_break_blocks_in_a_do_while_loop() {
+        utils::assert_input("i=0; j=0; do { i=i+1; do { j = j+2; break; print \"This is the j loop - this should not print\"; } while (j < 3); break; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;", "i is 1 and j is 2");
+    }
+
+    // i=0; do { i=i+2; if (i == 2) { continue; } } while(i<1); print "The value of i is", i;
+    #[test]
+    fn it_allows_continue_to_be_placed_in_do_while_loop() {
+        // TODO: I'm _pretty_ sure that the continue is leaving the success case from the if's conditional on the top of the stack
+        utils::assert_input("i=0; do { i=i+2; if (i == 2) { continue; } print \"This is the i loop - this should not print\"; } while(i<1); print \"The value of i is\", i;", "The value of i is 2")
+    }
+
+    /// i=0;
+    /// j=0;
+    /// do {
+    ///     i=i+1;
+    ///     do {
+    ///         j = j+1;
+    ///         continue;
+    ///         print "This is the j loop - this should not print";
+    ///     } while (j < 3);
+    ///     continue;
+    ///     print "This is the i loop - this should not print";
+    /// } while (i < 2);
+    /// print "i is", i, "and j is", j;
+    /// For quick debugging (without escaping quotes):
+    /// i=0; j=0; do { i=i+1; do { j = j+1; continue; print "This is the j loop - this should not print"; } while (j < 3); continue; print "This is the i loop - this should not print"; } while(i<2); print "i is", i, "and j is", j;
+    #[test]
+    fn it_supports_multiple_continue_blocks_in_a_do_while_loop() {
+        utils::assert_input("i=0; j=0; do { i=i+1; do { j = j+1; continue; print \"This is the j loop - this should not print\"; } while (j < 3); continue; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;", "i is 2 and j is 4");
+    }
+
+    /// {
+    ///     i = 0;
+    ///     j = 0;
+    ///     while (i < 1) {
+    ///         do {
+    ///             j = 2;
+    ///             break;
+    ///             j = 3;
+    ///         } while (j < 0);
+    ///         i = 4;
+    ///         break;
+    ///         i = 5;
+    ///     }
+    ///     print "i is",i,"j is",j;
+    /// } # EXPECT: i is 4 and j is 2
+    /// { i = 0; j = 0; while (i < 1) { do { j = 2; break; j = 3; } while (j <= 0); i = 4; break; i = 5; } print "i is",i,"j is",j; }
+    #[test]
+    fn it_supports_do_statement_in_while_break() {
+        utils::assert_input("i = 0; j = 0; while (i < 1) { do { j = 2; break; j = 3; } while (j <= 0); i = 4; break; i = 5; } print \"i is\",i,\"j is\",j;", "i is 4 j is 2");
+    }
+
+    /// {
+    ///     i = 0;
+    ///     j = 0;
+    ///     while (i < 1) {
+    ///         do {
+    ///             j = 2;
+    ///             continue;
+    ///             j = 3;
+    ///         } while (j <= 0);
+    ///         i = 4;
+    ///         continue;
+    ///         i = 5;
+    ///     }
+    ///     print "i is",i,"j is",j;
+    /// } # EXPECT: i is 4 and j is 2
+    /// { i = 0; j = 0; while (i < 1) { do { j = 2; continue; j = 3; } while (j <= 0); i = 4; continue; i = 5; } print "i is",i,"j is",j; }
+    #[test]
+    fn it_supports_do_statement_in_while_continue() {
+        utils::assert_input("i = 0; j = 0; while (i < 1) { do { j = 2; continue; j = 3; } while (j <= 0); i = 4; continue; i = 5; } print \"i is\",i,\"j is\",j;", "i is 4 j is 2")
+    }
+
+    /// {
+    ///     i = 0;
+    ///     j = 0;
+    ///     do {
+    ///         while (i < 1) {
+    ///             j = 2;
+    ///             break;
+    ///             j = 3;
+    ///         }
+    ///         i = 4;
+    ///         break;
+    ///         i = 5;
+    ///     } while (j <= 0);
+    ///     print "i is",i,"j is",j;
+    /// } # EXPECT: i is 4 and j is 2
+    /// { i = 0; j = 0; do { while (i < 1) { j = 2; break; j = 3; } i = 4; break; i = 5; } while (j <= 0); print "i is",i,"j is",j; }
+    #[test]
+    fn it_supports_while_statement_in_do_break() {
+        utils::assert_input("i = 0; j = 0; do { while (i < 1) { j = 2; break; j = 3; } i = 4; break; i = 5; } while (j <= 0); print \"i is\",i,\"j is\",j;", "i is 4 j is 2");
+    }
+
+    /// {
+    ///     i = 0;
+    ///     j = 0;
+    ///     do {
+    ///         while (j < 1) {
+    ///             j = 2;
+    ///             continue;
+    ///             j = 3;
+    ///         }
+    ///         i = 4;
+    ///         continue;
+    ///         i = 5;
+    ///     } while (i <= 3)
+    ///     print "i is",i,"j is",j;
+    /// } # EXPECT: i is 4 and j is 2
+    /// { i = 0; j = 0; do { while (j < 1) { j = 2; continue; j = 3; } i = 4; continue; i = 5; } while (i <= 3); print "i is",i,"j is",j; }
+    #[test]
+    fn it_supports_while_statement_in_do_continue() {
+        utils::assert_input("i = 0; j = 0; do { while (j < 1) { j = 2; continue; j = 3; } i = 4; continue; i = 5; } while (i <= 3); print \"i is\",i,\"j is\",j;", "i is 4 j is 2");
+    }
+
+    /// {
+    ///     i=1;
+    ///     do {
+    ///         break;
+    ///         i = 2;
+    ///         continue;
+    ///     } while (i>=2);
+    ///     print i;
+    /// } # EXPECT: 1
+    /// { i=1; do { break; i = 2; continue; } while (i>=2); print i; }'
+    #[test]
+    fn it_respects_break_before_continue_in_do() {
+        utils::assert_input(
+            "i=1; do { break; i = 2; continue; } while (i>=2); print i;",
+            "1",
+        );
+    }
+
+    /// {
+    ///     i=0;
+    ///     do {
+    ///         i = i + 2;
+    ///         continue;
+    ///         break;
+    ///     } while (i<=2);
+    ///     print i;
+    /// } # EXPECT: 4
+    /// { i=0; do { i = i + 2; continue; break; } while (i<=2); print i; }
+    #[test]
+    fn it_respects_continue_before_break_in_do() {
+        utils::assert_input(
+            "i=0; do { i = i + 2; continue; break; } while (i<=2); print i;",
+            "4",
+        );
     }
 
     #[test]

@@ -105,7 +105,13 @@ pub struct Parser<'a> {
     had_error: bool,
     panic_mode: bool,
     inner_most_loop_start: i32,
-    inner_most_loop_end: i32,
+    inner_most_loop_end_jump_point: i32,
+    inner_most_do_start: i32,
+    current_scope: i32,
+    last_break: i32,
+    last_continue: i32,
+    last_break_scope: i32,
+    last_continue_scope: i32,
 }
 
 impl<'a> Parser<'a> {
@@ -122,7 +128,13 @@ impl<'a> Parser<'a> {
             had_error: false,
             panic_mode: false,
             inner_most_loop_start: -1,
-            inner_most_loop_end: -1,
+            inner_most_loop_end_jump_point: -1,
+            inner_most_do_start: -1,
+            current_scope: -1,
+            last_break: -1,
+            last_continue: -1,
+            last_break_scope: -1,
+            last_continue_scope: -1,
         }
     }
 
@@ -302,6 +314,8 @@ impl<'a> Parser<'a> {
             self.print_statement();
         } else if self.match_token(&TokenType::If) {
             self.if_statement();
+        } else if self.match_token(&TokenType::Do) {
+            self.do_statement();
         } else if self.match_token(&TokenType::While) {
             self.while_statement();
         } else if self.match_token(&TokenType::For) {
@@ -392,6 +406,100 @@ impl<'a> Parser<'a> {
         self.patch_jump(else_jump);
     }
 
+    // TODO(NOW): There's a difference beteween where we break for continue and where we do this for break
+    // TODO Maybe we backpatch differently? Or we jump twice, once to the beginning of while, then again right after it for break?
+    /// Parsing method for do-while statements
+    fn do_statement(&mut self) {
+        self.start_scope();
+
+        // mark the start of the loop after we've parsed the `do`
+        let do_while_start = self.compiling_chunk.code.len();
+
+        // Store a reference to the while condition. The value on `self` will be mutated when the
+        // body of the while statement is parsed. This must be stored now, in the event there are
+        // break statements in the body of the loop.
+        let surrounding_loop_start = self.inner_most_do_start;
+
+        // Store where the loop starts should we run into a `continue` statement
+        self.inner_most_do_start = self.compiling_chunk.code.len() as i32;
+
+        // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
+        // the body of the while statement is parsed. This value must be stored now, in the event that there are break
+        // statements in the body of the loop.
+        let surrounding_loop_end = self.inner_most_loop_end_jump_point;
+
+        let temp_last_break = self.last_break;
+        let temp_last_continue = self.last_continue;
+
+        let temp_last_break_scope = self.last_break_scope;
+        let temp_last_continue_scope = self.last_continue_scope;
+
+        // consume the body of the loop
+        self.statement();
+
+        // in the event that we see a continue statement during the course of the parsing, we need to patch it now that
+        // we're at the end of the loop, with the ability to re-evaluate the condition in the while(...)
+        if self.inner_most_loop_end_jump_point != -1
+            && self.last_continue_scope >= self.last_break_scope
+        {
+            self.patch_jump((self.inner_most_loop_end_jump_point) as usize);
+            self.last_continue = temp_last_continue;
+        }
+
+        // consume the `while`
+        self.consume(&TokenType::While, "Expect 'while' after do-loop body");
+        self.consume(&TokenType::LeftParenthesis, "Expect '(' after 'while'.");
+        // this expression will be put on the stack to see if we should jump or not
+        self.expression();
+        self.consume(
+            &TokenType::RightParenthesis,
+            "Expect ')' after 'while' condition.",
+        );
+        self.consume(
+            &TokenType::Semicolon,
+            "Expect ';' after ')' in while condition.",
+        );
+
+        // jump a total of two instructions:
+        // 1. the pop instruction used for the case where we do jump (I.E. the top of the stack was truthy)
+        // 2. the instruction to loop back around
+        // those two instructions must immediately follow this block
+        let instructions_to_jump = 2;
+        let offset1 = (instructions_to_jump >> 8) & 0xff;
+        let offset2 = instructions_to_jump & 0xff;
+        self.emit_jump(OpCode::JumpIfFalse(offset1, offset2));
+
+        // if the result of the condition on the top of the stack was truthy, we didn't jump. clean up that value that
+        // was left on the top of the stack
+        self.emit_byte(OpCode::Pop);
+        self.emit_loop(do_while_start);
+
+        // in the event that we see a break statement during the course of the parsing, we need to patch it now that
+        // we're at the end of the loop
+        if self.inner_most_loop_end_jump_point != -1
+            && self.last_break_scope > self.last_continue_scope
+        {
+            self.patch_jump((self.inner_most_loop_end_jump_point) as usize);
+            self.last_break = temp_last_break;
+        }
+        self.inner_most_loop_end_jump_point = surrounding_loop_end;
+
+        // if the result of the condition in the `while` was falsy, we did a jump. need to clean up that value on the
+        // top of the stack
+        self.emit_byte(OpCode::Pop);
+
+        // Restore the reference to the active loops start after parsing the body of the while
+        self.inner_most_loop_start = surrounding_loop_start;
+
+        self.last_break = temp_last_break;
+        self.last_continue = temp_last_continue;
+
+        self.last_break_scope = temp_last_break_scope;
+        self.last_continue_scope = temp_last_continue_scope;
+
+        self.end_scope();
+    }
+
     /// Parsing method for while statements
     fn while_statement(&mut self) {
         // mark the location where the loop begins
@@ -406,7 +514,7 @@ impl<'a> Parser<'a> {
 
         // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
         // the body of the while statement is parsed
-        let surrounding_loop_end = self.inner_most_loop_end;
+        let surrounding_loop_end = self.inner_most_loop_end_jump_point;
 
         self.consume(&TokenType::LeftParenthesis, "Expect '(' after 'while'.");
         self.expression();
@@ -427,10 +535,10 @@ impl<'a> Parser<'a> {
 
         // in the event that we see a break statement during the course of the parsing, we need to patch it now that
         // we're at the end of the loop
-        if self.inner_most_loop_end != -1 {
-            self.patch_jump(self.inner_most_loop_end as usize);
+        if self.inner_most_loop_end_jump_point != -1 {
+            self.patch_jump(self.inner_most_loop_end_jump_point as usize);
         }
-        self.inner_most_loop_end = surrounding_loop_end;
+        self.inner_most_loop_end_jump_point = surrounding_loop_end;
 
         // backpatch the jump for a falsy condition and pop the result off the stack
         self.patch_jump(while_condition_false);
@@ -458,7 +566,7 @@ impl<'a> Parser<'a> {
 
         // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
         // the body of the for statement is parsed
-        let surrounding_loop_end = self.inner_most_loop_end;
+        let surrounding_loop_end = self.inner_most_loop_end_jump_point;
 
         let mut loop_start = self.compiling_chunk.code.len();
         let mut for_loop_exit_jump: Option<usize> = None;
@@ -507,11 +615,11 @@ impl<'a> Parser<'a> {
 
         // in the event that we see a break statement during the course of the parsing, we need to patch it now that
         // we're at the end of the loop
-        if self.inner_most_loop_end != -1 {
-            self.patch_jump(self.inner_most_loop_end as usize);
+        if self.inner_most_loop_end_jump_point != -1 {
+            self.patch_jump(self.inner_most_loop_end_jump_point as usize);
             self.emit_byte(OpCode::Pop);
         }
-        self.inner_most_loop_end = surrounding_loop_end;
+        self.inner_most_loop_end_jump_point = surrounding_loop_end;
 
         // patch the jump if the condition is false
         if let Some(value) = for_loop_exit_jump {
@@ -526,25 +634,34 @@ impl<'a> Parser<'a> {
 
     /// Function for parsing the continue token
     fn continue_statement(&mut self) {
-        if self.inner_most_loop_start <= -1 {
+        if self.inner_most_loop_start <= -1 && self.inner_most_do_start <= -1 {
             self.error_at_previous("Can't use 'continue' outside of a loop.");
         }
 
         self.consume(&TokenType::Semicolon, "Expect ';' after continue");
 
-        // casting is safer here, as we've ensure that the inner_most_loop_start >= 0 above
-        self.emit_loop(self.inner_most_loop_start as usize);
+        if self.inner_most_loop_start > self.inner_most_do_start {
+            // casting is safer here, as we've ensure that the inner_most_loop_start >= 0 above
+            self.emit_loop(self.inner_most_loop_start as usize);
+        } else {
+            // we're in a do-while loop, and need to jump over to the beginning of the while statement
+            self.last_continue = self.compiling_chunk.code.len() as i32;
+            self.last_continue_scope = self.current_scope;
+            self.inner_most_loop_end_jump_point = self.emit_jump(OpCode::Jump(0xFF, 0xFF)) as i32;
+        }
     }
 
     /// Function for parsing the break token
     fn break_statement(&mut self) {
-        if self.inner_most_loop_start <= -1 {
+        if self.inner_most_loop_start <= -1 && self.inner_most_do_start <= -1 {
             self.error_at_previous("Can't use 'break' outside of a loop.");
         }
 
         self.consume(&TokenType::Semicolon, "Expect ';' after break");
 
-        self.inner_most_loop_end = self.emit_jump(OpCode::Jump(0xFF, 0xFF)) as i32;
+        self.last_break_scope = self.current_scope;
+        self.last_break = self.compiling_chunk.code.len() as i32;
+        self.inner_most_loop_end_jump_point = self.emit_jump(OpCode::Jump(0xFF, 0xFF)) as i32;
     }
 
     /// Emits a looping instruction to go backwards in the code
@@ -572,7 +689,11 @@ impl<'a> Parser<'a> {
         self.compiling_chunk.code.len()
     }
 
-    /// Patch a jump instruction that was previously emitted
+    /// Patch a jump instruction that was previously emitted.
+    ///
+    /// The jump will be to the difference between the size o fthe compiling chunk and the jump instruction that was
+    /// stubbed out. For instance, if the location of the jump is at location 8, and there are 20 items in the chunk,
+    /// the jump will be for 12 (20-8) instructions.
     ///
     /// # Arguments
     /// - `offset` the location of the jump instruction that was emitted
@@ -812,6 +933,14 @@ impl<'a> Parser<'a> {
     fn grouping(&mut self) {
         self.expression();
         self.consume(&TokenType::RightParenthesis, "Expect ')' token");
+    }
+
+    fn start_scope(&mut self) {
+        self.current_scope += 1;
+    }
+
+    fn end_scope(&mut self) {
+        self.current_scope -= 1;
     }
 
     /// Helper function to emit the bytes associated with a constant
