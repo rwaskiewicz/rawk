@@ -151,7 +151,7 @@ mod control_flow {
     }
 
     #[test]
-    fn it_supports_logical_and_in_if_statements_to_be_falsey() {
+    fn it_supports_logical_and_in_if_statements_to_be_falsy() {
         utils::assert_input("if (1 && 0) { print \"logical and is supported, but this should not run\"; } else { print \"but this should\"; }", "but this should");
     }
 
@@ -185,7 +185,7 @@ mod control_flow {
     }
 
     #[test]
-    fn it_supports_logical_or_in_if_statements_to_be_falsey() {
+    fn it_supports_logical_or_in_if_statements_to_be_falsy() {
         utils::assert_input("if (0 || 0) { print \"logical or is supported, but this should not run\"; } else { print \"but this should\"; }", "but this should");
     }
 
@@ -211,7 +211,7 @@ mod control_flow {
     }
 
     #[test]
-    fn it_still_sets_var_when_assignment_is_falsy_with_logical_or_falsey() {
+    fn it_still_sets_var_when_assignment_is_falsy_with_logical_or_falsy() {
         utils::assert_input(
             "if (foo=0 || 0) { print \"this should not run\"; } else { print foo; }",
             "0",

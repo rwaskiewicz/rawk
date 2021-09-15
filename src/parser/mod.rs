@@ -377,7 +377,7 @@ impl<'a> Parser<'a> {
         // backpatching correctly.
         self.patch_jump(if_was_false_jump);
 
-        // when the if statement condiition is falsey, pop the result off the stack.
+        // when the if statement condition is falsy, pop the result off the stack.
         self.emit_byte(OpCode::Pop);
 
         if self.match_token(&TokenType::Else) {
@@ -484,7 +484,7 @@ impl<'a> Parser<'a> {
         self.compiling_chunk.code.len()
     }
 
-    /// Patch a jump instruciton that was previously emitted
+    /// Patch a jump instruction that was previously emitted
     ///
     /// # Arguments
     /// - `offset` the location of the jump instruction that was emitted
@@ -639,7 +639,7 @@ impl<'a> Parser<'a> {
     /// Function for parsing logical or (||) to support short circuiting.
     ///
     /// When this function is reached, the left hand side of the expression should have already been parsed and its
-    /// contents on the top of the stack. If that value is truthy, the entire estatement is truthy.
+    /// contents on the top of the stack. If that value is truthy, the entire statement is truthy.
     fn logical_or(&mut self) {
         // create a placeholder to jump to the end of the or statement should it's condition be true
         let end_jump = self.emit_jump(OpCode::JumpIfTrue(0xFF, 0xFF));
@@ -658,7 +658,7 @@ impl<'a> Parser<'a> {
     /// Function for parsing logical and (&&) to support short circuiting.
     ///
     /// When this function is reached, the left hand side of the expression should have already been parsed and its
-    /// contents on the top of the stack. If that value is falsey, the entire estatement is falsey.
+    /// contents on the top of the stack. If that value is falsy, the entire statement is falsy.
     fn logical_and(&mut self) {
         // create a placeholder to jump to the end of the and statement should it's condition be false
         let end_jump = self.emit_jump(OpCode::JumpIfFalse(0xFF, 0xFF));
