@@ -290,4 +290,112 @@ mod control_flow {
     fn it_supports_multiple_break_blocks_in_a_while_loop() {
         utils::assert_input("j=1; while(i<2) { i=i+1; while (j < 3) { j = j+1; break; print \"This is the j loop - this should not print\"; } break; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 1 and j is 2");
     }
+
+    #[test]
+    fn it_supports_for_loop() {
+        utils::assert_input(
+            "result = \"\";for (i=0; i<10; i=i+1) {result = result i;} print result;",
+            "0123456789",
+        );
+    }
+
+    #[test]
+    fn it_supports_for_loop_no_init() {
+        utils::assert_input(
+            "result = \"\";for (;i<10; i=i+1) {result = result i;} print result;",
+            "123456789",
+        );
+    }
+
+    #[test]
+    fn it_supports_for_loop_no_condition() {
+        utils::assert_input(
+            "result = \"\";for (i=0;; i=i+1) {result = result i; if (i>=10) { break; } } print result;",
+            "012345678910",
+        );
+    }
+
+    #[test]
+    fn it_supports_for_loop_no_incr() {
+        utils::assert_input(
+            "result = \"\";for (i=0; i<10;) {result = result i; i=i+1;} print result;",
+            "0123456789",
+        );
+    }
+
+    /// result = "hell";
+    /// for (i=0; i<10; i=i+1) {
+    ///     result = result "," i;
+    ///     break;
+    /// }
+    #[test]
+    fn it_supports_break_in_for_loop() {
+        utils::assert_input(
+            "result = \"hell\";for (i=0; i<10; i=i+1) {result = result i; break;} print result;",
+            "hell0",
+        );
+    }
+
+    /// for (i=1; i < 2; i=i+1) {
+    ///     for (j=2 j < 3; j=j+2) {
+    ///         break;
+    ///         print "This is the j loop - this should not print";
+    ///     }
+    ///     break;
+    ///     print "This is the i loop - this should not print";
+    /// }
+    /// print "i is", i, "and j is", j;
+    #[test]
+    fn it_supports_multiple_break_blocks_in_for_loop() {
+        utils::assert_input("for (i=1; i < 2; i=i+1) { for (j=2; j < 3; j=j+2) { break; print \"This is the j loop - this should not print\"; } break; print \"This is the i loop - this should not print\";} print \"i is\", i, \"and j is\", j;" ,"i is 1 and j is 2", );
+    }
+
+    /// result = "hell";
+    /// for (i=0; i<10; i=i+1) {
+    ///     result = result "," i;
+    ///     continue;
+    ///     result = "???";
+    /// }
+    #[test]
+    fn it_supports_continue_in_for_loop() {
+        utils::assert_input(
+            "result = \"hell\";for (i=0; i<10; i=i+1) {result = result i; continue; result=\"???\";} print result;",
+            "hell0123456789",
+        );
+    }
+
+    /// for (i=2; i<10; i=i+1) {
+    ///     for (j=3; j<=12; j=j+1) {
+    ///         continue;
+    ///         print "This is the j loop - this should not print";
+    ///     }
+    ///     continue;
+    ///     print "This is the i loop - this should not print";
+    /// }
+    /// print "i is", i, "and j is", j;
+    #[test]
+    fn it_supports_multiple_continue_blocks_in_for_loop() {
+        utils::assert_input("for (i=2; i<10; i=i+1) { for (j=3; j<=12; j=j+1) { continue; print \"This is the j loop - this should not print\"; } continue; print \"This is the i loop - this should not print\"; } print \"i is\", i, \"and j is\", j;", "i is 10 and j is 13");
+    }
+
+    /// for (i=1; i<2; i=i+1) {
+    ///     break;
+    ///     i = 99;
+    ///     continue;
+    /// }
+    /// print i;
+    #[test]
+    fn it_respects_break_before_continue_in_for() {
+        utils::assert_input("for (i=1; i<2; i=i+1) { break; i = 99; continue; } print i;", "1");
+    }
+
+    /// for (i=0; i<=2; i=i+2) {
+    ///     continue;
+    ///     break;
+    /// }
+    /// print i;
+    #[test]
+    fn it_respects_continue_before_break_in_for() {
+        utils::assert_input("for (i=0; i<=2; i=i+2) { continue; break; } print i;", "4");
+    }
 }

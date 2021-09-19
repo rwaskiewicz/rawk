@@ -302,6 +302,8 @@ impl<'a> Parser<'a> {
             self.if_statement();
         } else if self.match_token(&TokenType::While) {
             self.while_statement();
+        } else if self.match_token(&TokenType::For) {
+            self.for_statement();
         } else if self.match_token(&TokenType::Continue) {
             self.continue_statement();
         } else if self.match_token(&TokenType::Break) {
@@ -397,7 +399,7 @@ impl<'a> Parser<'a> {
         // body of the while statement is parsed
         let surrounding_loop_start = self.inner_most_loop_start;
 
-        // Store where the loop starts should we run into a `continue` statement
+        // Store where the loop starts should we run into a `continue` or `break` statement
         self.inner_most_loop_start = self.compiling_chunk.code.len() as i32;
 
         // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
@@ -432,7 +434,91 @@ impl<'a> Parser<'a> {
         self.patch_jump(while_condition_false);
         self.emit_byte(OpCode::Pop);
 
-        // Restore the references to the active loops start and loop scope depth after parsing the body of the while
+        // Restore the references to the active loops start after parsing the body of the while
+        self.inner_most_loop_start = surrounding_loop_start;
+    }
+
+    /// Function for parsing a for loop
+    fn for_statement(&mut self) {
+        self.consume(&TokenType::LeftParenthesis, "Expect '(' after for.");
+        // TODO Support `for (var in array) {}` when we get to arrays, that's why this for loop is funky ATM
+        if self.match_token(&TokenType::Semicolon) {
+            // assume there is no variable initialization occurring
+        } else {
+            // has a happy little side effect of finding a semicolon and performing a POP so we don't have the
+            // initializer leaving anything on the stack
+            self.expression();
+            self.consume(&TokenType::Semicolon, "Expect ';'.");
+        }
+
+        // Store a reference to the active loop start for this call frame. The value on `self` will be mutated when the
+        // body of the for statement is parsed
+        let surrounding_loop_start = self.inner_most_loop_start;
+
+        // Store a reference to the last loop's end place for this call frame. The value on `self` will be mutated when
+        // the body of the for statement is parsed
+        let surrounding_loop_end = self.inner_most_loop_end;
+
+        let mut loop_start = self.compiling_chunk.code.len();
+        let mut for_loop_exit_jump: Option<usize> = None;
+
+        if !self.match_token(&TokenType::Semicolon) {
+            self.expression();
+            self.consume(&TokenType::Semicolon, "Expect ';' after loop condition.");
+
+            // if the condition is false, we need to jump out of the loop
+            for_loop_exit_jump = Some(self.emit_jump(OpCode::JumpIfFalse(0xFF, 0xFF)));
+            // if the condition is true, we need to pop the result off of the stack
+            self.emit_byte(OpCode::Pop);
+        }
+
+        if !self.match_token(&TokenType::RightParenthesis) {
+            // unconditionally jump over the incrementer, to the body of the loop
+            let body_jump = self.emit_jump(OpCode::Jump(0xFF, 0xFF));
+            let increment_clause_start = self.compiling_chunk.code.len();
+
+            // compile the incrementer, then throw away the result since it's often assignment
+            self.expression();
+            self.emit_jump(OpCode::Pop);
+
+            self.consume(
+                &TokenType::RightParenthesis,
+                "Expect ')' after for clauses.",
+            );
+
+            // this happens right after an increment, since an increment happens at the end of a loop (a little
+            // weird, I know)
+            // 1. take us back to the top of the for loop, right before the condition (which may not exist). this occurs
+            // _after_ the increment
+            self.emit_loop(loop_start);
+            // 2. update the loop start to point to the increment clause
+            loop_start = increment_clause_start;
+            // 3. back patch the jump for the entire body
+            self.patch_jump(body_jump);
+        }
+
+        // Store where the loop starts should we run into a `continue` or `break` statement
+        self.inner_most_loop_start = loop_start as i32;
+
+        self.statement();
+
+        self.emit_loop(loop_start);
+
+        // in the event that we see a break statement during the course of the parsing, we need to patch it now that
+        // we're at the end of the loop
+        if self.inner_most_loop_end != -1 {
+            self.patch_jump(self.inner_most_loop_end as usize);
+        }
+        self.inner_most_loop_end = surrounding_loop_end;
+
+        // patch the jump if the condition is false
+        if for_loop_exit_jump.is_some() {
+            self.patch_jump(for_loop_exit_jump.unwrap());
+            // if the condition is false, we still have that value on the stack
+            self.emit_byte(OpCode::Pop);
+        }
+
+        // Restore the references to the active loops start after parsing the body of the while
         self.inner_most_loop_start = surrounding_loop_start;
     }
 
@@ -451,7 +537,7 @@ impl<'a> Parser<'a> {
     /// Function for parsing the break token
     fn break_statement(&mut self) {
         if self.inner_most_loop_start <= -1 {
-            self.error_at_previous("Can't use 'break outside of a loop.");
+            self.error_at_previous("Can't use 'break' outside of a loop.");
         }
 
         self.consume(&TokenType::Semicolon, "Expect ';' after break");
