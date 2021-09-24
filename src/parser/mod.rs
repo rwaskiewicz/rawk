@@ -366,13 +366,13 @@ impl<'a> Parser<'a> {
         let if_was_false_jump = self.emit_jump(OpCode::JumpIfFalse(0xff, 0xff));
         self.statement();
 
+        // when the if statement condition is truthy, pop the result off the stack
+        self.emit_byte(OpCode::Pop);
+
         // in the event the if statement's condition is truthy, we need to jump over the else block rather than fall
         // through. put a placeholder in that will be able to skip the else keyword & the statement(s) that follow it.
         // there is an implicit 'else' here, even if there isn't one in the author's code.
         let else_jump = self.emit_jump(OpCode::Jump(0xff, 0xff));
-
-        // when the if statement condition is truthy, pop the result off the stack
-        self.emit_byte(OpCode::Pop);
 
         // we've passed through the then statement(s) backpatch the jump that was emitted for the if block. we needed
         // to emit the pop instruction for the condition being truthy to ensure we calculated the distance for
@@ -445,10 +445,9 @@ impl<'a> Parser<'a> {
         if self.match_token(&TokenType::Semicolon) {
             // assume there is no variable initialization occurring
         } else {
-            // has a happy little side effect of finding a semicolon and performing a POP so we don't have the
-            // initializer leaving anything on the stack
             self.expression();
             self.consume(&TokenType::Semicolon, "Expect ';'.");
+            self.emit_byte(OpCode::Pop);
         }
 
         // Store a reference to the active loop start for this call frame. The value on `self` will be mutated when the
@@ -508,6 +507,7 @@ impl<'a> Parser<'a> {
         // we're at the end of the loop
         if self.inner_most_loop_end != -1 {
             self.patch_jump(self.inner_most_loop_end as usize);
+            self.emit_byte(OpCode::Pop);
         }
         self.inner_most_loop_end = surrounding_loop_end;
 

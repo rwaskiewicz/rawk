@@ -34,6 +34,10 @@ impl VM {
         let mut ret_ok = false;
         loop {
             if ret_ok {
+                if !self.stack.is_empty() {
+                    error!("The stack is not empty! {:?}", self.stack);
+                    return Err(InterpretError::RuntimeError);
+                }
                 return Ok(());
             }
 
@@ -74,6 +78,7 @@ impl VM {
                 OpCode::LogicalOr => self.logical_op(&instruction),
                 OpCode::OpConstant(val) => self.stack.push(val),
                 OpCode::Pop => {
+                    // TODO: Consider if we should return an error should we pop off the stack when it is empty
                     self.stack.pop();
                 }
                 OpCode::GetGlobal(chunk_index) => {

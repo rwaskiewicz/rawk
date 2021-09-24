@@ -386,7 +386,10 @@ mod control_flow {
     /// print i;
     #[test]
     fn it_respects_break_before_continue_in_for() {
-        utils::assert_input("for (i=1; i<2; i=i+1) { break; i = 99; continue; } print i;", "1");
+        utils::assert_input(
+            "for (i=1; i<2; i=i+1) { break; i = 99; continue; } print i;",
+            "1",
+        );
     }
 
     /// for (i=0; i<=2; i=i+2) {
