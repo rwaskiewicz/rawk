@@ -512,8 +512,8 @@ impl<'a> Parser<'a> {
         self.inner_most_loop_end = surrounding_loop_end;
 
         // patch the jump if the condition is false
-        if for_loop_exit_jump.is_some() {
-            self.patch_jump(for_loop_exit_jump.unwrap());
+        if let Some(value) = for_loop_exit_jump {
+            self.patch_jump(value);
             // if the condition is false, we still have that value on the stack
             self.emit_byte(OpCode::Pop);
         }
