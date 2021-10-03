@@ -29,6 +29,7 @@ enum Associativity {
 enum Precedence {
     None,
     Assignment,     // '='
+    Conditional,    // ternary - '?'
     LogicalOr,      // '||'
     LogicalAnd,     // '&&'
     Comparison,     // '>' '>=' '<' '<=' '==' '!=' // TODO: Where does append fit in?
@@ -51,7 +52,8 @@ impl Precedence {
     pub fn next_precedence(p: Precedence) -> Precedence {
         match p {
             Precedence::None => Precedence::Assignment,
-            Precedence::Assignment => Precedence::LogicalOr,
+            Precedence::Assignment => Precedence::Conditional,
+            Precedence::Conditional => Precedence::LogicalOr,
             Precedence::LogicalOr => Precedence::LogicalAnd,
             Precedence::LogicalAnd => Precedence::Comparison,
             Precedence::Comparison => Precedence::Concatenation,
@@ -722,6 +724,45 @@ impl<'a> Parser<'a> {
         }
     }
 
+    /// Parse a condition expression
+    ///
+    /// A condition expression takes the form `expr1 ? expr2 : expr3` where:
+    /// - if `expr1` is truthy, `expr2` is evaluated and `expr3` is not evaluated
+    /// - if `expr1` is falsy, `expr2` is not evaluated and `expr3` is evaluated
+    fn conditional_expression(&mut self) {
+        // expr1 has already been evaluated and is at the top of the stack.
+        // we need to jump over expr2 if that value on the stack if falsy
+        let over_expr_2_jump = self.emit_jump(OpCode::JumpIfFalse(0xFF, 0xFF));
+
+        // if the value from expr1 is truthy, pop it off the stack now. we cannot wait to pop this value,
+        // as that may lead to popping the result from expr2 being popped off the stack
+        self.emit_byte(OpCode::Pop);
+
+        // parse expr2
+        self.expression();
+
+        // we need to handle the colon (:) in this block
+        self.consume(&TokenType::Colon, "Expect ':' after expression in ternary.");
+
+        // if expr1 (which is on the stack) is truthy, we'll run through expr2. now we need to emit a jump over expr3
+        // to ensure we don't evaluate that as well
+        let over_expr_3_jump = self.emit_jump(OpCode::Jump(0xFF, 0xFF));
+
+        // by now, both expr2 and the colon in the ternary have been parsed, so we are exactly where we need to be to
+        // backpatch in the event expr1 was falsy
+        self.patch_jump(over_expr_2_jump);
+
+        // if the value from expr1 is falsy, pop it off the stack now. we cannot wait to pop this value,
+        // as that may lead to popping the result from expr3 being popped off the stack
+        self.emit_byte(OpCode::Pop);
+
+        // parse expr3
+        self.expression();
+
+        // now that expr3 has been parsed, we can backpatch the jump we'd have taken if expr1 was truthy
+        self.patch_jump(over_expr_3_jump);
+    }
+
     /// Function for parsing logical or (||) to support short circuiting.
     ///
     /// When this function is reached, the left hand side of the expression should have already been parsed and its
@@ -1239,8 +1280,8 @@ const PARSE_RULES: [ParseRule; 65] = [
     // Question
     ParseRule {
         prefix_parse_fn: None,
-        infix_parse_fn: None,
-        infix_precedence: Precedence::None,
+        infix_parse_fn: Some(|parser, _can_assign| parser.conditional_expression()),
+        infix_precedence: Precedence::Conditional,
         infix_associativity: Associativity::Right,
     },
     // Colon

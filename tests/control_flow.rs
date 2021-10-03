@@ -401,4 +401,38 @@ mod control_flow {
     fn it_respects_continue_before_break_in_for() {
         utils::assert_input("for (i=0; i<=2; i=i+2) { continue; break; } print i;", "4");
     }
+
+    /// val = 1;
+    /// result = val ? 100 : 50;
+    /// print result;
+    #[test]
+    fn it_supports_ternary_expressions() {
+        utils::assert_input("val = 1; result = val ? 100 : 50; print result;", "100");
+    }
+
+    /// val = 0;
+    /// result = val ? 100 : 50;
+    /// print result;
+    #[test]
+    fn it_supports_falsy_ternary_expressions() {
+        utils::assert_input("val = 0; result = val ? 100 : 50; print result;", "50");
+    }
+
+    /// val = 1;
+    /// result = val ? (val > 1 ? 2 : 3) : 50;
+    /// print result;
+    #[test]
+    fn it_supports_nested_ternary_expressions() {
+        utils::assert_input(
+            "val = 1; result = val ? (val > 1 ? 2 : 3) : 50; print result;",
+            "3",
+        );
+    }
+
+    /// val = 1;
+    /// print "The value is", (val > 2 ? "greater than" : "less than or equal to"), 2;
+    #[test]
+    fn it_supports_ternary_expressions_in_statement() {
+        utils::assert_input("val = 1; print \"The value is\", (val > 2 ? \"greater than\" : \"less than or equal to\"), 2;", "The value is less than or equal to 2");
+    }
 }
