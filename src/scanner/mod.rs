@@ -395,7 +395,10 @@ impl Scanner {
         if let Some(last_token_type) = tokens.last() {
             match &last_token_type.token_type {
                 // something like `print ,123;` is not permitted
-                TokenType::Number | TokenType::DoubleQuote | TokenType::Identifier => {
+                TokenType::Number
+                | TokenType::DoubleQuote
+                | TokenType::Identifier
+                | TokenType::RightParenthesis => {
                     tokens.push(Token {
                         lexeme: None,
                         token_type: &TokenType::StringConcat,
@@ -789,6 +792,71 @@ mod lexing {
             Some(&Token {
                 lexeme: Some(String::from("1")),
                 token_type: &TokenType::Number,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::StringConcat,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from(" ")),
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::StringConcat,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("2")),
+                token_type: &TokenType::Number,
+                line: 1,
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_a_comma_following_a_grouping() {
+        let tokens = Scanner::new(String::from("(1),2")).scan();
+        let mut token_iter = tokens.iter();
+
+        // +1 for EOF token.
+        assert_eq!(token_iter.len(), 8);
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::LeftParenthesis,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: Some(String::from("1")),
+                token_type: &TokenType::Number,
+                line: 1,
+            })
+        );
+        assert_eq!(
+            token_iter.next(),
+            Some(&Token {
+                lexeme: None,
+                token_type: &TokenType::RightParenthesis,
                 line: 1,
             })
         );
