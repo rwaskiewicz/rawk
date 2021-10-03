@@ -31,20 +31,9 @@ impl VM {
     }
 
     pub fn run(&mut self) -> Result<(), InterpretError> {
-        let mut ret_ok = false;
         loop {
-            if ret_ok {
-                if !self.stack.is_empty() {
-                    error!("The stack is not empty! {:?}", self.stack);
-                    return Err(InterpretError::RuntimeError);
-                }
-                return Ok(());
-            }
-
-            let old_ip = self.ip;
+            let instruction: OpCode = self.chunk.code[self.ip].code.clone();
             self.ip += 1;
-
-            let instruction: OpCode = self.chunk.code[old_ip].code.clone();
 
             debug!("VM switching on instruction '{:#?}'", &instruction);
             match instruction {
@@ -54,10 +43,16 @@ impl VM {
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");
-                        panic!("{:?}", InterpretError::RuntimeError);
+                        return Err(InterpretError::RuntimeError);
                     }
                 },
-                OpCode::OpReturn => ret_ok = true,
+                OpCode::OpReturn => {
+                    if !self.stack.is_empty() {
+                        error!("The stack is not empty! {:?}", self.stack);
+                        return Err(InterpretError::RuntimeError);
+                    }
+                    return Ok(());
+                }
                 OpCode::GreaterEqual => self.comparison_op(&instruction),
                 OpCode::Greater => self.comparison_op(&instruction),
                 OpCode::LessEqual => self.comparison_op(&instruction),
