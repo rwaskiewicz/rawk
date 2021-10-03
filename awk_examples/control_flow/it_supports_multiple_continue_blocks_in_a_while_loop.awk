@@ -1,4 +1,6 @@
 {
+    i=0;
+    j=0;
     while (i < 2) {
         i=i+1;
         while (j < 3) {
@@ -10,5 +12,4 @@
         print "This is the i loop - this should not print";
     }
     print "i is", i, "and j is", j;
-}
-# EXPECT: i is 2 and j is 3
+} # EXPECT: i is 2 and j is 3

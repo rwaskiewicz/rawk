@@ -12,5 +12,4 @@
         print "This is the i loop - this should not print";
     }
     print "i is", i, "and j is", j;
-}
-# EXPECT: i is 1 and j is 2
+} # EXPECT: i is 1 and j is 2
