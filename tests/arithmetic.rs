@@ -250,4 +250,64 @@ mod arithmetic_tests {
     fn it_uses_variables_in_concatenation() {
         utils::assert_input("zfoo=3; print \"z\" zfoo\"z\";", "z3z");
     }
+
+    #[test]
+    fn it_supports_add_assign() {
+        utils::assert_input("foo=3; bar+=foo; print bar;", "3");
+    }
+
+    #[test]
+    fn it_supports_multiple_add_assign() {
+        utils::assert_input("foo=3; foo+=foo+=foo; print foo;", "12");
+    }
+
+    #[test]
+    fn it_supports_sub_assign() {
+        utils::assert_input("foo=3; bar-=foo; print bar;", "-3");
+    }
+
+    #[test]
+    fn it_supports_multiple_sub_assign() {
+        utils::assert_input("foo=3; bar=1; foo-=bar-=foo; print foo;", "5");
+    }
+
+    #[test]
+    fn it_supports_mul_assign() {
+        utils::assert_input("foo=3; bar=7; bar*=foo; print bar;", "21");
+    }
+
+    #[test]
+    fn it_supports_multiple_mul_assign() {
+        utils::assert_input("foo=3; foo*=foo*=foo; print foo;", "81");
+    }
+
+    #[test]
+    fn it_supports_div_assign() {
+        utils::assert_input("foo=3; bar=6; bar/=foo; print bar;", "2");
+    }
+
+    #[test]
+    fn it_supports_multiple_div_assign() {
+        utils::assert_input("foo=81; bar=9; baz=3; foo/=bar/=baz; print foo;", "27");
+    }
+
+    #[test]
+    fn it_supports_mod_assign() {
+        utils::assert_input("foo=3; bar=7; bar%=foo; print bar;", "1");
+    }
+
+    #[test]
+    fn it_supports_multiple_mod_assign() {
+        utils::assert_input("foo=7; bar=5; baz=3; foo%=bar%=baz; print foo;", "1");
+    }
+
+    #[test]
+    fn it_supports_pow_assign() {
+        utils::assert_input("foo=3; foo^=foo; print foo;", "27");
+    }
+
+    #[test]
+    fn it_supports_multiple_pow_assign() {
+        utils::assert_input("foo=2; foo^=foo^=foo; print foo;", "256");
+    }
 }

@@ -263,6 +263,8 @@ impl<'a> Parser<'a> {
 
         if self.match_token(&TokenType::Equals) {
             self.expression();
+        } else if self.op_assign_match() {
+            self.op_assign(global_variable_index);
         } else {
             self.emit_constant(Value::String("".into()));
         }
@@ -272,6 +274,19 @@ impl<'a> Parser<'a> {
         );
 
         self.define_variable(global_variable_index);
+    }
+
+    /// Evaluates whether or not the current token is an operator assignment
+    ///
+    /// # Return value
+    /// true if the current token is an operator assignment, false otherwise
+    fn op_assign_match(&mut self) -> bool {
+        self.match_token(&TokenType::AddAssign)
+            || self.match_token(&TokenType::SubAssign)
+            || self.match_token(&TokenType::MulAssign)
+            || self.match_token(&TokenType::DivAssign)
+            || self.match_token(&TokenType::ModAssign)
+            || self.match_token(&TokenType::PowAssign)
     }
 
     /// Parses a variable's name and places it in the current chunk's constant table
@@ -632,7 +647,10 @@ impl<'a> Parser<'a> {
         let chunk_index = self.parse_variable();
         if can_assign && self.match_token(&TokenType::Equals) {
             self.expression();
-            self.emit_byte(OpCode::SetGlobal(chunk_index))
+            self.emit_byte(OpCode::SetGlobal(chunk_index));
+        } else if can_assign && self.op_assign_match() {
+            self.op_assign(chunk_index);
+            self.emit_byte(OpCode::SetGlobal(chunk_index));
         } else {
             self.emit_byte(OpCode::GetGlobal(chunk_index));
         }
@@ -686,6 +704,47 @@ impl<'a> Parser<'a> {
             self.emit_byte(OpCode::UnaryMinus)
         } else if let TokenType::Bang = operator_type {
             self.emit_byte(OpCode::LogicalNot)
+        }
+    }
+
+    /// Function for parsing operator assignment
+    ///
+    /// # Arguments
+    /// - `global_variable_index` an index into the current compiling chunk's constants table
+    fn op_assign(&mut self, global_variable_index: usize) {
+        let operator_type = self.previous_token.expect("Missing token!").token_type;
+        match operator_type {
+            TokenType::AddAssign => {
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.emit_byte(OpCode::Add);
+            }
+            TokenType::SubAssign => {
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::Subtract);
+            }
+            TokenType::MulAssign => {
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.emit_byte(OpCode::Multiply);
+            }
+            TokenType::DivAssign => {
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::Divide);
+            }
+            TokenType::ModAssign => {
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::Modulus);
+            }
+            TokenType::PowAssign => {
+                self.parse_precedence(Precedence::Assignment);
+                self.emit_byte(OpCode::GetGlobal(global_variable_index));
+                self.emit_byte(OpCode::Exponentiation);
+            }
+            _ => {}
         }
     }
 
