@@ -214,3 +214,35 @@ impl Chunk {
         offset + 1
     }
 }
+
+#[cfg(test)]
+mod chunk {
+    use super::*;
+
+    #[test]
+    fn it_returns_the_index_of_a_constant_that_exists() {
+        let mut chunk = Chunk::new();
+        chunk.add_constant(String::from("foo"));
+        chunk.add_constant(String::from("bar"));
+        chunk.add_constant(String::from("baz"));
+        let bar_index = chunk.add_constant(String::from("bar"));
+
+        assert_eq!(bar_index, 1);
+        assert_ne!(bar_index, chunk.constants.len());
+    }
+
+    #[test]
+    fn it_places_a_never_seen_before_chunk_at_the_end_of_table() {
+        let mut chunk = Chunk::new();
+
+        chunk.add_constant(String::from("foo"));
+        let foo_index = chunk.add_constant(String::from("foo"));
+        assert_eq!(foo_index, 0);
+        assert_eq!(foo_index, chunk.constants.len() - 1);
+
+        chunk.add_constant(String::from("bar"));
+        let bar_index = chunk.add_constant(String::from("bar"));
+        assert_eq!(bar_index, 1);
+        assert_eq!(bar_index, chunk.constants.len() - 1);
+    }
+}
