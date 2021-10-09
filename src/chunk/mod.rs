@@ -78,8 +78,13 @@ impl Chunk {
     /// # Return value
     /// the index of the item in the constant table
     pub fn add_constant(&mut self, constant: String) -> usize {
-        self.constants.push(constant);
-        self.constants.len() - 1
+        match self.constants.binary_search(&constant) {
+            Ok(index) => index,
+            Err(_) => {
+                self.constants.push(constant);
+                self.constants.len() - 1
+            }
+        }
     }
 
     /// Disassembles the chunk to debugging purposes
