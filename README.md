@@ -3,7 +3,7 @@
 A subset of [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
 
 ## Running
-The project is currently compiled using `rustc 1.55.0 (c8dfcfe04 2021-09-06)`
+The project is currently compiled using `rustc 1.56.0 (09c42c458 2021-10-18)`
 
 At this time, only running the REPL is supported as the project is in active development.
 ```commandline
