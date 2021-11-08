@@ -20,31 +20,57 @@ use crate::vm::VM;
 /// single line.
 ///
 /// # Arguments
+/// - `program` the user's program to run
+/// - `data` the data the user may have passed to process
 /// - `is_eval` whether or not a single line of awk code is being interpreted. If so, this function
 /// terminates after a single line of code from STDIN has been evaluated.
-pub fn run_prompt(is_eval: bool) {
+/// - `is_quick` whether or not a single line of awk code is being interpreted without data. If so,
+/// this function terminates after no code from STDIN has been evaluated and is a temporary stand
+/// in for `BEGIN`.
+pub fn run_prompt(program: &str, data: &[String], is_eval: bool, is_quick: bool) {
     let mut rl = Editor::<()>::new();
     let mut vm = VM::new();
 
-    loop {
-        let user_input = rl.readline("r-awk > ");
-        match user_input {
-            Ok(awk_line) => {
-                debug!("r-awk line to process: {}", awk_line);
-                let _result = vm.interpret(awk_line);
-            }
-            Err(err) => {
-                match err {
-                    ReadlineError::Eof => println!("Eof received, exiting."),
-                    ReadlineError::Interrupted => println!("Interrupt received, exiting."),
-                    _ => error!("An error occurred: '{:?}'", err),
+    if is_quick {
+        // TODO: Remove this when `BEGIN` is implemented
+        let _result = vm.interpret(String::from(program), &[]);
+    } else if data.is_empty() {
+        loop {
+            let data_input = rl.readline("$ ");
+            let data_received = match data_input {
+                Ok(data_line) => {
+                    debug!("data line to process: {}", data_line);
+                    data_line
                 }
+                Err(err) => {
+                    match err {
+                        // Yes, we know eprintln exists and these could be `error!()`, considering
+                        // them to be semantically different
+                        ReadlineError::Eof => println!("Eof received, exiting."),
+                        ReadlineError::Interrupted => println!("Interrupt received, exiting."),
+                        _ => error!("An error occurred: '{:?}'", err),
+                    }
+                    panic!();
+                }
+            };
+
+            let mut split_data = data_received
+                // TODO: Replace this when FS is implemented
+                .split_whitespace()
+                .map(String::from)
+                .collect::<Vec<String>>();
+            let mut data_to_eval = vec![data_received];
+            data_to_eval.append(&mut split_data);
+
+            let _result = vm.interpret(String::from(program).clone(), &data_to_eval);
+
+            if is_eval {
+                // the eval should only run once
                 break;
             }
         }
-        // the eval should only run once
-        if is_eval {
-            break;
-        }
+    } else {
+        // TODO this is now the case of passing in a file
+        panic!("Reading a file is not implemented yet");
     }
 }

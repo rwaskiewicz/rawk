@@ -38,6 +38,7 @@ enum Precedence {
     Factor,         // '*' '/' '%'
     Unary,          // '!' '+' '-'
     Exponentiation, // '^'
+    FieldVariable,  // '$0', '$1', etc.
     Primary,
 }
 
@@ -61,7 +62,8 @@ impl Precedence {
             Precedence::Term => Precedence::Factor,
             Precedence::Factor => Precedence::Unary,
             Precedence::Unary => Precedence::Exponentiation,
-            Precedence::Exponentiation => Precedence::Primary,
+            Precedence::Exponentiation => Precedence::FieldVariable,
+            Precedence::FieldVariable => Precedence::Primary,
             Precedence::Primary => Precedence::Primary,
         }
     }
@@ -254,6 +256,16 @@ impl<'a> Parser<'a> {
         } else {
             self.statement();
         }
+    }
+
+    /// Parse a field variable reference
+    fn field_variable(&mut self) {
+        // a field variable is one that is prefixed with a dollar sign/sigil ('$')
+        // because the value immediately following the '$' may be the result of an expression,
+        // e.g. $(2+3), we must parse the right hand side first and push it onto the stack
+        self.parse_precedence(Precedence::FieldVariable);
+        // now that the result of the expression is on the stack, push the '$'
+        self.emit_byte(OpCode::GetFieldVariable());
     }
 
     /// Parse a variable production
@@ -1359,7 +1371,7 @@ const PARSE_RULES: [ParseRule; 65] = [
     },
     // Sigil
     ParseRule {
-        prefix_parse_fn: None,
+        prefix_parse_fn: Some(|parser, _can_assign| parser.field_variable()),
         infix_parse_fn: None,
         infix_precedence: Precedence::None,
         infix_associativity: Associativity::NA,

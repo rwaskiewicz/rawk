@@ -33,6 +33,7 @@ pub enum OpCode {
     GetGlobal(usize),
     SetGlobal(usize),
     DefineGlobal(usize),
+    GetFieldVariable(),
     JumpIfFalse(usize, usize),
     Jump(usize, usize),
     JumpIfTrue(usize, usize),

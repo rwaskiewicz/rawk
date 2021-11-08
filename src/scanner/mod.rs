@@ -173,6 +173,7 @@ impl Scanner {
                 }
                 '$' => {
                     Scanner::report_scanned_character(ch, &TokenType::Sigil);
+                    Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                     tokens.push(Token::new(None, &TokenType::Sigil, current_line));
                 }
                 '+' => {
@@ -420,6 +421,7 @@ impl Scanner {
         }
     }
 
+    // TODO: This breaks for groupings, probably other things too
     /// Checks to see if a synthetic concatenation token should be emitted or not
     ///
     /// # Arguments

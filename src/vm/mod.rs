@@ -30,7 +30,15 @@ impl VM {
         }
     }
 
-    pub fn run(&mut self) -> Result<(), InterpretError> {
+    /// Runs code that has been compiled
+    ///
+    /// # Arguments
+    /// - `data` user provided data to use when running the compiled code
+    ///
+    /// # Return value
+    /// the result of running the provided source, expressed as an `InterpretError` if the code is
+    /// unable to run to completion
+    pub fn run(&mut self, data: &[String]) -> Result<(), InterpretError> {
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
             self.ip += 1;
@@ -93,6 +101,53 @@ impl VM {
                     self.globals.insert(variable_name, val);
                     self.stack.pop();
                 }
+                OpCode::GetFieldVariable() => {
+                    // the index may be the result of an expression - e.g. $(1+2), where the result
+                    // (3) would be on the top of the stack. pop it off. if there is no value,
+                    // that's illegal.
+                    let index = match self.stack.pop() {
+                        // https://www.gnu.org/software/gawk/manual/gawk.html#Nonconstant-Fields:
+                        // > Negative field numbers are not allowed; trying to reference one
+                        // > usually terminates the program. (The POSIX standard does not define
+                        // > what happens when you reference a negative field number. gawk notices
+                        // > this and terminates your program. Other awk implementations may behave
+                        // > differently.)
+                        // This awk will allow decimal accesses (for now) by loss of precision:
+                        // $2.3 -> $2
+                        Some(awk_value) => awk_value.num_value(),
+                        None => {
+                            error!("Error: The stack was empty when trying to determine a field reference lookup");
+                            return Err(InterpretError::RuntimeError);
+                        }
+                    };
+                    if index < 0.0 {
+                        error!("r-awk: trying to access out of range field {}", index);
+                        return Err(InterpretError::RuntimeError);
+                    } else if (index - index.trunc()).abs() > 0.0 {
+                        error!("r-awk: trying to access non integer index {}", index);
+                        return Err(InterpretError::RuntimeError);
+                    }
+
+                    let safer_index = index as usize;
+
+                    if safer_index < data.len() {
+                        let value = &data[safer_index];
+                        #[allow(clippy::if_same_then_else)]
+                        #[allow(clippy::branches_sharing_code)]
+                        if value.trim().parse::<f32>().is_ok() {
+                            // TODO: Make this push as StrNum, rm clippy bypass, and test with
+                            // `cargo run -- 'foo = $1; bar = $2; if (foo > bar) { res = "first"; } else if (bar > foo) { res = "second"; } else { res = "neither"; } print res,"is bigger";'`
+                            // which is yielding 'first is bigger' for 2 12.
+                            self.stack.push(Value::String(value.clone()));
+                        } else {
+                            self.stack.push(Value::String(value.clone()));
+                        }
+                    } else {
+                        // if the index that user specified does not exist, push something on the
+                        // stack in case we're doing something like `print $9999;'
+                        self.stack.push(Value::String(String::from("")));
+                    }
+                }
                 OpCode::JumpIfFalse(offset1, offset2) => {
                     let if_result = self.peek(0).num_value() != 0.0;
                     if !if_result {
@@ -131,7 +186,16 @@ impl VM {
             .clone()
     }
 
-    pub fn interpret(&mut self, source: String) -> Result<(), InterpretError> {
+    /// Entrypoint for the VM
+    ///
+    /// # Arguments
+    /// - `source` the source code to run
+    /// - `data` any user provided data to run the provided `source` against
+    ///
+    /// # Return value
+    /// the result of running the provided source, expressed as an `InterpretError` if the code is unable to run to
+    /// completion
+    pub fn interpret(&mut self, source: String, data: &[String]) -> Result<(), InterpretError> {
         let scanner = Scanner::new(source);
         let tokens: Vec<Token> = scanner.scan();
 
@@ -143,7 +207,7 @@ impl VM {
             return Err(InterpretError::CompileError);
         }
 
-        self.run()
+        self.run(data)
     }
 
     /// Perform an arithmetic operation on two values on the stack, placing the result on the stack

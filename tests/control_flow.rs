@@ -46,7 +46,7 @@ mod control_flow {
     }
 
     #[test]
-    fn does_not_execute_a_child_if_statment_when_parent_false() {
+    fn does_not_execute_a_child_if_statement_when_parent_false() {
         utils::assert_input_yields_empty(
             "if (0) if (2) print \"Double if should not be reached\";",
         );
