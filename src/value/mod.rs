@@ -7,10 +7,6 @@ use std::fmt;
 pub enum Value {
     Number(f32),
     String(String),
-    // TODO: Remove this once we have a solid StrNum plan in place.
-    //   Normally, I'd let this lint failure continue to bug me, but there are bigger fish to fry
-    //   first...
-    #[allow(dead_code)]
     StrNum(String),
 }
 

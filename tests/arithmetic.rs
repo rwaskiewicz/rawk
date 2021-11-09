@@ -47,10 +47,20 @@ mod arithmetic_tests {
     }
 
     #[test]
+    fn it_negates_a_negative_strnum_with_unary_minus() {
+        utils::assert_input_with_data("print -$1;", "9", "-9")
+    }
+
+    #[test]
     fn it_does_not_negate_zero_with_unary_minus() {
-        // echo '-0' | awk '{print -0}' yields 0 BUT
-        // echo '-0' | awk '{print -$1}' yields -0
+        // echo '-0' | awk '{print -0}' yields 0
         utils::assert_input("print -0;", "0")
+    }
+
+    #[test]
+    fn it_does_negates_zero_with_strnum_unary_minus() {
+        // echo '-0' | awk '{print -$1}' yields -0
+        utils::assert_input_with_data("print -$1;", "0", "0")
     }
 
     #[test]
@@ -59,13 +69,28 @@ mod arithmetic_tests {
     }
 
     #[test]
+    fn it_keeps_a_negative_strnum_as_such_with_unary_plus() {
+        utils::assert_input_with_data("print -+$1;", "9", "-9")
+    }
+
+    #[test]
     fn it_keeps_a_negative_number_as_such_with_unary_plus_flipped() {
         utils::assert_input("print +-9;", "-9")
     }
 
     #[test]
+    fn it_keeps_a_negative_strnum_as_such_with_unary_plus_flipped() {
+        utils::assert_input_with_data("print +-$1;", "9", "-9")
+    }
+
+    #[test]
     fn it_does_not_alter_zero_with_unary_plus() {
         utils::assert_input("print +0;", "0")
+    }
+
+    #[test]
+    fn it_does_not_alter_zero_with_strnum_unary_plus() {
+        utils::assert_input_with_data("print +$1;", "0", "0")
     }
 
     #[test]

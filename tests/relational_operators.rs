@@ -350,4 +350,144 @@ mod relational_tests {
     fn compares_a_number_and_string_less_than_symmetric() {
         utils::assert_input("print 1<\"a\";", "1");
     }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_double_equal() {
+        utils::assert_input("print \"1.1\"==1.1;", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_double_equal_false() {
+        utils::assert_input("print 1==\"1.1\";", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_not_equals() {
+        utils::assert_input("print \"1.1\"!=1;", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_not_equals_false() {
+        utils::assert_input("print 1.1!=\"1.1\";", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_greater_than_equal() {
+        utils::assert_input("print \"1.1\">=1;", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_greater_than_equal_symmetric() {
+        utils::assert_input("print 1>=\"1.1\";", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_greater_than() {
+        utils::assert_input("print \"1.1\">1;", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_greater_than_lex() {
+        utils::assert_input("print \"2\">12;", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_greater_than_symmetric() {
+        utils::assert_input("print 1>\"1.1\";", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_less_than_equal() {
+        utils::assert_input("print \"1.1\"<=1;", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_less_than_equal_symmetric() {
+        utils::assert_input("print 1<=\"1.1\";", "1");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_less_than() {
+        utils::assert_input("print \"1.1\"<1;", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_less_than_lex() {
+        utils::assert_input("print \"2\"<12;", "0");
+    }
+
+    #[test]
+    fn compares_a_string_number_and_a_number_less_than_symmetric() {
+        utils::assert_input("print 1<\"1.1\";", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_double_equal() {
+        utils::assert_input_with_data("print $1==1.1;", "1.1", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_double_equal_false() {
+        utils::assert_input_with_data("print 1==$1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_not_equals() {
+        utils::assert_input_with_data("print $1!=1;", "1.1", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_not_equals_false() {
+        utils::assert_input_with_data("print 1.1!=$1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_greater_than_equal() {
+        utils::assert_input_with_data("print $1>=1;", "1.1", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_greater_than_equal_symmetric() {
+        utils::assert_input_with_data("print 1>=$1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_greater_than() {
+        utils::assert_input_with_data("print $1>1;", "1.1", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_greater_than_lex() {
+        utils::assert_input_with_data("print $1>12;", "2", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_greater_than_symmetric() {
+        utils::assert_input_with_data("print 1>$1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_less_than_equal() {
+        utils::assert_input_with_data("print $1<=1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_less_than_equal_symmetric() {
+        utils::assert_input_with_data("print 1<=$1;", "1.1", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_less_than() {
+        utils::assert_input_with_data("print $1<1;", "1.1", "0");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_less_than_lex() {
+        utils::assert_input_with_data("print $1<12;", "2", "1");
+    }
+
+    #[test]
+    fn compares_a_strnum_and_a_number_less_than_symmetric() {
+        utils::assert_input_with_data("print 1<$1;", "1.1", "1");
+    }
 }

@@ -132,13 +132,8 @@ impl VM {
 
                     if safer_index < data.len() {
                         let value = &data[safer_index];
-                        #[allow(clippy::if_same_then_else)]
-                        #[allow(clippy::branches_sharing_code)]
                         if value.trim().parse::<f32>().is_ok() {
-                            // TODO: Make this push as StrNum, rm clippy bypass, and test with
-                            // `cargo run -- 'foo = $1; bar = $2; if (foo > bar) { res = "first"; } else if (bar > foo) { res = "second"; } else { res = "neither"; } print res,"is bigger";'`
-                            // which is yielding 'first is bigger' for 2 12.
-                            self.stack.push(Value::String(value.clone()));
+                            self.stack.push(Value::StrNum(value.clone()));
                         } else {
                             self.stack.push(Value::String(value.clone()));
                         }
@@ -317,6 +312,7 @@ impl VM {
         if is_string_comparison {
             self.string_comparison(op_code, &*a.str_value(), &*b.str_value());
         } else {
+            // implicitly convert `Value::StrNum` to numbers
             self.numeric_comparison(op_code, a.num_value(), b.num_value());
         }
     }
@@ -433,33 +429,32 @@ impl VM {
     }
 
     fn unary_op(&mut self, op_code: &OpCode) {
-        if matches!(self.peek(0), Value::Number(_)) {
-            if let Value::Number(a) = self.stack.pop().unwrap() {
-                match *op_code {
-                    // Unary plus will be more useful for converting a string to a number
-                    OpCode::UnaryPlus => {
-                        if a == 0.0 {
-                            self.stack.push(Value::Number(0.0))
-                        } else {
-                            self.stack.push(Value::Number(a))
-                        }
+        if matches!(self.peek(0), Value::Number(_)) || matches!(self.peek(0), Value::StrNum(_)) {
+            let num_like = self.stack.pop().unwrap().num_value();
+            match *op_code {
+                // Unary plus will be more useful for converting a string to a number
+                OpCode::UnaryPlus => {
+                    if num_like == 0.0 {
+                        self.stack.push(Value::Number(0.0))
+                    } else {
+                        self.stack.push(Value::Number(num_like))
                     }
-                    OpCode::UnaryMinus => {
-                        if a == 0.0 {
-                            self.stack.push(Value::Number(0.0))
-                        } else {
-                            self.stack.push(Value::Number(-a))
-                        }
-                    }
-                    OpCode::LogicalNot => {
-                        let mut result: f32 = 1.0;
-                        if a > 0.0 {
-                            result = 0.0;
-                        }
-                        self.stack.push(Value::Number(result))
-                    }
-                    _ => panic!("Unknown op code given for unary '{:?}'", op_code),
                 }
+                OpCode::UnaryMinus => {
+                    if num_like == 0.0 {
+                        self.stack.push(Value::Number(0.0))
+                    } else {
+                        self.stack.push(Value::Number(-num_like))
+                    }
+                }
+                OpCode::LogicalNot => {
+                    let mut result: f32 = 1.0;
+                    if num_like > 0.0 {
+                        result = 0.0;
+                    }
+                    self.stack.push(Value::Number(result))
+                }
+                _ => panic!("Unknown op code given for unary '{:?}'", op_code),
             }
         } else if matches!(self.peek(0), Value::String(_)) {
             if let Value::String(a) = self.stack.pop().unwrap() {
