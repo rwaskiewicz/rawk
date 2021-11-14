@@ -1,6 +1,7 @@
 use clap::{App, Arg};
 use env_logger::{Builder, Env};
 use log::{error, LevelFilter};
+use rawk::runtime_config::RuntimeConfig;
 
 fn main() {
     Builder::from_env(Env::default().default_filter_or("info"))
@@ -8,53 +9,73 @@ fn main() {
         .filter_module("rustyline", LevelFilter::Error)
         .init();
 
+    const PROGRAM_KEY: &str = "program";
+    const QUICK_KEY: &str = "quick";
+    const EVAL_KEY: &str = "eval";
+    const FIELD_SEPARATOR_KEY: &str = "field_separator";
+    const FILE_KEY: &str = "file";
+
     // https://www.gnu.org/software/gawk/manual/html_node/Options.html
     let matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")
         .arg(
-            Arg::with_name("file")
+            Arg::with_name(FILE_KEY)
                 .short("f")
-                .long("file")
+                .long(FILE_KEY)
                 .takes_value(true)
                 .required(false)
                 .help("Runs an awk file"),
         )
         .arg(
-            Arg::with_name("program")
+            Arg::with_name(PROGRAM_KEY)
                 .index(1) // note this is the first positional argument, not the first argument as a whole
                 .default_value("print $0;"),
         )
         .arg(
             // TODO: Remove this when `BEGIN` is implemented. We could use -w, but this is quicker
-            Arg::with_name("quick")
+            Arg::with_name(QUICK_KEY)
                 .short("q")
-                .long("quick")
+                .long(QUICK_KEY)
                 .takes_value(false)
                 .required(false)
                 .help("Runs a single line of awk code without data, then terminates"),
         )
         .arg(
-            Arg::with_name("eval")
+            Arg::with_name(EVAL_KEY)
                 .short("k") // '-e' is taken already...
-                .long("eval")
+                .long(EVAL_KEY)
                 .takes_value(false)
                 .required(false)
                 .help("Runs a single line of awk code, then terminates"),
         )
-        // TODO: Implement -F for overriding FS
+        .arg(
+            Arg::with_name(FIELD_SEPARATOR_KEY)
+                .short("F")
+                .takes_value(true)
+                .required(false)
+                .default_value(" ")
+                .help("Sets the field separator character/regex for parsing data"),
+        )
         .get_matches();
 
     let program = matches
-        .value_of("program")
+        .value_of(PROGRAM_KEY)
         .expect("awk program default is unspecified");
-    let file_name = matches.value_of("file");
+    let field_separator = matches
+        .value_of(FIELD_SEPARATOR_KEY)
+        .map(|separator| separator.to_string())
+        .expect("awk file separator default is unspecified");
+    let file_name = matches.value_of(FILE_KEY);
+
+    let config: RuntimeConfig = RuntimeConfig::new(
+        field_separator,
+        matches.is_present(EVAL_KEY),
+        matches.is_present(QUICK_KEY),
+    );
     match file_name {
         None => {
-            let is_eval = matches.is_present("eval");
-            // TODO: Remove this when `BEGIN` is implemented
-            let is_quick = matches.is_present("quick");
-            rawk::run_prompt(program, &[], is_eval, is_quick);
+            rawk::run_prompt(program, &[], config);
         }
         Some(s) => {
             error!("TODO: Implement file parsing. Got file_name {}", s);

@@ -38,4 +38,64 @@ mod field_variables {
         //  $($(1+1)); -> $($2); -> $3 -> 5
         utils::assert_input_with_data("print $($(1+1));", "0 3 5", "5");
     }
+
+    #[test]
+    fn it_does_not_truncate_whitespace_for_fs() {
+        utils::assert_input_with_data_and_opts(
+            "print $1$2$3;",
+            vec!["-F,"],
+            " Alice  ,40 ,25 ",
+            " Alice  40 25 ",
+        );
+    }
+
+    #[test]
+    fn it_supports_single_character_fs() {
+        utils::assert_input_with_data_and_opts(
+            "print $1$2$3;",
+            vec!["-F,"],
+            "Alice4025",
+            "Alice4025",
+        );
+    }
+
+    #[test]
+    fn it_counts_two_consecutive_fs_as_empty_record() {
+        utils::assert_input_with_data_and_opts(
+            "print $1$2$3;",
+            vec!["-F,"],
+            "Hello,,World!",
+            "HelloWorld!",
+        );
+    }
+
+    #[test]
+    fn it_splits_nothing_when_fs_not_found() {
+        utils::assert_input_with_data_and_opts(
+            "print $1;",
+            vec!["-F:"],
+            "Hello,,World!",
+            "Hello,,World!",
+        );
+    }
+
+    #[test]
+    fn it_splits_data_entirely_when_fs_matches_test_data_single_char() {
+        utils::assert_input_with_data_and_opts(
+            "print \"|\"$1\"|\"$2\"|\";",
+            vec!["-Fa"],
+            "a",
+            "|||",
+        );
+    }
+
+    #[test]
+    fn it_splits_data_when_fs_matches_leading_char() {
+        utils::assert_input_with_data_and_opts("print $1$2$3;", vec!["-Fa"], "abac", "bc");
+    }
+
+    #[test]
+    fn it_splits_data_when_fs_matches_trailing_char() {
+        utils::assert_input_with_data_and_opts("print $1$2$3;", vec!["-Fa"], "baca", "bc");
+    }
 }
