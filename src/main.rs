@@ -1,6 +1,6 @@
 use clap::{App, Arg};
 use env_logger::{Builder, Env};
-use log::{error, LevelFilter};
+use log::LevelFilter;
 use rawk::runtime_config::RuntimeConfig;
 
 fn main() {
@@ -66,19 +66,13 @@ fn main() {
         .value_of(FIELD_SEPARATOR_KEY)
         .map(|separator| separator.to_string())
         .expect("awk file separator default is unspecified");
-    let file_name = matches.value_of(FILE_KEY);
+    let file_name = matches.value_of(FILE_KEY).map(|name| name.to_string());
 
     let config: RuntimeConfig = RuntimeConfig::new(
+        file_name,
         field_separator,
         matches.is_present(EVAL_KEY),
         matches.is_present(QUICK_KEY),
     );
-    match file_name {
-        None => {
-            rawk::run_prompt(program, &[], config);
-        }
-        Some(s) => {
-            error!("TODO: Implement file parsing. Got file_name {}", s);
-        }
-    }
+    rawk::run_prompt(program, config);
 }

@@ -23,15 +23,14 @@ use crate::vm::VM;
 ///
 /// # Arguments
 /// - `program` the user's program to run
-/// - `data` the data the user may have passed to process
 /// - `config` the runtime configuration for the lifetime of the awk program
-pub fn run_prompt(program: &str, data: &[String], runtime_config: RuntimeConfig) {
+pub fn run_prompt(program: &str, runtime_config: RuntimeConfig) {
     let mut vm = VM::new();
 
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
         let _result = vm.interpret(String::from(program), &[]);
-    } else if data.is_empty() {
+    } else if runtime_config.file_name.is_none() {
         loop {
             let data_received = read_user_data_from_terminal();
             let data_to_eval = split_user_data(&runtime_config.field_separator, data_received);

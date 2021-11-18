@@ -1,6 +1,8 @@
 //! Runtime configuration structs and impl
 
 pub struct RuntimeConfig {
+    // the name of the awk file to read/run
+    pub file_name: Option<String>,
     // a single character or regex to be used to split user input by
     pub field_separator: String,
     // whether or not a single line of awk code is being interpreted. If so, terminate after a single line of code from
@@ -12,8 +14,14 @@ pub struct RuntimeConfig {
 }
 
 impl RuntimeConfig {
-    pub fn new(field_separator: String, is_eval: bool, is_quick: bool) -> RuntimeConfig {
+    pub fn new(
+        file_name: Option<String>,
+        field_separator: String,
+        is_eval: bool,
+        is_quick: bool,
+    ) -> RuntimeConfig {
         RuntimeConfig {
+            file_name,
             field_separator,
             is_eval,
             is_quick,
