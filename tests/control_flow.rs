@@ -27,9 +27,7 @@ mod control_flow {
         );
     }
 
-    // TODO: Need to allow the repl (which is the basis of this test fw) to handle line breaks
     #[test]
-    #[ignore]
     fn it_allows_multi_line_if_statements() {
         utils::assert_input(
             "if (1)\nprint \"Allows single line if statements\";",
