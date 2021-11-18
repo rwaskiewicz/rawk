@@ -317,7 +317,6 @@ impl Scanner {
                         }
 
                         Scanner::report_scanned_string(&num_parsed, &TokenType::Number);
-                        // TODO: Store this value in floating point
                         tokens.push(Token::new(
                             Some(num_parsed),
                             &TokenType::Number,

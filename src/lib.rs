@@ -42,7 +42,6 @@ pub fn run_prompt(program: &str, runtime_config: RuntimeConfig) {
             }
         }
     } else {
-        // TODO this is now the case of passing in a file
         panic!("Reading a file is not implemented yet");
     }
 }

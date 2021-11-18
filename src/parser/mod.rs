@@ -79,7 +79,6 @@ impl Precedence {
 /// - `can_assign` whether or not assignment to a variable is permitted
 type ParseFn = fn(&mut Parser, can_assign: bool) -> ();
 
-// TODO: We may need to track the precedence of the prefix for awk
 #[derive(Copy, Clone)]
 struct ParseRule {
     // function to compile a _prefix expression_ starting with a token of some type
@@ -890,7 +889,6 @@ impl<'a> Parser<'a> {
     /// # Arguments
     /// - `value` the constant to emit bytes for
     fn emit_constant(&mut self, value: Value) {
-        // TODO: This is a tad different from CI
         self.emit_byte(OpCode::OpConstant(value));
     }
 
