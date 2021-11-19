@@ -9,6 +9,7 @@ fn main() {
         .filter_module("rustyline", LevelFilter::Error)
         .init();
 
+    const VERSION_KEY: &str = "version";
     const PROGRAM_KEY: &str = "program";
     const QUICK_KEY: &str = "quick";
     const EVAL_KEY: &str = "eval";
@@ -19,6 +20,14 @@ fn main() {
     let matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")
+        .arg(
+            Arg::with_name(VERSION_KEY)
+                .short("V")
+                .long(VERSION_KEY)
+                .takes_value(false)
+                .required(false)
+                .help("Determine the current version of r-awk"),
+        )
         .arg(
             Arg::with_name(FILE_KEY)
                 .short("f")
@@ -58,6 +67,15 @@ fn main() {
                 .help("Sets the field separator character/regex for parsing data"),
         )
         .get_matches();
+
+    if matches.is_present(VERSION_KEY) {
+        println!(
+            "{} version {}",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        );
+        return;
+    }
 
     let program = matches
         .value_of(PROGRAM_KEY)
