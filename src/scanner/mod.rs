@@ -4,6 +4,11 @@ use log::{debug, error};
 use std::collections::HashMap;
 
 #[derive(Debug)]
+enum ScanError {
+    UnterminatedString,
+}
+
+#[derive(Debug)]
 pub struct Scanner {
     input: String,
     keywords: HashMap<&'static str, &'static TokenType>,
@@ -106,18 +111,36 @@ impl Scanner {
                     Scanner::report_scanned_character(ch, &TokenType::DoubleQuote);
 
                     let mut string_parsed = String::from("");
-                    while let Some(_maybe_quote) = char_stream.peek() {
-                        if let Some(next_ch) = char_stream.next() {
-                            if next_ch == '\n' {
-                                current_line += 1;
-                            } else if next_ch == '\"' {
-                                // TODO: Handle EOF/unterminated string
-                                break;
+                    let mut is_properly_terminated = false;
+
+                    while let Some(next_ch) = char_stream.next() {
+                        if next_ch == '\n' {
+                            current_line += 1;
+                        } else if next_ch == '\\' {
+                            // TODO: https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences.html
+                            // some items like \t should not print literally
+
+                            // Do not push the '\' onto the string, do consume the next character it escaped
+                            if let Some(escaped_ch) = char_stream.next() {
+                                ch = escaped_ch;
+                                string_parsed.push(ch);
+                            } else {
+                                panic!("{:?}", ScanError::UnterminatedString);
                             }
-                            ch = next_ch;
-                            string_parsed.push(ch);
+                            continue;
+                        } else if next_ch == '\"' {
+                            is_properly_terminated = true;
+                            break;
                         }
+                        ch = next_ch;
+                        string_parsed.push(ch);
                     }
+
+                    if char_stream.peek().is_none() && !is_properly_terminated {
+                        // the end of the stream was reached, but the string wasn't terminated
+                        panic!("{:?}", ScanError::UnterminatedString);
+                    }
+
                     let string_token =
                         Token::new(Some(string_parsed), &TokenType::DoubleQuote, current_line);
 
@@ -528,6 +551,61 @@ mod lexing {
             tokens.iter().next(),
             Some(&Token {
                 lexeme: Some(String::from("Hello World!")),
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
+            })
+        );
+    }
+
+    #[test]
+    fn it_parses_an_empty_string() {
+        // parse the text: ""
+        let tokens = Scanner::new(String::from("\"\"")).scan();
+
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: Some(String::from("")),
+                token_type: &TokenType::DoubleQuote,
+                line: 1,
+            })
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "UnterminatedString")]
+    fn it_panics_on_an_unterminated_string() {
+        // parse the text: "Hello
+        Scanner::new(String::from("\"Hello")).scan();
+    }
+
+    #[test]
+    #[should_panic(expected = "UnterminatedString")]
+    fn it_panics_on_an_unterminated_empty_string() {
+        // parse the text: "
+        Scanner::new(String::from("\"")).scan();
+    }
+
+    #[test]
+    #[should_panic(expected = "UnterminatedString")]
+    fn it_panics_on_an_unterminated_escaped_string() {
+        // parse the text: "Hello\"
+        Scanner::new(String::from("\"Hello\\\"")).scan();
+    }
+
+    #[test]
+    fn it_handles_a_terminated_string_with_escaped_double_quote() {
+        // parse the text: "Hello\""
+        let tokens = Scanner::new(String::from("\"Hello\\\"\"")).scan();
+
+        // +1 for EOF token
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(
+            tokens.iter().next(),
+            Some(&Token {
+                lexeme: Some(String::from("Hello\"")),
                 token_type: &TokenType::DoubleQuote,
                 line: 1,
             })
