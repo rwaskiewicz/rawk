@@ -13,6 +13,8 @@ mod value;
 mod vm;
 
 use crate::runtime_config::RuntimeConfig;
+use crate::scanner::Scanner;
+use crate::token::Token;
 use crate::vm::VM;
 
 /// Invokes a REPL for awk code.
@@ -24,17 +26,20 @@ use crate::vm::VM;
 /// # Arguments
 /// - `program` the user's program to run
 /// - `config` the runtime configuration for the lifetime of the awk program
-pub fn run_prompt(program: &str, runtime_config: RuntimeConfig) {
+pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
+    let scanner = Scanner::new(String::from(program));
+    let tokens: Vec<Token> = scanner.scan();
+
     let mut vm = VM::new();
 
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
-        let _result = vm.interpret(String::from(program), &[]);
+        let _result = vm.interpret(&tokens, &[]);
     } else if runtime_config.file_name.is_none() {
         loop {
             let data_received = read_user_data_from_terminal();
             let data_to_eval = split_user_data(&runtime_config.field_separator, data_received);
-            let _result = vm.interpret(String::from(program).clone(), &data_to_eval);
+            let _result = vm.interpret(&tokens, &data_to_eval);
 
             if runtime_config.is_eval {
                 // the eval should only run once

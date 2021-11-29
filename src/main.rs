@@ -92,5 +92,5 @@ fn main() {
         matches.is_present(EVAL_KEY),
         matches.is_present(QUICK_KEY),
     );
-    rawk::run_prompt(program, config);
+    rawk::run_program(program, config);
 }
