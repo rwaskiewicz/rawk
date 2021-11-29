@@ -25,7 +25,7 @@ use crate::vm::VM;
 ///
 /// # Arguments
 /// - `program` the user's program to run
-/// - `config` the runtime configuration for the lifetime of the awk program
+/// - `runtime_config` the runtime configuration for the lifetime of the awk program
 pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
     let scanner = Scanner::new(String::from(program));
     let tokens: Vec<Token> = scanner.scan();
