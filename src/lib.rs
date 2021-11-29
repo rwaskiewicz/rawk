@@ -164,13 +164,13 @@ mod lib {
     }
 
     #[test]
-    #[ignore] // TODO: Restore this test
     fn it_splits_nothing_when_fs_not_found() {
         let test_data = "  Hello World  I\tam  someone! ";
         let split_data = split_user_data(&",", String::from(test_data));
 
-        assert_eq!(split_data.len(), 1);
+        assert_eq!(split_data.len(), 2);
         assert_eq!(split_data[0], test_data);
+        assert_eq!(split_data[1], test_data);
     }
 
     #[test]
