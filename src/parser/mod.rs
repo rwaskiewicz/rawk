@@ -136,8 +136,12 @@ impl<'a> Parser<'a> {
         // prime the pump, so that the `current_token` is defined
         self.advance();
 
+        if !self.match_token(&TokenType::LeftCurly) {
+            self.error_at_current("Expect patterns to start with '{'.")
+        }
+
         while !self.match_token(&TokenType::Eof) {
-            self.declaration();
+            self.block();
         }
 
         self.end_compiler();
