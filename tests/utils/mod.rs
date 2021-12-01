@@ -170,3 +170,25 @@ pub fn assert_input_yields_empty(input: &str) {
         .assert()
         .stdout(predicates::str::is_match(expected_text).unwrap());
 }
+
+/// Helper library for invoking r-awk and asserting an empty output on stdout
+///
+/// # Arguments:
+/// - `input` the input that would have been received by the user
+/// - `data` the data that would have been received by the user that the `program` should run against
+///
+/// # Panics:
+/// If the result is non-empty
+// Allow dead code here per https://github.com/rust-lang/rust/issues/46379
+// I don't expect this to be long lived anyway
+#[allow(dead_code)]
+pub fn assert_input_yields_empty_with_data(input: &str, data: &str) {
+    let expected_text = String::from("^$");
+    Command::cargo_bin("rawk")
+        .unwrap()
+        .arg(input)
+        .arg("-q")
+        .write_stdin(data)
+        .assert()
+        .stdout(predicates::str::is_match(expected_text).unwrap());
+}

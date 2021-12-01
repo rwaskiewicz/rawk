@@ -147,17 +147,58 @@ impl<'a> Parser<'a> {
 
     /// Parse a single pattern-action
     fn parse_pattern_action(&mut self) {
-        // TODO: For now, every pattern is implicitly 'true', since we don't support parsing it ATM
+        self.parse_pattern();
         self.parse_action();
+    }
+
+    /// Parse a single pattern
+    fn parse_pattern(&mut self) {
+        if self.match_token(&TokenType::Begin) {
+            // BEGIN has been parsed, now handle the block
+            self.emit_true();
+            panic!("TODO: Implement BEGIN support");
+        } else if self.match_token(&TokenType::End) {
+            // END has been parsed, now handle the block
+            self.emit_true();
+            panic!("TODO: Implement END support");
+        } else if self.peek_token(&TokenType::LeftCurly) {
+            // we've run into an action earlier than we thought, emit true so we always run the action that will follow
+            self.emit_true();
+        } else {
+            // we have a pattern to parse
+            self.expression();
+            // TODO: Support multiple patterns - https://www.gnu.org/software/gawk/manual/html_node/Ranges.html
+        }
+    }
+
+    /// Emits a number one ('1') for the [TokenType::Number] token type
+    fn emit_true(&mut self) {
+        self.emit_constant(Value::Number(1.0));
     }
 
     /// Parse a single action
     fn parse_action(&mut self) {
-        if !self.match_token(&TokenType::LeftCurly) {
-            self.error_at_current("Expect patterns to start with '{'.")
+        // emit a jump instruction as a placeholder to skip over the 'action' associated with the action in the
+        // event the pattern condition is false (if one exists). we'll backpatch it soon with the correct offset.
+        let pattern_false_jump = self.emit_jump(OpCode::JumpIfFalse(0xff, 0xff));
+
+        if self.match_token(&TokenType::LeftCurly) {
+            // parse the contents of the action
+            self.block();
+        } else {
+            // no pattern - the action implicitly becomes 'print $0'
+            self.emit_constant(Value::Number(0.0));
+            self.emit_byte(OpCode::GetFieldVariable());
+            self.emit_byte(OpCode::OpPrint);
+            self.emit_byte(OpCode::Pop);
         }
 
-        self.block();
+        // we've passed through the action successfully, backpatch the jump that was emitted for the block
+        self.patch_jump(pattern_false_jump);
+
+        // always pop the pattern's result off the stack. this differs from handling an if statement, which has a
+        // then clause that requires conditional popping
+        self.emit_byte(OpCode::Pop);
     }
 
     /// Parses a series of tokens, based on the precedence associated with them.
@@ -922,8 +963,11 @@ impl<'a> Parser<'a> {
     /// # Arguments
     /// - `op_code` the value to emit the bytes for
     fn emit_byte(&mut self, op_code: OpCode) {
-        self.compiling_chunk
-            .write_chunk(op_code, self.previous_token.unwrap().line);
+        let line_number = self
+            .previous_token
+            .unwrap_or_else(|| self.current_token.unwrap())
+            .line;
+        self.compiling_chunk.write_chunk(op_code, line_number);
     }
 
     /// Helper function for reporting an error at the current token

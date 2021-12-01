@@ -20,6 +20,15 @@ cargo run -- -F, '{print $2 * $3 + $1;}'
 34
 ```
 
+Patterns are also supported:
+```commandline
+cargo run -- -F, '$1 > $2 {print "First is bigger";} $2 > $1 {print "Second is bigger";}'
+1,2
+Second is bigger
+2,1
+First is bigger
+```
+
 At this time, only single line programs are supported in the REPL in the REPL are supported. Take 'fizzbuzz' for 
 example:
 ```awk
