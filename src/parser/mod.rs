@@ -136,17 +136,28 @@ impl<'a> Parser<'a> {
         // prime the pump, so that the `current_token` is defined
         self.advance();
 
-        if !self.match_token(&TokenType::LeftCurly) {
-            self.error_at_current("Expect patterns to start with '{'.")
-        }
-
         while !self.match_token(&TokenType::Eof) {
-            self.block();
+            self.parse_pattern_action();
         }
 
         self.end_compiler();
 
         !self.had_error
+    }
+
+    /// Parse a single pattern-action
+    fn parse_pattern_action(&mut self) {
+        // TODO: For now, every pattern is implicitly 'true', since we don't support parsing it ATM
+        self.parse_action();
+    }
+
+    /// Parse a single action
+    fn parse_action(&mut self) {
+        if !self.match_token(&TokenType::LeftCurly) {
+            self.error_at_current("Expect patterns to start with '{'.")
+        }
+
+        self.block();
     }
 
     /// Parses a series of tokens, based on the precedence associated with them.
