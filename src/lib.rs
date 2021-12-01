@@ -14,6 +14,7 @@ mod vm;
 
 use crate::runtime_config::RuntimeConfig;
 use crate::scanner::Scanner;
+use crate::token::token_type::TokenType;
 use crate::token::Token;
 use crate::vm::VM;
 
@@ -29,6 +30,10 @@ use crate::vm::VM;
 pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
     let scanner = Scanner::new(String::from(program));
     let tokens: Vec<Token> = scanner.scan();
+
+    if tokens.is_empty() || tokens.get(0).unwrap().token_type == &TokenType::Eof {
+        return;
+    }
 
     let mut vm = VM::new();
 

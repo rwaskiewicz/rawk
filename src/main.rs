@@ -37,9 +37,7 @@ fn main() {
                 .help("Runs an awk file"),
         )
         .arg(
-            Arg::with_name(PROGRAM_KEY)
-                .index(1) // note this is the first positional argument, not the first argument as a whole
-                .default_value("print $0;"),
+            Arg::with_name(PROGRAM_KEY).index(1), // note this is the first positional argument, not the first argument as a whole
         )
         .arg(
             // TODO: Remove this when `BEGIN` is implemented. We could use -w, but this is quicker
@@ -68,7 +66,7 @@ fn main() {
         )
         .get_matches();
 
-    if matches.is_present(VERSION_KEY) {
+    if matches.is_present(VERSION_KEY) || !matches.is_present(PROGRAM_KEY) {
         println!(
             "{} version {}",
             env!("CARGO_PKG_NAME"),
