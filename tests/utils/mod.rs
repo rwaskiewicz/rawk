@@ -4,20 +4,20 @@
 
 use assert_cmd::Command;
 
-/// Helper library for invoking r-awk and asserting on output in stderr
+/// Helper library for invoking r-awk and asserting on output in stdout
 ///
 /// # Arguments:
 /// - `input` the input that would have been received by the user
-/// - `expected_value` the expected result to appear in stderr
+/// - `expected_value` the expected result to appear in stdout
 ///
 /// # Panics:
-/// If the `expected_value` cannot be found in stderr, the assertion (and test) will fail
+/// If the `expected_value` cannot be found in stdout, the assertion (and test) will fail
 // Allow dead code here per https://github.com/rust-lang/rust/issues/46379
 // I don't expect this to be long lived anyway
 #[allow(dead_code)]
 pub fn assert_input(input: &str, expected_value: &str) {
     let mut expected_text = String::new();
-    expected_text.push_str("^\\[INFO  rawk::vm\\] ");
+    expected_text.push_str("^");
     expected_text.push_str(expected_value);
     expected_text.push_str("\n$");
     Command::cargo_bin("rawk")
@@ -25,17 +25,17 @@ pub fn assert_input(input: &str, expected_value: &str) {
         .arg(input)
         .arg("-q")
         .assert()
-        .stderr(predicates::str::is_match(expected_text).unwrap());
+        .stdout(predicates::str::is_match(expected_text).unwrap());
 }
 
-/// Helper library for invoking r-awk and asserting on output in stderr over multiple lines
+/// Helper library for invoking r-awk and asserting on output in stdout over multiple lines
 ///
 /// # Arguments:
 /// - `input` the input that would have been received by the user
-/// - `expected_values` the expected result to appear in stderr
+/// - `expected_values` the expected result to appear in stdout
 ///
 /// # Panics:
-/// If the `expected_values` cannot be found in stderr, the assertion (and test) will fail
+/// If the `expected_values` cannot be found in stdout, the assertion (and test) will fail
 // Allow dead code here per https://github.com/rust-lang/rust/issues/46379
 // I don't expect this to be long lived anyway
 #[allow(dead_code)]
@@ -45,7 +45,6 @@ pub fn assert_input_for_outputs(input: &str, expected_values: Vec<String>) {
     expected_items.push(String::from("^"));
     for expected_value in expected_values {
         let mut expected_text = String::new();
-        expected_text.push_str("\\[INFO  rawk::vm\\] ");
         expected_text.push_str(&*expected_value);
         expected_text.push_str("\n");
         expected_items.push(expected_text);
@@ -57,24 +56,24 @@ pub fn assert_input_for_outputs(input: &str, expected_values: Vec<String>) {
         .arg(input)
         .arg("-q")
         .assert()
-        .stderr(predicates::str::is_match(final_text).unwrap());
+        .stdout(predicates::str::is_match(final_text).unwrap());
 }
 
-/// Helper library for invoking r-awk, providing data, and asserting on output in stderr
+/// Helper library for invoking r-awk, providing data, and asserting on output in stdout
 ///
 /// # Arguments:
 /// - `program` the program that would have been received by the user
 /// - `data` the data that would have been received by the user that the `program` should run against
-/// - `expected_value` the expected result to appear in stderr
+/// - `expected_value` the expected result to appear in stdout
 ///
 /// # Panics:
-/// If the `expected_value` cannot be found in stderr, the assertion (and test) will fail
+/// If the `expected_value` cannot be found in stdout, the assertion (and test) will fail
 // Allow dead code here per https://github.com/rust-lang/rust/issues/46379
 // I don't expect this to be long lived anyway
 #[allow(dead_code)]
 pub fn assert_input_with_data(program: &str, data: &str, expected_value: &str) {
     let mut expected_text = String::new();
-    expected_text.push_str("^\\[INFO  rawk::vm\\] ");
+    expected_text.push_str("^");
     expected_text.push_str(expected_value);
     expected_text.push_str("\n$");
     Command::cargo_bin("rawk")
@@ -83,18 +82,18 @@ pub fn assert_input_with_data(program: &str, data: &str, expected_value: &str) {
         .arg("-k")
         .write_stdin(data)
         .assert()
-        .stderr(predicates::str::is_match(expected_text).unwrap());
+        .stdout(predicates::str::is_match(expected_text).unwrap());
 }
 
-/// Helper library for invoking r-awk and asserting on output in stderr over multiple lines with data
+/// Helper library for invoking r-awk and asserting on output in stdout over multiple lines with data
 ///
 /// # Arguments:
 /// - `input` the input that would have been received by the user
 /// - `data` the data that would have been received by the user that the `input` should run against
-/// - `expected_value`s the expected result to appear in stderr
+/// - `expected_value`s the expected result to appear in stdout
 ///
 /// # Panics:
-/// If the `expected_values` cannot be found in stderr, the assertion (and test) will fail
+/// If the `expected_values` cannot be found in stdout, the assertion (and test) will fail
 // Allow dead code here per https://github.com/rust-lang/rust/issues/46379
 // I don't expect this to be long lived anyway
 #[allow(dead_code)]
@@ -104,7 +103,6 @@ pub fn assert_input_for_outputs_with_data(input: &str, data: &str, expected_valu
     expected_items.push(String::from("^"));
     for expected_value in expected_values {
         let mut expected_text = String::new();
-        expected_text.push_str("\\[INFO  rawk::vm\\] ");
         expected_text.push_str(&*expected_value);
         expected_text.push_str("\n");
         expected_items.push(expected_text);
@@ -117,19 +115,19 @@ pub fn assert_input_for_outputs_with_data(input: &str, data: &str, expected_valu
         .arg("-k")
         .write_stdin(data)
         .assert()
-        .stderr(predicates::str::is_match(final_text).unwrap());
+        .stdout(predicates::str::is_match(final_text).unwrap());
 }
 
-/// Helper library for invoking r-awk, providing data, and asserting on output in stderr
+/// Helper library for invoking r-awk, providing data, and asserting on output in stdout
 ///
 /// # Arguments:
 /// - `program` the program that would have been received by the user
 /// - `opts` command line options to pass to awk
 /// - `data` the data that would have been received by the user that the `program` should run against
-/// - `expected_value` the expected result to appear in stderr
+/// - `expected_value` the expected result to appear in stdout
 ///
 /// # Panics:
-/// If the `expected_value` cannot be found in stderr, the assertion (and test) will fail
+/// If the `expected_value` cannot be found in stdout, the assertion (and test) will fail
 // Allow dead code here per https://github.com/rust-lang/rust/issues/46379
 // I don't expect this to be long lived anyway
 #[allow(dead_code)]
@@ -140,7 +138,7 @@ pub fn assert_input_with_data_and_opts(
     expected_value: &str,
 ) {
     let mut expected_text = String::new();
-    expected_text.push_str("^\\[INFO  rawk::vm\\] ");
+    expected_text.push_str("^");
     expected_text.push_str(expected_value);
     expected_text.push_str("\n$");
     Command::cargo_bin("rawk")
@@ -150,10 +148,10 @@ pub fn assert_input_with_data_and_opts(
         .args(&opts)
         .write_stdin(data)
         .assert()
-        .stderr(predicates::str::is_match(expected_text).unwrap());
+        .stdout(predicates::str::is_match(expected_text).unwrap());
 }
 
-/// Helper library for invoking r-awk and asserting an empty output on stderr
+/// Helper library for invoking r-awk and asserting an empty output on stdout
 ///
 /// # Arguments:
 /// - `input` the input that would have been received by the user
@@ -170,5 +168,5 @@ pub fn assert_input_yields_empty(input: &str) {
         .arg(input)
         .arg("-q")
         .assert()
-        .stderr(predicates::str::is_match(expected_text).unwrap());
+        .stdout(predicates::str::is_match(expected_text).unwrap());
 }

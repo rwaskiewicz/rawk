@@ -3,7 +3,7 @@ use crate::parser::Parser;
 use crate::token::Token;
 use crate::value::Value;
 
-use log::{debug, error, info};
+use log::{debug, error};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
@@ -46,7 +46,7 @@ impl VM {
             match instruction {
                 OpCode::OpPrint => match self.stack.pop() {
                     Some(val) => {
-                        info!("{}", val.to_string());
+                        println!("{}", val.to_string());
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");

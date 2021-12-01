@@ -14,10 +14,10 @@ shall be the data that is fed into the program. The program below demonstrates r
 
 ```commandline
 cargo run -- '{print $2 * $3 + $1;}'
-$ 1 2 3
-[INFO  rawk::vm] 7
-$ 4 5 6
-[INFO  rawk::vm] 34
+1 2 3
+7
+4 5 6
+34
 ```
 
 At this time, only single line programs are supported in the REPL in the REPL are supported. Take 
