@@ -213,15 +213,14 @@ impl<'a> Parser<'a> {
 
         // our scanner will emit 'EOF' tokens once, so if we've detected it, don't try to consume
         // anything else
-        if self.current_token.is_some() && self.current_token.unwrap().token_type == &TokenType::Eof
-        {
+        if self.current_token.is_some() && self.peek_token(&TokenType::Eof) {
             return;
         }
 
         loop {
             self.current_token = self.tokens_iter.next();
 
-            if self.current_token.unwrap().token_type != &TokenType::Error {
+            if !self.peek_token(&TokenType::Error) {
                 break;
             }
             self.error_at_current("An error token was discovered.");
@@ -247,6 +246,19 @@ impl<'a> Parser<'a> {
     /// Helper function for determining whether or not the current token is of the same type as the
     /// one provided
     ///
+    /// # Arguments
+    /// - `token_type` the token type to match
+    ///
+    /// # Return value
+    /// - `true` if the current token type matches
+    /// - `false` otherwise
+    fn peek_token(&mut self, token_type: &TokenType) -> bool {
+        token_type == self.current_token.unwrap().token_type
+    }
+
+    /// Helper function for determining whether or not the current token is of the same type as the
+    /// one provided
+    ///
     /// If the provided token type matches, advance the current token
     ///
     /// # Arguments
@@ -256,7 +268,7 @@ impl<'a> Parser<'a> {
     /// - `true` if the current token type matches
     /// - `false` otherwise
     fn match_token(&mut self, token_type: &TokenType) -> bool {
-        if token_type == self.current_token.unwrap().token_type {
+        if self.peek_token(token_type) {
             self.advance();
             return true;
         }
@@ -367,9 +379,7 @@ impl<'a> Parser<'a> {
 
     /// Function for parsing a block of code contained by curly braces
     fn block(&mut self) {
-        while self.current_token.unwrap().token_type != &TokenType::RightCurly
-            && self.current_token.unwrap().token_type != &TokenType::Eof
-        {
+        while !self.peek_token(&TokenType::RightCurly) && !self.peek_token(&TokenType::Eof) {
             self.declaration();
         }
         self.consume(&TokenType::RightCurly, "Expect '}' after block.");
