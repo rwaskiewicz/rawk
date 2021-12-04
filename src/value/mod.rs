@@ -73,7 +73,15 @@ impl Value {
         match self {
             Value::Number(val) => *val != 0.0,
             Value::String(val) => !val.is_empty(),
-            Value::StrNum(val) => !val.is_empty(),
+            Value::StrNum(val) => {
+                match val.parse::<f32>() {
+                    Ok(num) => num != 0.0,
+                    Err(_) => {
+                        // we know it's a string, if parse() failed
+                        !val.is_empty()
+                    }
+                }
+            }
         }
     }
 }
@@ -258,7 +266,7 @@ mod value {
 
     #[test]
     fn truthy_value_returns_true_for_strnum_containing_zero() {
-        assert_eq!(Value::StrNum(String::from("0")).truthy_value(), true);
+        assert_eq!(Value::StrNum(String::from("0")).truthy_value(), false);
     }
 
     #[test]
