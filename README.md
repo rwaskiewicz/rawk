@@ -1,27 +1,27 @@
 # r-awk
 
-A subset of [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
+a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
 
 ## Running
-The project is currently compiled using `rustc 1.57.0 (f1edd0429 2021-11-29)`
+The minimum version required to run r-awk can be found under the `rust-version` key in the project's 
+[`Cargo.toml`](./Cargo.toml) file.
 
-At this time, only running the REPL is supported as the project is in active development.
-
-Like a 'real' awk, this version will take a single program from the STDIN. Successive lines input
-shall be the data that is fed into the program. The program below demonstrates running r-awk via
-`cargo run` and demonstrating the usage of 
-[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields).
+At this time, only running a REPL is supported, as the project is in active development. Like a real awk, this r-awk
+will take a single program from the STDIN when invoked. It then will prompt for input to serve as the data that is fed
+into the program. The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
+[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) with a comma (,) as a
+[field separator](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
 
 ```commandline
-cargo run -- '{print $2 * $3 + $1;}'
-1 2 3
+cargo run -- -F, '{print $2 * $3 + $1;}'
+1,2,3
 7
-4 5 6
+4,5,6
 34
 ```
 
-At this time, only single line programs are supported in the REPL in the REPL are supported. Take 
-'fizzbuzz' for example:
+At this time, only single line programs are supported in the REPL in the REPL are supported. Take 'fizzbuzz' for 
+example:
 ```awk
 {i=0; while (i < 100) { i=i+1; is_three_div = (i % 3 == 0); is_five_div = (i % 5 == 0); if (is_three_div && is_five_div) { print "fizzbuzz"; } else if (is_three_div) { print "fizz"; } else if (is_five_div) { print "buzz"; } else { print i; }}}
 ```
