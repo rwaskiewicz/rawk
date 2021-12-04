@@ -109,6 +109,50 @@ mod control_flow {
     }
 
     #[test]
+    fn it_supports_non_null_strings_in_if_condition() {
+        utils::assert_input(
+            "{if (\"hello\") print \"should print\"; else print \"this should not\";}",
+            "should print",
+        );
+    }
+
+    #[test]
+    fn it_supports_non_null_strnum_in_if_condition() {
+        utils::assert_input_with_data(
+            "{if ($1) print \"should print\"; else print \"this should not\";}",
+            "hello",
+            "should print",
+        );
+    }
+
+    #[test]
+    fn it_supports_null_strnum_in_if_condition() {
+        utils::assert_input_with_data(
+            "{if ($1) print \"should print\"; else print \"this should not\";}",
+            "\n",
+            "this should not",
+        );
+    }
+
+    #[test]
+    fn it_supports_strnum_in_if_condition_one() {
+        utils::assert_input_with_data(
+            "{if ($1) print \"should print\"; else print \"this should not\";}",
+            "1",
+            "should print",
+        );
+    }
+
+    #[test]
+    fn it_supports_strnum_in_if_condition_zero() {
+        utils::assert_input_with_data(
+            "{if ($1) print \"should print\"; else print \"this should not\";}",
+            "0",
+            "this should not",
+        );
+    }
+
+    #[test]
     fn it_supports_multiple_statements_in_the_else() {
         utils::assert_input("{if (0) print \"I should not print\"; else { foo = 2; print \"Should execute this many lines in else: \" foo; }}",
                             "Should execute this many lines in else: 2");

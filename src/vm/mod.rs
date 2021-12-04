@@ -143,15 +143,15 @@ impl VM {
                     }
                 }
                 OpCode::JumpIfFalse(offset1, offset2) => {
-                    let if_result = self.peek(0).num_value() != 0.0;
-                    if !if_result {
+                    let condition_result = self.peek(0).truthy_value();
+                    if !condition_result {
                         let offset = (offset1 >> 8) | offset2;
                         self.ip += offset;
                     }
                 }
                 OpCode::JumpIfTrue(offset1, offset2) => {
-                    let if_result = self.peek(0).num_value() != 0.0;
-                    if if_result {
+                    let condition_result = self.peek(0).num_value() != 0.0;
+                    if condition_result {
                         // the top of the stack may not yield a one, force it
                         self.stack.pop();
                         self.stack.push(Value::Number(1.0));
