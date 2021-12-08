@@ -57,9 +57,8 @@ mod variable_tests {
     // TODO: Validate that assignment does not work for cases like:
     // utils::assert_input("{a=2;b=3;c=7;d=11;print a*b=c+d;}", "Error at \'TODO: This is a shortsighted part of the lexeme\': Expect \';\' at the end of a statement.");
 
-    // TODO Re-enable when comma support is added
-    // #[test]
-    // fn allows_assignment_in_print_statement() {
-    //     utils::assert_input("{print foo=3,2;print foo;}", "3 2\n3");
-    // }
+    #[test]
+    fn allows_assignment_in_print_statement_w_comma_operator() {
+        utils::assert_input("{print foo=3,2;print foo;}", "3 2\n3");
+    }
 }
