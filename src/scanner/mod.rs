@@ -63,7 +63,11 @@ impl Scanner {
                 }
                 ',' => {
                     Scanner::report_scanned_character(ch, &TokenType::Comma);
-                    Scanner::check_and_emit_comma_operator(&mut tokens, current_line);
+                    tokens.push(Token {
+                        lexeme: None,
+                        token_type: &TokenType::Comma,
+                        line: current_line,
+                    });
                 }
                 '#' => {
                     // consume the rest of the line, as we've found a comment
@@ -407,40 +411,6 @@ impl Scanner {
         }
 
         &expected_char == current_char.unwrap()
-    }
-
-    /// Checks to see if a synthetic concatenation token should be emitted or not for a comma
-    ///
-    /// # Arguments
-    /// - `tokens` the stream of tokens that have been emitter thus far
-    /// - `current_line` the current line number
-    fn check_and_emit_comma_operator(tokens: &mut Vec<Token>, current_line: i32) {
-        if let Some(last_token_type) = tokens.last() {
-            match &last_token_type.token_type {
-                // something like `print ,123;` is not permitted
-                TokenType::Number
-                | TokenType::DoubleQuote
-                | TokenType::Identifier
-                | TokenType::RightParenthesis => {
-                    tokens.push(Token {
-                        lexeme: None,
-                        token_type: &TokenType::StringConcat,
-                        line: current_line,
-                    });
-                    tokens.push(Token {
-                        lexeme: Option::Some(String::from(" ")),
-                        token_type: &TokenType::DoubleQuote,
-                        line: current_line,
-                    });
-                    tokens.push(Token {
-                        lexeme: None,
-                        token_type: &TokenType::StringConcat,
-                        line: current_line,
-                    });
-                }
-                _ => (),
-            }
-        }
     }
 
     // TODO: This breaks for groupings, probably other things too
@@ -860,12 +830,12 @@ mod lexing {
     }
 
     #[test]
-    fn it_parses_a_comma_as_string_concatenation() {
+    fn it_parses_a_comma() {
         let tokens = Scanner::new(String::from("1,2")).scan();
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token
-        assert_eq!(token_iter.len(), 6);
+        assert_eq!(token_iter.len(), 4);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -878,23 +848,7 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::StringConcat,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: Some(String::from(" ")),
-                token_type: &TokenType::DoubleQuote,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::StringConcat,
+                token_type: &TokenType::Comma,
                 line: 1,
             })
         );
@@ -914,7 +868,7 @@ mod lexing {
         let mut token_iter = tokens.iter();
 
         // +1 for EOF token.
-        assert_eq!(token_iter.len(), 8);
+        assert_eq!(token_iter.len(), 6);
         assert_eq!(
             token_iter.next(),
             Some(&Token {
@@ -943,23 +897,7 @@ mod lexing {
             token_iter.next(),
             Some(&Token {
                 lexeme: None,
-                token_type: &TokenType::StringConcat,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: Some(String::from(" ")),
-                token_type: &TokenType::DoubleQuote,
-                line: 1,
-            })
-        );
-        assert_eq!(
-            token_iter.next(),
-            Some(&Token {
-                lexeme: None,
-                token_type: &TokenType::StringConcat,
+                token_type: &TokenType::Comma,
                 line: 1,
             })
         );

@@ -698,7 +698,15 @@ impl<'a> Parser<'a> {
 
     fn print_expr_list(&mut self) {
         self.print_expr();
-        // TODO: | print_expr_list ',' newline_opt print_expr
+
+        while self.match_token(&TokenType::Comma) {
+            // for every comma operator, concatenate the expr that follows the comma with a space
+            // and the expr result
+            self.emit_constant(Value::String(String::from(" ")));
+            self.emit_byte(OpCode::Concatenate);
+            self.expression();
+            self.emit_byte(OpCode::Concatenate);
+        }
     }
 
     fn print_expr(&mut self) {

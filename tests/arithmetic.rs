@@ -242,7 +242,7 @@ mod arithmetic_tests {
     }
 
     #[test]
-    fn it_concatenates_using_comma() {
+    fn it_concatenates_using_comma_in_print_statement() {
         utils::assert_input("{print \"hello\",\"world\";}", "hello world");
     }
 
@@ -252,7 +252,7 @@ mod arithmetic_tests {
     }
 
     #[test]
-    fn it_concatenates_two_numbers() {
+    fn it_concatenates_two_numbers_in_print_statement() {
         utils::assert_input("{hello=23; print hello,hello;}", "23 23");
     }
 
