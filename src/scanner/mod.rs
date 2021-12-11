@@ -648,7 +648,6 @@ mod lexing {
             ("[", &TokenType::LeftSquareBracket),
             ("]", &TokenType::RightSquareBracket),
             (";", &TokenType::Semicolon),
-            // TODO: NEWLINE
             ("+", &TokenType::Plus),
             ("-", &TokenType::Minus),
             ("*", &TokenType::Star),

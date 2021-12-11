@@ -52,7 +52,6 @@ pub enum TokenType {
     RightSquareBracket,
     Comma,
     Semicolon,
-    // TODO: NEWLINE
     Plus,
     Minus,
     Star,

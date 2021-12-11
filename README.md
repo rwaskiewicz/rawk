@@ -29,14 +29,9 @@ Second is bigger
 First is bigger
 ```
 
-At this time, only single line programs are supported in the REPL in the REPL are supported. Take 'fizzbuzz' for 
-example:
+Multi-line programs are supported in the REPL. Take 'fizzbuzz' for example:
 ```awk
-{i=0; while (i < 100) { i=i+1; is_three_div = (i % 3 == 0); is_five_div = (i % 5 == 0); if (is_three_div && is_five_div) { print "fizzbuzz"; } else if (is_three_div) { print "fizz"; } else if (is_five_div) { print "buzz"; } else { print i; }}}
-```
-which, when split into multiple lines, is:
-```awk
-{
+cargo run -- '{
     i=0;
     while (i < 100) {
         i=i+1;
@@ -52,31 +47,24 @@ which, when split into multiple lines, is:
             print i;
         }
     }
-}
+}'
 ```
 
-Or with string concatenation: 
+Or with string concatenation:
 ```awk
-{i=0; while (i < 100) { result = ""; i=i+1; if (i % 3 == 0) { result = "fizz"; } if (i % 5 == 0) { result = result "buzz"; } if (!(i % 3 == 0) && !(i % 5 == 0)){ result=i; } print result; }}
-```
-```awk
-{
-    i=0; 
-    while (i < 100) {
+cargo run -- '{
+    for (i=0; i<=100; i=i+1) {
       result = "";
-      i=i+1;
       if (i % 3 == 0) { 
         result = "fizz";
-      } 
-      if (i % 5 == 0) { 
+      } else if (i % 5 == 0) {
         result = result "buzz";
-      } 
-      if (!(i % 3 == 0) && !(i % 5 == 0)){
-        result=i;
+      } else {
+        result = i;
       }
       print result;
     }
-}
+}'
 ```
 
 ### Logging
