@@ -68,7 +68,7 @@ impl VM {
                 OpCode::NotEqual => self.comparison_op(&instruction),
                 OpCode::Add => self.arithmetic_op(&instruction),
                 OpCode::Subtract => self.arithmetic_op(&instruction),
-                OpCode::Multiply => self.arithmetic_op(&instruction),
+                            OpCode::Multiply => self.arithmetic_op(&instruction),
                 OpCode::Divide => self.arithmetic_op(&instruction),
                 OpCode::Modulus => self.arithmetic_op(&instruction),
                 OpCode::Exponentiation => self.arithmetic_op(&instruction),
