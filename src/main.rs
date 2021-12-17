@@ -1,23 +1,32 @@
-use clap::{App, Arg};
+use clap::{App, Arg, ArgMatches};
 use env_logger::{Builder, Env};
 use log::LevelFilter;
 use rawk::runtime_config::RuntimeConfig;
+use std::error::Error;
+use std::fmt::Debug;
+use std::fs;
 
-fn main() {
+#[derive(Debug)]
+enum TempAwkReadFileError {
+    FileDoesNotExist,
+}
+
+const PROGRAM_KEY: &str = "program";
+const PROGRAM_FILE_KEY: &str = "file";
+
+fn main() -> Result<(), Box<dyn Error>> {
     Builder::from_env(Env::default().default_filter_or("info"))
         .format_timestamp(None)
         .filter_module("rustyline", LevelFilter::Error)
         .init();
 
     const VERSION_KEY: &str = "version";
-    const PROGRAM_KEY: &str = "program";
     const QUICK_KEY: &str = "quick";
     const EVAL_KEY: &str = "eval";
     const FIELD_SEPARATOR_KEY: &str = "field_separator";
-    const FILE_KEY: &str = "file";
 
     // https://www.gnu.org/software/gawk/manual/html_node/Options.html
-    let matches = App::new("r-awk")
+    let cmd_line_matches = App::new("r-awk")
         .version("0.0.1")
         .about("awk, implemented in Rust")
         .arg(
@@ -29,12 +38,14 @@ fn main() {
                 .help("Determine the current version of r-awk"),
         )
         .arg(
-            Arg::with_name(FILE_KEY)
+            Arg::with_name(PROGRAM_FILE_KEY)
                 .short("f")
-                .long(FILE_KEY)
+                .long(PROGRAM_FILE_KEY)
                 .takes_value(true)
                 .required(false)
-                .help("Runs an awk file"),
+                .multiple(true)
+                .number_of_values(1)
+                .help("Runs an awk program"),
         )
         .arg(
             Arg::with_name(PROGRAM_KEY).index(1), // note this is the first positional argument, not the first argument as a whole
@@ -66,29 +77,61 @@ fn main() {
         )
         .get_matches();
 
-    if matches.is_present(VERSION_KEY) || !matches.is_present(PROGRAM_KEY) {
+    if cmd_line_matches.is_present(VERSION_KEY)
+        || (!cmd_line_matches.is_present(PROGRAM_KEY)
+            && !cmd_line_matches.is_present(PROGRAM_FILE_KEY))
+    {
         println!(
             "{} version {}",
             env!("CARGO_PKG_NAME"),
             env!("CARGO_PKG_VERSION")
         );
-        return;
+        return Ok(());
     }
 
-    let program = matches
-        .value_of(PROGRAM_KEY)
-        .expect("awk program default is unspecified");
-    let field_separator = matches
+    let program = get_awk_program(&cmd_line_matches);
+
+    let field_separator = cmd_line_matches
         .value_of(FIELD_SEPARATOR_KEY)
         .map(|separator| separator.to_string())
         .expect("awk file separator default is unspecified");
-    let file_name = matches.value_of(FILE_KEY).map(|name| name.to_string());
 
     let config: RuntimeConfig = RuntimeConfig::new(
-        file_name,
+        None,
         field_separator,
-        matches.is_present(EVAL_KEY),
-        matches.is_present(QUICK_KEY),
+        cmd_line_matches.is_present(EVAL_KEY),
+        cmd_line_matches.is_present(QUICK_KEY),
     );
-    rawk::run_program(program, config);
+    rawk::run_program(&program, config);
+    Ok(())
+}
+
+/// Retrieve an awk program from the command line
+///
+/// A program can be provided as a single argument from the command line, or through one or more
+/// usages of the `-f progfile` flag, where `progfile` is the path to the awk program to run. if
+/// more than one instance of `-f progfile` is provided, each `progfile` shall be read in the order
+/// they are declared and concatenated to previously read `progfile`s
+///
+/// # Arguments
+/// - `cmd_line_matches` the matched command line arguments provided by the user at runtime
+///
+/// # Return value
+/// - The awk program to run
+fn get_awk_program(cmd_line_matches: &ArgMatches) -> String {
+    let mut program = String::new();
+
+    if let Some(provided_awk_filepaths) = cmd_line_matches.values_of(PROGRAM_FILE_KEY) {
+        for awk_filepath in provided_awk_filepaths {
+            // TODO: Support for '-' as a special filename
+            let contents = match fs::read_to_string(awk_filepath) {
+                Ok(contents) => contents,
+                Err(_) => panic!("{:?}", TempAwkReadFileError::FileDoesNotExist),
+            };
+            program.push_str(contents.as_str());
+        }
+    } else {
+        program = cmd_line_matches.value_of(PROGRAM_KEY).unwrap().into();
+    }
+    program
 }
