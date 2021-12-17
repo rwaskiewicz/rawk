@@ -40,7 +40,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
         let _result = vm.interpret(&tokens, &[]);
-    } else if runtime_config.file_name.is_none() {
+    } else if runtime_config.data_file_path.is_none() {
         loop {
             let data_received = read_user_data_from_terminal();
             let data_to_eval = split_user_data(&runtime_config.field_separator, data_received);
