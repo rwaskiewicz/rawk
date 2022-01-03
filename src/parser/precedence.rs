@@ -47,3 +47,112 @@ impl Precedence {
         }
     }
 }
+
+#[cfg(test)]
+mod precedence {
+    use super::*;
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_none() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::None),
+            Precedence::Assignment
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_assignment() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Assignment),
+            Precedence::Conditional
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_conditional() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Conditional),
+            Precedence::LogicalOr
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_logical_or() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::LogicalOr),
+            Precedence::LogicalAnd
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_logical_and() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::LogicalAnd),
+            Precedence::Comparison
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_comparison() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Comparison),
+            Precedence::Concatenation
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_concatenation() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Concatenation),
+            Precedence::Term
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_term() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Term),
+            Precedence::Factor
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_factor() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Factor),
+            Precedence::Unary
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_unary() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Unary),
+            Precedence::Exponentiation
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_exponentiation() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Exponentiation),
+            Precedence::FieldVariable
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_field_variable() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::FieldVariable),
+            Precedence::Primary
+        );
+    }
+
+    #[test]
+    fn next_precedence_returns_correct_val_for_primary() {
+        assert_eq!(
+            Precedence::next_precedence(Precedence::Primary),
+            Precedence::Primary
+        );
+    }
+}
