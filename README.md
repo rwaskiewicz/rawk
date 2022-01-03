@@ -6,7 +6,7 @@ a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rus
 The minimum version required to run r-awk can be found under the `rust-version` key in the project's 
 [`Cargo.toml`](./Cargo.toml) file.
 
-At this time, only running a REPL is supported, as the project is in active development. Like a real awk, this r-awk
+At this time, running a REPL is fully supported and limited support for awk file reading. Like a real awk, this r-awk
 will take a single program from the STDIN when invoked. It then will prompt for input to serve as the data that is fed
 into the program. The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
 [field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) with a comma (,) as a
@@ -65,6 +65,13 @@ cargo run -- '{
       print result;
     }
 }'
+```
+
+Reading an awk program from a file:
+```commandline
+cargo run -- -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
+IN: alice 40 25
+OUT: alice 40 25
 ```
 
 ### Logging
