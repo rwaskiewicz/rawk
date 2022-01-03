@@ -4,9 +4,11 @@
 //! "Crafting Interpreters" in the second half of the book.
 
 mod parse_rules;
+mod precedence;
 
 use crate::chunk::{Chunk, OpCode};
-use crate::parser::parse_rules::{Associativity, Precedence};
+use crate::parser::parse_rules::Associativity;
+use crate::parser::precedence::Precedence;
 use crate::token::token_type::TokenType;
 use crate::token::Token;
 use crate::value::Value;
