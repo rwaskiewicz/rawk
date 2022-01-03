@@ -3,11 +3,12 @@
 //! The parser is implemented as a Pratt Parser, and is heavily modeled after the one given in
 //! "Crafting Interpreters" in the second half of the book.
 
+mod associativity;
 mod parse_rules;
 mod precedence;
 
 use crate::chunk::{Chunk, OpCode};
-use crate::parser::parse_rules::Associativity;
+use crate::parser::associativity::Associativity;
 use crate::parser::precedence::Precedence;
 use crate::token::token_type::TokenType;
 use crate::token::Token;

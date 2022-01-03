@@ -1,14 +1,7 @@
+use crate::parser::associativity::Associativity;
 use crate::parser::precedence::Precedence;
 use crate::parser::Parser;
 use crate::TokenType;
-
-/// Enum describing associativity of items in the grammar
-#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
-pub enum Associativity {
-    NA,
-    Left,
-    Right,
-}
 
 /// Type describing functions that will be invoked at parse time.
 ///
