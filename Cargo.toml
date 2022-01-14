@@ -2,7 +2,7 @@
 name = "rawk"
 version = "0.1.0"
 authors = ["Ryan Waskiewicz <ryanwaskiewicz@gmail.com>"]
-rust-version = "1.57.0"
+rust-version = "1.58.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

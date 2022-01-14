@@ -46,7 +46,7 @@ impl VM {
             match instruction {
                 OpCode::OpPrint => match self.stack.pop() {
                     Some(val) => {
-                        println!("{}", val.to_string());
+                        println!("{}", val);
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");
