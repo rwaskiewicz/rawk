@@ -12,14 +12,7 @@ mod entrypoint {
             None,
             vec!["-V"],
             None,
-            Some(
-                format!(
-                    "{} version {}",
-                    env!("CARGO_PKG_NAME"),
-                    env!("CARGO_PKG_VERSION")
-                )
-                .as_str(),
-            ),
+            Some(format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str()),
         );
     }
 
@@ -29,14 +22,7 @@ mod entrypoint {
             None,
             vec![],
             None,
-            Some(
-                format!(
-                    "{} version {}",
-                    env!("CARGO_PKG_NAME"),
-                    env!("CARGO_PKG_VERSION")
-                )
-                .as_str(),
-            ),
+            Some(format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str()),
         );
     }
 

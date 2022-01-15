@@ -26,50 +26,54 @@ fn main() -> Result<(), Box<dyn Error>> {
     const FIELD_SEPARATOR_KEY: &str = "field_separator";
 
     // https://www.gnu.org/software/gawk/manual/html_node/Options.html
-    let cmd_line_matches = App::new("r-awk")
-        .version("0.0.1")
-        .about("awk, implemented in Rust")
+    let cmd_line_app = App::new(env!("CARGO_PKG_NAME"))
+        .version(env!("CARGO_PKG_VERSION"))
+        .about("awk, implemented in Rust");
+
+    let version_info = cmd_line_app.render_version();
+
+    let cmd_line_matches = cmd_line_app
         .arg(
-            Arg::with_name(VERSION_KEY)
-                .short("V")
+            Arg::new(VERSION_KEY)
+                .short('V')
                 .long(VERSION_KEY)
                 .takes_value(false)
                 .required(false)
                 .help("Determine the current version of r-awk"),
         )
         .arg(
-            Arg::with_name(PROGRAM_FILE_KEY)
-                .short("f")
+            Arg::new(PROGRAM_FILE_KEY)
+                .short('f')
                 .long(PROGRAM_FILE_KEY)
                 .takes_value(true)
                 .required(false)
-                .multiple(true)
+                .multiple_occurrences(true)
                 .number_of_values(1)
                 .help("Runs an awk program"),
         )
         .arg(
-            Arg::with_name(PROGRAM_KEY).index(1), // note this is the first positional argument, not the first argument as a whole
+            Arg::new(PROGRAM_KEY).index(1), // note this is the first positional argument, not the first argument as a whole
         )
         .arg(
             // TODO: Remove this when `BEGIN` is implemented. We could use -w, but this is quicker
-            Arg::with_name(QUICK_KEY)
-                .short("q")
+            Arg::new(QUICK_KEY)
+                .short('q')
                 .long(QUICK_KEY)
                 .takes_value(false)
                 .required(false)
                 .help("Runs a single line of awk code without data, then terminates"),
         )
         .arg(
-            Arg::with_name(EVAL_KEY)
-                .short("k") // '-e' is taken already...
+            Arg::new(EVAL_KEY)
+                .short('k') // '-e' is taken already...
                 .long(EVAL_KEY)
                 .takes_value(false)
                 .required(false)
                 .help("Runs a single line of awk code, then terminates"),
         )
         .arg(
-            Arg::with_name(FIELD_SEPARATOR_KEY)
-                .short("F")
+            Arg::new(FIELD_SEPARATOR_KEY)
+                .short('F')
                 .takes_value(true)
                 .required(false)
                 .default_value(" ")
@@ -77,15 +81,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         )
         .get_matches();
 
-    if cmd_line_matches.is_present(VERSION_KEY)
-        || (!cmd_line_matches.is_present(PROGRAM_KEY)
-            && !cmd_line_matches.is_present(PROGRAM_FILE_KEY))
-    {
-        println!(
-            "{} version {}",
-            env!("CARGO_PKG_NAME"),
-            env!("CARGO_PKG_VERSION")
-        );
+    if !cmd_line_matches.is_present(PROGRAM_KEY) && !cmd_line_matches.is_present(PROGRAM_FILE_KEY) {
+        // clap handles version flags itself, use post-matching results to handle other cases where
+        // we only wish to print the version info
+        println!("{}", version_info.trim());
         return Ok(());
     }
 
