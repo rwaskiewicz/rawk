@@ -8,11 +8,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "2.33.0"
+clap = "2.34.0"
 env_logger = "0.9.0"
 log = "0.4.14"
-rustyline = "9.0.0"
+rustyline = "9.1.2"
 
 [dev-dependencies]
-assert_cmd = "2.0.2"
-predicates = "2.0.3"
+assert_cmd = "2.0.4"
+predicates = "2.1.1"
