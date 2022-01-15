@@ -1,7 +1,7 @@
 //! Module describing the various operations the VM can take with various debugging utilities
 
 use crate::value;
-use crate::value::Value;
+#[cfg(debug_assertions)]
 use log::debug;
 
 // TODO: Look further into byte alignment
@@ -94,6 +94,7 @@ impl Chunk {
     ///
     /// # Arguments
     /// - `name` a name to give the chunk while debugging for readability/understanding purposes
+    #[cfg(debug_assertions)]
     pub fn disassemble_chunk(&self, name: &str) {
         debug!("== {} ==", name);
 
@@ -108,7 +109,7 @@ impl Chunk {
     ///
     /// # Arguments
     /// - `offset` the offset in the chunk to disassemble
-    #[allow(unreachable_patterns)]
+    #[cfg(debug_assertions)]
     fn disassemble_instruction(&self, offset: usize) -> usize {
         let mut instruction_info: String = String::from("");
         instruction_info.push_str(format!("{:<04} ", offset).as_str());
@@ -187,6 +188,7 @@ impl Chunk {
     ///
     /// # Return value
     /// A new offset to read the next instruction from
+    #[cfg(debug_assertions)]
     fn simple_instruction(prelude: &str, name: &str, offset: usize) -> usize {
         debug!("{} {}", prelude, name);
         offset + 1
@@ -204,12 +206,13 @@ impl Chunk {
     ///
     /// # Return value
     /// A new offset to read the next instruction from
+    #[cfg(debug_assertions)]
     fn constant_instruction(
         &self,
         prelude: &str,
         name: &str,
         offset: usize,
-        value: &Value,
+        value: &value::Value,
     ) -> usize {
         debug!("{} {} {}", prelude, name, value);
         offset + 1
