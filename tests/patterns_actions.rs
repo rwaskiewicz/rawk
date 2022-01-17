@@ -1,118 +1,126 @@
 //! Integration tests for logical operations
 
-mod utils;
+pub mod utils;
 
 #[cfg(test)]
 mod patterns_actions {
     use crate::utils;
 
     #[test]
-    fn it_supports_a_pattern_only() {
-        utils::run_rawk(
-            Some("1 > 0"),
-            vec![],
-            Some("Hello World"),
-            Some("Hello World"),
-        );
+    fn it_supports_an_awk_pattern_with_no_action() {
+        utils::CodeRunner::init()
+            .program("1 > 0")
+            .stdin_data("Hello World")
+            .expect_output("Hello World")
+            .assert()
     }
 
     #[test]
-    fn it_supports_skips_implicit_action() {
-        utils::run_rawk(Some("1 - 1"), vec!["-q"], Some("Hello"), None);
+    fn it_supports_skipping_an_implicit_action() {
+        utils::CodeRunner::init()
+            .program("1 - 1")
+            .cli_options(vec!["-q"])
+            .stdin_data("Hello")
+            .expect_empty_output()
+            .assert()
     }
 
     #[test]
     fn it_allows_more_than_one_action() {
-        utils::run_rawk(
-            Some("{print \"Hello\";}{print \"World!\";}"),
-            vec!["-q"],
-            None,
-            Some("Hello\nWorld!"),
-        );
+        utils::CodeRunner::init()
+            .program("{print \"Hello\";}{print \"World!\";}")
+            .cli_options(vec!["-q"])
+            .expect_output("Hello\nWorld!")
+            .assert()
     }
 
     #[test]
     fn it_correctly_manages_data_between_actions() {
-        utils::run_rawk(
-            Some("{print foo=$1;}{print foo*2;}{print foo;}"),
-            vec![],
-            Some("32"),
-            Some("32\n64\n32"),
-        );
+        utils::CodeRunner::init()
+            .program("{print foo=$1;}{print foo*2;}{print foo;}")
+            .stdin_data("32")
+            .expect_output("32\n64\n32")
+            .assert()
     }
 
     #[test]
     fn it_correctly_manages_data_between_actions_mutate() {
-        utils::run_rawk(
-            Some("{print foo=$1;}{print foo*=2;}{print foo+2;}"),
-            vec![],
-            Some("32"),
-            Some("32\n64\n66"),
-        );
+        utils::CodeRunner::init()
+            .program("{print foo=$1;}{print foo*=2;}{print foo+2;}")
+            .stdin_data("32")
+            .expect_output("32\n64\n66")
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern() {
-        utils::run_rawk(
-            Some("1 > 0 {print \"Hello\";}"),
-            vec!["-q"],
-            None,
-            Some("Hello"),
-        );
+        utils::CodeRunner::init()
+            .program("1 > 0 {print \"Hello\";}")
+            .cli_options(vec!["-q"])
+            .expect_output("Hello")
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_falsy() {
-        utils::run_rawk(Some("0 > 1 {print \"Hello\";}"), vec!["-q"], None, None);
+        utils::CodeRunner::init()
+            .program("0 > 1 {print \"Hello\";}")
+            .cli_options(vec!["-q"])
+            .expect_empty_output()
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_null_str() {
-        utils::run_rawk(Some("\"\" {print \"Hello\";}"), vec!["-q"], None, None);
+        utils::CodeRunner::init()
+            .program("\"\" {print \"Hello\";}")
+            .cli_options(vec!["-q"])
+            .expect_empty_output()
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_one() {
-        utils::run_rawk(
-            Some("1 {print \"Hello\";}"),
-            vec!["-q"],
-            None,
-            Some("Hello"),
-        );
+        utils::CodeRunner::init()
+            .program("1 {print \"Hello\";}")
+            .cli_options(vec!["-q"])
+            .expect_output("Hello")
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_zero() {
-        utils::run_rawk(Some("0 {print \"Hello\";}"), vec!["-q"], None, None);
+        utils::CodeRunner::init()
+            .program("0 {print \"Hello\";}")
+            .cli_options(vec!["-q"])
+            .expect_empty_output()
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_valid_str() {
-        utils::run_rawk(
-            Some("\"str\" {print \"Hello World\";}"),
-            vec!["-q"],
-            None,
-            Some("Hello World"),
-        );
+        utils::CodeRunner::init()
+            .program("\"str\" {print \"Hello World\";}")
+            .cli_options(vec!["-q"])
+            .expect_output("Hello World")
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_empty_assign() {
-        utils::run_rawk(
-            Some("foo=\"\" {print \"Hello World\";}"),
-            vec!["-q"],
-            None,
-            None,
-        );
+        utils::CodeRunner::init()
+            .program("foo=\"\" {print \"Hello World\";}")
+            .cli_options(vec!["-q"])
+            .expect_empty_output()
+            .assert()
     }
 
     #[test]
     fn it_supports_an_action_and_pattern_valid_assign() {
-        utils::run_rawk(
-            Some("foo=\"str\" {print \"Hello World\";}"),
-            vec!["-q"],
-            None,
-            Some("Hello World"),
-        );
+        utils::CodeRunner::init()
+            .program("foo=\"str\" {print \"Hello World\";}")
+            .cli_options(vec!["-q"])
+            .expect_output("Hello World")
+            .assert()
     }
 }

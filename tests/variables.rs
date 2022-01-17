@@ -1,6 +1,6 @@
 //! Integration tests for user defined variables
 
-mod utils;
+pub mod utils;
 
 #[cfg(test)]
 mod variable_tests {
@@ -8,84 +8,91 @@ mod variable_tests {
 
     #[test]
     fn it_stores_a_value_and_reads_it_back() {
-        utils::run_rawk(
-            Some("{price = \"4.99\"; print price;}"),
-            vec!["-q"],
-            None,
-            Some("4.99"),
-        );
+        utils::CodeRunner::init()
+            .program("{price = \"4.99\"; print price;}")
+            .cli_options(vec!["-q"])
+            .expect_output("4.99")
+            .assert()
     }
 
     #[test]
     fn it_stores_and_updates_a_value() {
-        utils::run_rawk(
-            Some("{price = \"4.99\"; price = price + 1; print price;}"),
-            vec!["-q"],
-            None,
-            Some("5.99"),
-        );
+        utils::CodeRunner::init()
+            .program("{price = \"4.99\"; price = price + 1; print price;}")
+            .cli_options(vec!["-q"])
+            .expect_output("5.99")
+            .assert()
     }
 
     #[test]
     fn it_reassigns_a_value() {
-        utils::run_rawk(
-            Some("{price = \"4.99\"; price = 2; print price;}"),
-            vec!["-q"],
-            None,
-            Some("2"),
-        );
+        utils::CodeRunner::init()
+            .program("{price = \"4.99\"; price = 2; print price;}")
+            .cli_options(vec!["-q"])
+            .expect_output("2")
+            .assert()
     }
 
     #[test]
     fn defines_a_variable_from_mention() {
-        utils::run_rawk(Some("{print price;}"), vec!["-q"], None, Some(""));
+        utils::CodeRunner::init()
+            .program("{print price;}")
+            .cli_options(vec!["-q"])
+            .expect_output("")
+            .assert()
     }
 
     #[test]
     fn defines_an_empty_value() {
-        utils::run_rawk(Some("{price; print price;}"), vec!["-q"], None, Some(""));
+        utils::CodeRunner::init()
+            .program("{price; print price;}")
+            .cli_options(vec!["-q"])
+            .expect_output("")
+            .assert()
     }
 
     #[test]
     fn creates_a_new_var_from_simple_copy() {
-        utils::run_rawk(
-            Some("{foo = 23; bar = foo; print bar;}"),
-            vec!["-q"],
-            None,
-            Some("23"),
-        );
+        utils::CodeRunner::init()
+            .program("{foo = 23; bar = foo; print bar;}")
+            .cli_options(vec!["-q"])
+            .expect_output("23")
+            .assert()
     }
 
     #[test]
     fn creates_a_new_var_from_existing() {
-        utils::run_rawk(
-            Some("{foo = 23; bar = foo * foo; print bar;}"),
-            vec!["-q"],
-            None,
-            Some("529"),
-        );
+        utils::CodeRunner::init()
+            .program("{foo = 23; bar = foo * foo; print bar;}")
+            .cli_options(vec!["-q"])
+            .expect_output("529")
+            .assert()
     }
 
     #[test]
     fn allows_assignment_in_print_statement() {
-        utils::run_rawk(Some("{print foo=3;}"), vec!["-q"], None, Some("3"));
+        utils::CodeRunner::init()
+            .program("{print foo=3;}")
+            .cli_options(vec!["-q"])
+            .expect_output("3")
+            .assert()
     }
 
     #[test]
     fn allows_assignment_in_print_statement_with_premature_ref_arithmetic() {
-        utils::run_rawk(Some("{print foo=3*2+foo;}"), vec!["-q"], None, Some("6"));
+        utils::CodeRunner::init()
+            .program("{print foo=3*2+foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("6")
+            .assert()
     }
-
-    // TODO: Validate that assignment does not work for cases like:
-    // utils::run_rawk(Some("{a=2;b=3;c=7;d=11;print a*b=c+d;}"), vec!["-q"], None,  Some("Error at \'TODO: This is a shortsighted part of the lexeme\': Expect \';\' at the end of a statement."));
 
     #[test]
     fn allows_assignment_in_print_statement_w_comma_operator() {
-        utils::run_rawk(
-            Some("{print foo=3,2;print foo;}"),
-            vec!["-q"],
-            None,
-            Some("3 2\n3"),
-        );
+        utils::CodeRunner::init()
+            .program("{print foo=3,2;print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("3 2\n3")
+            .assert()
     }
 }

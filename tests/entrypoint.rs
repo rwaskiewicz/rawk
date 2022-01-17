@@ -1,6 +1,6 @@
 //! Integration tests for the entrypoint of the CLI
 
-mod utils;
+pub mod utils;
 
 #[cfg(test)]
 mod entrypoint {
@@ -8,79 +8,75 @@ mod entrypoint {
 
     #[test]
     fn prints_version_info_when_the_version_flag_provided() {
-        utils::run_rawk(
-            None,
-            vec!["-V"],
-            None,
-            Some(format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str()),
-        );
+        utils::CodeRunner::init()
+            .cli_options(vec!["-V"])
+            .expect_output(
+                format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str(),
+            )
+            .assert();
     }
 
     #[test]
     fn prints_version_info_neither_program_nor_file_flag_provided() {
-        utils::run_rawk(
-            None,
-            vec![],
-            None,
-            Some(format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str()),
-        );
+        utils::CodeRunner::init()
+            .expect_output(
+                format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str(),
+            )
+            .assert();
     }
 
     #[test]
     fn prints_nothing_when_empty_program_provided() {
-        // mark this as a 'quick' test to prevent us from awaiting user input
-        utils::run_rawk(Some(""), vec!["-q"], None, None);
+        utils::CodeRunner::init()
+            .program("")
+            // mark this as a 'quick' test to prevent us from awaiting user input
+            .cli_options(vec!["-q"])
+            .expect_empty_output()
+            .assert();
     }
 
     #[test]
     fn runs_an_awk_program_from_file() {
-        utils::run_rawk(
-            None,
-            vec![
+        utils::CodeRunner::init()
+            .cli_options(vec![
                 "-f",
                 "./awk_examples/field_variables/it_prints_all_line_parts.awk",
-            ],
-            Some("Alice 40 25"),
-            Some("Alice 40 25"),
-        );
+            ])
+            .stdin_data("Alice 40 25")
+            .expect_output("Alice 40 25")
+            .assert();
     }
 
     #[test]
     fn runs_an_awk_program_from_multiple_files() {
-        utils::run_rawk(
-            None,
-            vec![
+        utils::CodeRunner::init()
+            .cli_options(vec![
                 "-f",
                 "./awk_examples/field_variables/it_prints_all_line_parts.awk",
                 "-f",
                 "./awk_examples/field_variables/it_prints_line_parts.awk",
-            ],
-            Some("Alice 40 25"),
-            Some("Alice 40 25\n40 25"),
-        );
+            ])
+            .stdin_data("Alice 40 25")
+            .expect_output("Alice 40 25\n40 25")
+            .assert();
     }
 
     #[test]
-    #[should_panic(expected = "FileDoesNotExist")]
     fn panics_for_a_non_existent_file() {
-        // TODO: Fix test util to not require Some() for expected output
-        utils::run_rawk(None, vec!["-f", "./does_not_exist.awk"], None, Some(""));
+        utils::CodeRunner::init()
+            .cli_options(vec!["-f", "./does_not_exist.awk"])
+            .assert_fail();
     }
 
     #[test]
-    #[should_panic(expected = "FileDoesNotExist")]
     fn panics_for_a_non_existent_file_many_given() {
-        // TODO: Fix test util to not require Some() for expected output
-        utils::run_rawk(
-            None,
-            vec![
+        utils::CodeRunner::init()
+            .cli_options(vec![
                 "-f",
                 "./awk_examples/field_variables/it_prints_all_line_parts.awk",
                 "-f",
                 "./does_not_exist.awk",
-            ],
-            None,
-            Some(""),
-        );
+            ])
+            .assert_fail();
     }
 }
