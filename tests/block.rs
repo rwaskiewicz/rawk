@@ -12,7 +12,7 @@ mod block_tests {
             .program("{foo = 123; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("123")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -21,7 +21,7 @@ mod block_tests {
             .program("{foo = 2; { foo = 3; } print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("3")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -30,6 +30,6 @@ mod block_tests {
             .program("{foo = 2; { bar = 3; } print foo + bar;}")
             .cli_options(vec!["-q"])
             .expect_output("5")
-            .assert();
+            .assert()
     }
 }

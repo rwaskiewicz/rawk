@@ -13,7 +13,7 @@ mod entrypoint {
             .expect_output(
                 format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str(),
             )
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -22,7 +22,7 @@ mod entrypoint {
             .expect_output(
                 format!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")).as_str(),
             )
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod entrypoint {
             // mark this as a 'quick' test to prevent us from awaiting user input
             .cli_options(vec!["-q"])
             .expect_empty_output()
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -44,7 +44,7 @@ mod entrypoint {
             ])
             .stdin_data("Alice 40 25")
             .expect_output("Alice 40 25")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -58,7 +58,7 @@ mod entrypoint {
             ])
             .stdin_data("Alice 40 25")
             .expect_output("Alice 40 25\n40 25")
-            .assert();
+            .assert()
     }
 
     #[test]

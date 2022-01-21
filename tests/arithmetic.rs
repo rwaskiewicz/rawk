@@ -66,7 +66,7 @@ mod arithmetic_tests {
             .program("{print 3^2^3;}")
             .cli_options(vec!["-q"])
             .expect_output("6561")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -75,7 +75,7 @@ mod arithmetic_tests {
             .program("{print -9;}")
             .cli_options(vec!["-q"])
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -84,7 +84,7 @@ mod arithmetic_tests {
             .program("{print -$1;}")
             .stdin_data("9")
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -94,7 +94,7 @@ mod arithmetic_tests {
             .program("{print -0;}")
             .cli_options(vec!["-q"])
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -104,7 +104,7 @@ mod arithmetic_tests {
             .program("{print -$1;}")
             .stdin_data("0")
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -113,7 +113,7 @@ mod arithmetic_tests {
             .program("{print -+9;}")
             .cli_options(vec!["-q"])
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -122,7 +122,7 @@ mod arithmetic_tests {
             .program("{print -+$1;}")
             .stdin_data("9")
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -131,7 +131,7 @@ mod arithmetic_tests {
             .program("{print +-9;}")
             .cli_options(vec!["-q"])
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -140,7 +140,7 @@ mod arithmetic_tests {
             .program("{print +-$1;}")
             .stdin_data("9")
             .expect_output("-9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -149,7 +149,7 @@ mod arithmetic_tests {
             .program("{print +0;}")
             .cli_options(vec!["-q"])
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -158,7 +158,7 @@ mod arithmetic_tests {
             .program("{print +$1;}")
             .stdin_data("0")
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -167,7 +167,7 @@ mod arithmetic_tests {
             .program("{print 2.14 + \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("3.14")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -176,7 +176,7 @@ mod arithmetic_tests {
             .program("{print 2.14 + \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("3.38")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -185,7 +185,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" + 2;}")
             .cli_options(vec!["-q"])
             .expect_output("4")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -194,7 +194,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" + 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("6.76")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -203,7 +203,7 @@ mod arithmetic_tests {
             .program("{print 2.14 - \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("1.1400001")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -212,7 +212,7 @@ mod arithmetic_tests {
             .program("{print 2.14 - \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("0.9000001")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -221,7 +221,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" - 2;}")
             .cli_options(vec!["-q"])
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -230,7 +230,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" - 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("4.34")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -239,7 +239,7 @@ mod arithmetic_tests {
             .program("{print 2.14 * \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("2.14")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -248,7 +248,7 @@ mod arithmetic_tests {
             .program("{print 2.14 * \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("2.6536002")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -257,7 +257,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" * 2;}")
             .cli_options(vec!["-q"])
             .expect_output("4")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -266,7 +266,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" * 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("6.7155004")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -275,7 +275,7 @@ mod arithmetic_tests {
             .program("{print 2.14 / \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("2.14")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -284,7 +284,7 @@ mod arithmetic_tests {
             .program("{print 2.14 / \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("1.7258065")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -293,7 +293,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" / 2;}")
             .cli_options(vec!["-q"])
             .expect_output("1")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -302,7 +302,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" / 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("4.5867767")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -311,7 +311,7 @@ mod arithmetic_tests {
             .program("{print 2.14 % \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("0.1400001")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -320,7 +320,7 @@ mod arithmetic_tests {
             .program("{print 2.14 % \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("0.9000001")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -329,7 +329,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" % 2;}")
             .cli_options(vec!["-q"])
             .expect_output("0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -338,7 +338,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" % 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("0.71000004")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -347,7 +347,7 @@ mod arithmetic_tests {
             .program("{print 2.14 ^ \"1Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("2.14")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -356,7 +356,7 @@ mod arithmetic_tests {
             .program("{print 2.14 ^ \"1.24Hello\";}")
             .cli_options(vec!["-q"])
             .expect_output("2.5686984")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -365,7 +365,7 @@ mod arithmetic_tests {
             .program("{print \"02Hello\" ^ 2;}")
             .cli_options(vec!["-q"])
             .expect_output("4")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -374,7 +374,7 @@ mod arithmetic_tests {
             .program("{print \"5.55Hello\" ^ 1.21;}")
             .cli_options(vec!["-q"])
             .expect_output("7.9541645")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -383,7 +383,7 @@ mod arithmetic_tests {
             .program("{print \"Hello\" \" World!\";}")
             .cli_options(vec!["-q"])
             .expect_output("Hello World!")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -392,7 +392,7 @@ mod arithmetic_tests {
             .program("{print \"Hello\" \" World!\" \" \" \"I come in peace!\";}")
             .cli_options(vec!["-q"])
             .expect_output("Hello World! I come in peace!")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -401,7 +401,7 @@ mod arithmetic_tests {
             .program("{print 1 \" World\";}")
             .cli_options(vec!["-q"])
             .expect_output("1 World")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -410,7 +410,7 @@ mod arithmetic_tests {
             .program("{print \"Hell\" 0;}")
             .cli_options(vec!["-q"])
             .expect_output("Hell0")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -419,7 +419,7 @@ mod arithmetic_tests {
             .program("{print 3 + \"Hello\" 4;}")
             .cli_options(vec!["-q"])
             .expect_output("34")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -428,7 +428,7 @@ mod arithmetic_tests {
             .program("{print \"hello\",\"world\";}")
             .cli_options(vec!["-q"])
             .expect_output("hello world")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -437,7 +437,7 @@ mod arithmetic_tests {
             .program("{print hello,\"world\";}")
             .cli_options(vec!["-q"])
             .expect_output(" world")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -446,7 +446,7 @@ mod arithmetic_tests {
             .program("{hello=23; print hello,hello;}")
             .cli_options(vec!["-q"])
             .expect_output("23 23")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -455,7 +455,7 @@ mod arithmetic_tests {
             .program("{foo = \"3\"; print foo * 3;}")
             .cli_options(vec!["-q"])
             .expect_output("9")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -464,7 +464,7 @@ mod arithmetic_tests {
             .program("{foo = 3; print foo \"3\";}")
             .cli_options(vec!["-q"])
             .expect_output("33")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -473,7 +473,7 @@ mod arithmetic_tests {
             .program("{zfoo=3; print \"z\" foo\"z\";}")
             .cli_options(vec!["-q"])
             .expect_output("zz")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -482,7 +482,7 @@ mod arithmetic_tests {
             .program("{zfoo=3; print \"z\" zfoo\"z\";}")
             .cli_options(vec!["-q"])
             .expect_output("z3z")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -491,7 +491,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar+=foo; print bar;}")
             .cli_options(vec!["-q"])
             .expect_output("3")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -500,7 +500,7 @@ mod arithmetic_tests {
             .program("{foo=3; foo+=foo+=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("12")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -509,7 +509,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar-=foo; print bar;}")
             .cli_options(vec!["-q"])
             .expect_output("-3")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -518,7 +518,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar=1; foo-=bar-=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("5")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -527,7 +527,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar=7; bar*=foo; print bar;}")
             .cli_options(vec!["-q"])
             .expect_output("21")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -536,7 +536,7 @@ mod arithmetic_tests {
             .program("{foo=3; foo*=foo*=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("81")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -545,7 +545,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar=6; bar/=foo; print bar;}")
             .cli_options(vec!["-q"])
             .expect_output("2")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -554,7 +554,7 @@ mod arithmetic_tests {
             .program("{foo=81; bar=9; baz=3; foo/=bar/=baz; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("27")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -563,7 +563,7 @@ mod arithmetic_tests {
             .program("{foo=3; bar=7; bar%=foo; print bar;}")
             .cli_options(vec!["-q"])
             .expect_output("1")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -572,7 +572,7 @@ mod arithmetic_tests {
             .program("{foo=7; bar=5; baz=3; foo%=bar%=baz; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("1")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -581,7 +581,7 @@ mod arithmetic_tests {
             .program("{foo=3; foo^=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("27")
-            .assert();
+            .assert()
     }
 
     #[test]
@@ -590,6 +590,6 @@ mod arithmetic_tests {
             .program("{foo=2; foo^=foo^=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("256")
-            .assert();
+            .assert()
     }
 }

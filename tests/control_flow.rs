@@ -57,7 +57,7 @@ mod control_flow {
             .program("{if (0) if (2) print \"Double if should not be reached\";}")
             .cli_options(vec!["-q"])
             .expect_empty_output()
-            .assert();
+            .assert()
     }
 
     #[test]
