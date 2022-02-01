@@ -5,6 +5,7 @@ use assert_cmd::Command;
 
 /// Runner for r-awk testing
 #[derive(Debug)]
+#[must_use]
 pub struct CodeRunner {
     program: Option<&'static str>,
     opts: Vec<&'static str>,
@@ -30,7 +31,7 @@ impl CodeRunner {
     ///
     /// This option is useful for gaining insight into what arguments are used to invoke r-awk, as
     /// well as inspecting the return status of the program invocation.
-    pub fn debug(&mut self) -> &mut Self {
+    pub fn debug(mut self) -> Self {
         self.debug = true;
         self
     }
@@ -41,7 +42,7 @@ impl CodeRunner {
     ///
     /// # Arguments
     /// - `program` the program that would have been received by the user as a positional argument
-    pub fn program(&mut self, program: &'static str) -> &mut Self {
+    pub fn program(mut self, program: &'static str) -> Self {
         self.program = Some(program);
         self
     }
@@ -52,7 +53,7 @@ impl CodeRunner {
     ///
     /// # Arguments
     /// - `opts` command line options to pass to r-awk
-    pub fn cli_options(&mut self, opts: Vec<&'static str>) -> &mut Self {
+    pub fn cli_options(mut self, opts: Vec<&'static str>) -> Self {
         self.opts.append(&mut opts.clone());
         self
     }
@@ -64,7 +65,7 @@ impl CodeRunner {
     /// # Arguments
     /// - `data` the data that would have been received from the user that the program should run
     /// against
-    pub fn stdin_data(&mut self, data: &'static str) -> &mut Self {
+    pub fn stdin_data(mut self, data: &'static str) -> Self {
         self.data = data;
         self
     }
@@ -73,7 +74,7 @@ impl CodeRunner {
     ///
     /// This method does not determine which output stream the empty string should be evaluated
     /// against. To assert against `STDOUT`, see [`assert`].
-    pub fn expect_empty_output(&mut self) -> &mut Self {
+    pub fn expect_empty_output(mut self) -> Self {
         self.expected_value = String::from("^$");
         self
     }
@@ -85,7 +86,7 @@ impl CodeRunner {
     ///
     /// # Arguments
     /// - `expected_value` the expected result to appear
-    pub fn expect_output(&mut self, expected_output: &str) -> &mut Self {
+    pub fn expect_output(mut self, expected_output: &str) -> Self {
         self.expected_value = format!("^{}\n$", expected_output);
         self
     }
@@ -94,7 +95,7 @@ impl CodeRunner {
     /// [`expect_output`]
     ///
     /// If no value was provided, assert an empty string was printed to STDOUT
-    pub fn assert(&mut self) -> () {
+    pub fn assert(mut self) {
         let mut expected_text = String::from("^$");
         if !self.expected_value.is_empty() {
             expected_text = self.expected_value.clone();
@@ -106,7 +107,7 @@ impl CodeRunner {
     }
 
     /// Runs r-awk, and asserts that command failed
-    pub fn assert_fail(&mut self) -> () {
+    pub fn assert_fail(mut self) {
         self.build_assert().failure();
     }
 
