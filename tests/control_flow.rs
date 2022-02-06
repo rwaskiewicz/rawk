@@ -431,24 +431,19 @@ mod control_flow {
 
     #[test]
     fn it_supports_do_while_loops() {
-        // utils::assert_input("i=0; do { i=i+3; } while(i<10); print i;", "12");
         utils::CodeRunner::init()
             .program("{i=0; do { i=i+3; } while(i<10); print i;}")
             .cli_options(vec!["-q"])
-            .expect_output("11")
+            .expect_output("12")
             .assert()
     }
 
     #[test]
     fn it_supports_break_in_do_while_loops() {
-        // utils::assert_input(
-        //     "i=0; do { i=i+3; if (i == 6) { break; } } while(i<10); print i;",
-        //     "6",
-        // );
         utils::CodeRunner::init()
             .program("{i=0; do { i=i+3; if (i == 6) { break; } } while(i<10); print i;}")
             .cli_options(vec!["-q"])
-            .expect_output("5") // 6
+            .expect_output("6")
             .assert()
     }
 
@@ -468,23 +463,20 @@ mod control_flow {
         // } while (i < 2);
         // print "i is", i, "and j is", j;
 
-        // utils::assert_input("i=0; j=0; do { i=i+1; do { j = j+2; break; print \"This is the j loop - this should not print\"; } while (j < 3); break; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;", "i is 1 and j is 2");
-
         utils::CodeRunner::init()
             .program("{i=0; j=0; do { i=i+1; do { j = j+2; break; print \"This is the j loop - this should not print\"; } while (j < 3); break; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 1 and j is 3") // j is 2
+            .expect_output("i is 1 and j is 2")
             .assert()
     }
 
     #[test]
     fn it_allows_continue_to_be_placed_in_do_while_loop() {
         // TODO: I'm _pretty_ sure that the continue is leaving the success case from the if's conditional on the top of the stack
-        // utils::assert_input("i=0; do { i=i+2; if (i == 2) { continue; } print \"This is the i loop - this should not print\"; } while(i<1); print \"The value of i is\", i;", "The value of i is 2")
         utils::CodeRunner::init()
             .program("{i=0; do { i=i+2; if (i == 2) { continue; } print \"This is the i loop - this should not print\"; } while(i<1); print \"The value of i is\", i;}")
             .cli_options(vec!["-q"])
-            .expect_output("The value of i is 1") // is 2
+            .expect_output("The value of i is 2")
             .assert()
     }
 
@@ -504,12 +496,10 @@ mod control_flow {
         // } while (i < 2);
         // print "i is", i, "and j is", j;
 
-        // utils::assert_input("i=0; j=0; do { i=i+1; do { j = j+1; continue; print \"This is the j loop - this should not print\"; } while (j < 3); continue; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;", "i is 2 and j is 4");
-
         utils::CodeRunner::init()
             .program("{i=0; j=0; do { i=i+1; do { j = j+1; continue; print \"This is the j loop - this should not print\"; } while (j < 3); continue; print \"This is the i loop - this should not print\"; } while(i<2); print \"i is\", i, \"and j is\", j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 2 and j is 3") // j is 4
+            .expect_output("i is 2 and j is 4")
             .assert()
     }
 
@@ -531,12 +521,10 @@ mod control_flow {
         //     print "i is",i,"j is",j;
         // } # EXPECT: i is 4 and j is 2
 
-        // utils::assert_input("i = 0; j = 0; while (i < 1) { do { j = 2; break; j = 3; } while (j <= 0); i = 4; break; i = 5; } print \"i is\",i,\"j is\",j;", "i is 4 j is 2");
-
         utils::CodeRunner::init()
             .program("{i = 0; j = 0; while (i < 1) { do { j = 2; break; j = 3; } while (j <= 0); i = 4; break; i = 5; } print \"i is\",i,\"j is\",j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 4 j is 1") // j is 2
+            .expect_output("i is 4 j is 2")
             .assert()
     }
 
@@ -558,12 +546,10 @@ mod control_flow {
         //     print "i is",i,"j is",j;
         // } # EXPECT: i is 4 and j is 2
 
-        // utils::assert_input("i = 0; j = 0; while (i < 1) { do { j = 2; continue; j = 3; } while (j <= 0); i = 4; continue; i = 5; } print \"i is\",i,\"j is\",j;", "i is 4 j is 2")
-
         utils::CodeRunner::init()
             .program("{i = 0; j = 0; while (i < 1) { do { j = 2; continue; j = 3; } while (j <= 0); i = 4; continue; i = 5; } print \"i is\",i,\"j is\",j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 4 j is 1") // j is 2
+            .expect_output("i is 4 j is 2")
             .assert()
     }
     #[test]
@@ -589,7 +575,7 @@ mod control_flow {
         utils::CodeRunner::init()
             .program("{i = 0; j = 0; do { while (i < 1) { j = 2; break; j = 3; } i = 4; break; i = 5; } while (j <= 0); print \"i is\",i,\"j is\",j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 4 j is 1") // j is 2
+            .expect_output("i is 4 j is 2")
             .assert()
     }
 
@@ -611,12 +597,10 @@ mod control_flow {
         //     print "i is",i,"j is",j;
         // } # EXPECT: i is 4 and j is 2
 
-        // utils::assert_input("i = 0; j = 0; do { while (j < 1) { j = 2; continue; j = 3; } i = 4; continue; i = 5; } while (i <= 3); print \"i is\",i,\"j is\",j;", "i is 4 j is 2");
-
         utils::CodeRunner::init()
             .program("{i = 0; j = 0; do { while (j < 1) { j = 2; continue; j = 3; } i = 4; continue; i = 5; } while (i <= 3); print \"i is\",i,\"j is\",j;}")
             .cli_options(vec!["-q"])
-            .expect_output("i is 4 j is 1") // j is 2
+            .expect_output("i is 4 j is 2")
             .assert()
     }
 
@@ -632,15 +616,10 @@ mod control_flow {
         //     print i;
         // } # EXPECT: 1
 
-        // utils::assert_input(
-        //     "i=1; do { break; i = 2; continue; } while (i>=2); print i;",
-        //     "1",
-        // );
-
         utils::CodeRunner::init()
             .program("{i=1; do { break; i = 2; continue; } while (i>=2); print i;}")
             .cli_options(vec!["-q"])
-            .expect_output("2") // 1
+            .expect_output("1")
             .assert()
     }
 
@@ -656,15 +635,10 @@ mod control_flow {
         //     print i;
         // } # EXPECT: 4
 
-        // utils::assert_input(
-        //     "i=0; do { i = i + 2; continue; break; } while (i<=2); print i;",
-        //     "4",
-        // );
-
         utils::CodeRunner::init()
             .program("{i=0; do { i = i + 2; continue; break; } while (i<=2); print i;}")
             .cli_options(vec!["-q"])
-            .expect_output("3") // 4
+            .expect_output("3")
             .assert()
     }
 
