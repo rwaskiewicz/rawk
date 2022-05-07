@@ -135,7 +135,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"==\"a\";}")
+            .program(r#"{print "a"=="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -144,7 +144,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"==\"abc\";}")
+            .program(r#"{print "abc"=="abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -153,7 +153,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"==\"A\";}")
+            .program(r#"{print "a"=="A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -162,7 +162,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"==\"aBc\";}")
+            .program(r#"{print "abc"=="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -171,7 +171,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\"==\"a\";}")
+            .program(r#"{print ""=="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -180,7 +180,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_double_equal_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\"==\"\";}")
+            .program(r#"{print "a"=="";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -189,7 +189,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"!=\"a\";}")
+            .program(r#"{print "a"!="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -198,7 +198,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"!=\"abc\";}")
+            .program(r#"{print "abc"!="abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -207,7 +207,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"!=\"A\";}")
+            .program(r#"{print "a"!="A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -216,7 +216,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"!=\"aBc\";}")
+            .program(r#"{print "abc"!="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -225,7 +225,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\"!=\"a\";}")
+            .program(r#"{print ""!="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -234,7 +234,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_not_equal_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\"!=\"\";}")
+            .program(r#"{print "a"!="";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -243,7 +243,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\">=\"a\";}")
+            .program(r#"{print "a">="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -252,7 +252,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\">=\"abc\";}")
+            .program(r#"{print "abc">="abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -261,7 +261,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\">=\"A\";}")
+            .program(r#"{print "a">="A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -270,7 +270,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\">=\"aBc\";}")
+            .program(r#"{print "abc">="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -279,7 +279,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_diff_case_multiple_char_diff_len() {
         utils::CodeRunner::init()
-            .program("{print \"a\">=\"aBc\";}")
+            .program(r#"{print "a">="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -288,7 +288,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_diff_case_multiple_char_diff_len_two() {
         utils::CodeRunner::init()
-            .program("{print \"aBc\">=\"a\";}")
+            .program(r#"{print "aBc">="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -297,7 +297,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\">=\"a\";}")
+            .program(r#"{print "">="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -306,7 +306,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_equal_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\">=\"\";}")
+            .program(r#"{print "a">="";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -315,7 +315,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\">\"a\";}")
+            .program(r#"{print "a">"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -324,7 +324,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\">\"abc\";}")
+            .program(r#"{print "abc">"abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -333,7 +333,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\">\"A\";}")
+            .program(r#"{print "a">"A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -342,7 +342,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\">\"aBc\";}")
+            .program(r#"{print "abc">"aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -351,7 +351,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_diff_case_multiple_char_diff_len() {
         utils::CodeRunner::init()
-            .program("{print \"a\">\"aBc\";}")
+            .program(r#"{print "a">"aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -360,7 +360,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_diff_case_multiple_char_diff_len_two() {
         utils::CodeRunner::init()
-            .program("{print \"aBc\">\"a\";}")
+            .program(r#"{print "aBc">"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -369,7 +369,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\">\"a\";}")
+            .program(r#"{print "">"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -378,7 +378,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_greater_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\">\"\";}")
+            .program(r#"{print "a">"";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -387,7 +387,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<=\"a\";}")
+            .program(r#"{print "a"<="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -396,7 +396,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"<=\"abc\";}")
+            .program(r#"{print "abc"<="abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -405,7 +405,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<=\"A\";}")
+            .program(r#"{print "a"<="A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -414,7 +414,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"<=\"aBc\";}")
+            .program(r#"{print "abc"<="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -423,7 +423,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_diff_case_multiple_char_diff_len() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<=\"aBc\";}")
+            .program(r#"{print "a"<="aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -432,7 +432,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_diff_case_multiple_char_diff_len_two() {
         utils::CodeRunner::init()
-            .program("{print \"aBc\"<=\"a\";}")
+            .program(r#"{print "aBc"<="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -441,7 +441,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\"<=\"a\";}")
+            .program(r#"{print ""<="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -450,7 +450,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_equal_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<=\"\";}")
+            .program(r#"{print "a"<="";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -459,7 +459,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_same_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<\"a\";}")
+            .program(r#"{print "a"<"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -468,7 +468,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_same_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"<\"abc\";}")
+            .program(r#"{print "abc"<"abc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -477,7 +477,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_diff_case() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<\"A\";}")
+            .program(r#"{print "a"<"A";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -486,7 +486,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_diff_case_multiple_char() {
         utils::CodeRunner::init()
-            .program("{print \"abc\"<\"aBc\";}")
+            .program(r#"{print "abc"<"aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -495,7 +495,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_diff_case_multiple_char_diff_len() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<\"aBc\";}")
+            .program(r#"{print "a"<"aBc";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -504,7 +504,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_diff_case_multiple_char_diff_len_two() {
         utils::CodeRunner::init()
-            .program("{print \"aBc\"<\"a\";}")
+            .program(r#"{print "aBc"<"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -513,7 +513,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_empty_lhs() {
         utils::CodeRunner::init()
-            .program("{print \"\"<\"a\";}")
+            .program(r#"{print ""<"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -522,7 +522,7 @@ mod relational_tests {
     #[test]
     fn compares_two_strings_less_than_empty_rhs() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<\"\";}")
+            .program(r#"{print "a"<"";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -531,7 +531,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_double_equal() {
         utils::CodeRunner::init()
-            .program("{print \"a\"==1;}")
+            .program(r#"{print "a"==1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -540,7 +540,7 @@ mod relational_tests {
     #[test]
     fn compares_zero_and_empty_string_double_equal() {
         utils::CodeRunner::init()
-            .program("{print \"\"==0;}")
+            .program(r#"{print ""==0;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -549,7 +549,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_not_equal() {
         utils::CodeRunner::init()
-            .program("{print \"a\"!=1;}")
+            .program(r#"{print "a"!=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -558,7 +558,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_greater_equal() {
         utils::CodeRunner::init()
-            .program("{print \"a\">=1;}")
+            .program(r#"{print "a">=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -567,7 +567,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_greater_equal_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1>=\"a\";}")
+            .program(r#"{print 1>="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -576,7 +576,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_greater() {
         utils::CodeRunner::init()
-            .program("{print \"a\">1;}")
+            .program(r#"{print "a">1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -585,7 +585,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_greater_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1>\"a\";}")
+            .program(r#"{print 1>"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -594,7 +594,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_less_than_equal() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<=1;}")
+            .program(r#"{print "a"<=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -603,7 +603,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_less_than_equal_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1<=\"a\";}")
+            .program(r#"{print 1<="a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -612,7 +612,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_less_than() {
         utils::CodeRunner::init()
-            .program("{print \"a\"<1;}")
+            .program(r#"{print "a"<1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -621,7 +621,7 @@ mod relational_tests {
     #[test]
     fn compares_a_number_and_string_less_than_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1<\"a\";}")
+            .program(r#"{print 1<"a";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -630,7 +630,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_double_equal() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\"==1.1;}")
+            .program(r#"{print "1.1"==1.1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -639,7 +639,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_double_equal_false() {
         utils::CodeRunner::init()
-            .program("{print 1==\"1.1\";}")
+            .program(r#"{print 1=="1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -648,7 +648,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_not_equals() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\"!=1;}")
+            .program(r#"{print "1.1"!=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -657,7 +657,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_not_equals_false() {
         utils::CodeRunner::init()
-            .program("{print 1.1!=\"1.1\";}")
+            .program(r#"{print 1.1!="1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -666,7 +666,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_greater_than_equal() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\">=1;}")
+            .program(r#"{print "1.1">=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -675,7 +675,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_greater_than_equal_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1>=\"1.1\";}")
+            .program(r#"{print 1>="1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -684,7 +684,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_greater_than() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\">1;}")
+            .program(r#"{print "1.1">1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -693,7 +693,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_greater_than_lex() {
         utils::CodeRunner::init()
-            .program("{print \"2\">12;}")
+            .program(r#"{print "2">12;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -702,7 +702,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_greater_than_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1>\"1.1\";}")
+            .program(r#"{print 1>"1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -711,7 +711,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_less_than_equal() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\"<=1;}")
+            .program(r#"{print "1.1"<=1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -720,7 +720,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_less_than_equal_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1<=\"1.1\";}")
+            .program(r#"{print 1<="1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -729,7 +729,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_less_than() {
         utils::CodeRunner::init()
-            .program("{print \"1.1\"<1;}")
+            .program(r#"{print "1.1"<1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -738,7 +738,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_less_than_lex() {
         utils::CodeRunner::init()
-            .program("{print \"2\"<12;}")
+            .program(r#"{print "2"<12;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -747,7 +747,7 @@ mod relational_tests {
     #[test]
     fn compares_a_string_number_and_a_number_less_than_symmetric() {
         utils::CodeRunner::init()
-            .program("{print 1<\"1.1\";}")
+            .program(r#"{print 1<"1.1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()

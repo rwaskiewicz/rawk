@@ -106,7 +106,7 @@ mod field_variables {
     #[test]
     fn it_splits_data_entirely_when_fs_matches_test_data_single_char() {
         utils::CodeRunner::init()
-            .program("{print \"b\"$1\"b\"$2\"b\";}")
+            .program(r#"{print "b"$1"b"$2"b";}"#)
             .cli_options(vec!["-Fa"])
             .stdin_data("a")
             .expect_output("bbb")

@@ -48,7 +48,7 @@ mod logical_tests {
         // > When an expression is used in a Boolean context, ... . Otherwise, a string value of the
         // > null string shall be treated as false and any other value shall be treated as true."
         utils::CodeRunner::init()
-            .program("{print !\"\";}")
+            .program(r#"{print !"";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -57,7 +57,7 @@ mod logical_tests {
     #[test]
     fn it_performs_unary_negation_on_non_empty_string() {
         utils::CodeRunner::init()
-            .program("{print !\"Hello World\";}")
+            .program(r#"{print !"Hello World";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -66,7 +66,7 @@ mod logical_tests {
     #[test]
     fn it_performs_unary_negation_on_string_0() {
         utils::CodeRunner::init()
-            .program("{print !\"0\";}")
+            .program(r#"{print !"0";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -75,7 +75,7 @@ mod logical_tests {
     #[test]
     fn it_performs_unary_negation_on_string_1() {
         utils::CodeRunner::init()
-            .program("{print !\"1\";}")
+            .program(r#"{print !"1";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -111,7 +111,7 @@ mod logical_tests {
     #[test]
     fn it_performs_logical_and_with_0_str_returns_true() {
         utils::CodeRunner::init()
-            .program("{print 1 && \"0\";}")
+            .program(r#"{print 1 && "0";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -120,7 +120,7 @@ mod logical_tests {
     #[test]
     fn it_performs_logical_and_with_empty_str_returns_false() {
         utils::CodeRunner::init()
-            .program("{print 1 && \"\";}")
+            .program(r#"{print 1 && "";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -194,7 +194,7 @@ mod logical_tests {
     #[test]
     fn it_performs_logical_or_with_str_returns_true() {
         utils::CodeRunner::init()
-            .program("{print 1 || \"0\";}")
+            .program(r#"{print 1 || "0";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -203,7 +203,7 @@ mod logical_tests {
     #[test]
     fn it_performs_logical_or_with_empty_str_returns_true() {
         utils::CodeRunner::init()
-            .program("{print \"\" || 1;}")
+            .program(r#"{print "" || 1;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
