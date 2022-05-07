@@ -28,7 +28,7 @@ mod patterns_actions {
     #[test]
     fn it_allows_more_than_one_action() {
         utils::CodeRunner::init()
-            .program("{print \"Hello\";}{print \"World!\";}")
+            .program(r#"{print "Hello";}{print "World!";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello\nWorld!")
             .assert()
@@ -55,7 +55,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern() {
         utils::CodeRunner::init()
-            .program("1 > 0 {print \"Hello\";}")
+            .program(r#"1 > 0 {print "Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello")
             .assert()
@@ -64,7 +64,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_falsy() {
         utils::CodeRunner::init()
-            .program("0 > 1 {print \"Hello\";}")
+            .program(r#"0 > 1 {print "Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_empty_output()
             .assert()
@@ -73,7 +73,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_null_str() {
         utils::CodeRunner::init()
-            .program("\"\" {print \"Hello\";}")
+            .program(r#""" {print "Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_empty_output()
             .assert()
@@ -82,7 +82,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_one() {
         utils::CodeRunner::init()
-            .program("1 {print \"Hello\";}")
+            .program(r#"1 {print "Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello")
             .assert()
@@ -91,7 +91,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_zero() {
         utils::CodeRunner::init()
-            .program("0 {print \"Hello\";}")
+            .program(r#"0 {print "Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_empty_output()
             .assert()
@@ -100,7 +100,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_valid_str() {
         utils::CodeRunner::init()
-            .program("\"str\" {print \"Hello World\";}")
+            .program(r#""str" {print "Hello World";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello World")
             .assert()
@@ -109,7 +109,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_empty_assign() {
         utils::CodeRunner::init()
-            .program("foo=\"\" {print \"Hello World\";}")
+            .program(r#"foo="" {print "Hello World";}"#)
             .cli_options(vec!["-q"])
             .expect_empty_output()
             .assert()
@@ -118,7 +118,7 @@ mod patterns_actions {
     #[test]
     fn it_supports_an_action_and_pattern_valid_assign() {
         utils::CodeRunner::init()
-            .program("foo=\"str\" {print \"Hello World\";}")
+            .program(r#"foo="str" {print "Hello World";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello World")
             .assert()

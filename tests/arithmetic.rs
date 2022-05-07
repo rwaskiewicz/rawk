@@ -164,7 +164,7 @@ mod arithmetic_tests {
     #[test]
     fn it_sums_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 + \"1Hello\";}")
+            .program(r#"{print 2.14 + "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("3.14")
             .assert()
@@ -173,7 +173,7 @@ mod arithmetic_tests {
     #[test]
     fn it_sums_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 + \"1.24Hello\";}")
+            .program(r#"{print 2.14 + "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("3.38")
             .assert()
@@ -182,7 +182,7 @@ mod arithmetic_tests {
     #[test]
     fn it_sums_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" + 2;}")
+            .program(r#"{print "02Hello" + 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4")
             .assert()
@@ -191,7 +191,7 @@ mod arithmetic_tests {
     #[test]
     fn it_sums_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" + 1.21;}")
+            .program(r#"{print "5.55Hello" + 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("6.76")
             .assert()
@@ -200,7 +200,7 @@ mod arithmetic_tests {
     #[test]
     fn it_subtracts_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 - \"1Hello\";}")
+            .program(r#"{print 2.14 - "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1.1400001")
             .assert()
@@ -209,7 +209,7 @@ mod arithmetic_tests {
     #[test]
     fn it_subtracts_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 - \"1.24Hello\";}")
+            .program(r#"{print 2.14 - "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0.9000001")
             .assert()
@@ -218,7 +218,7 @@ mod arithmetic_tests {
     #[test]
     fn it_subtracts_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" - 2;}")
+            .program(r#"{print "02Hello" - 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -227,7 +227,7 @@ mod arithmetic_tests {
     #[test]
     fn it_subtracts_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" - 1.21;}")
+            .program(r#"{print "5.55Hello" - 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4.34")
             .assert()
@@ -236,7 +236,7 @@ mod arithmetic_tests {
     #[test]
     fn it_multiplies_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 * \"1Hello\";}")
+            .program(r#"{print 2.14 * "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("2.14")
             .assert()
@@ -245,7 +245,7 @@ mod arithmetic_tests {
     #[test]
     fn it_multiplies_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 * \"1.24Hello\";}")
+            .program(r#"{print 2.14 * "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("2.6536002")
             .assert()
@@ -254,7 +254,7 @@ mod arithmetic_tests {
     #[test]
     fn it_multiplies_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" * 2;}")
+            .program(r#"{print "02Hello" * 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4")
             .assert()
@@ -263,7 +263,7 @@ mod arithmetic_tests {
     #[test]
     fn it_multiplies_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" * 1.21;}")
+            .program(r#"{print "5.55Hello" * 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("6.7155004")
             .assert()
@@ -272,7 +272,7 @@ mod arithmetic_tests {
     #[test]
     fn it_divides_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 / \"1Hello\";}")
+            .program(r#"{print 2.14 / "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("2.14")
             .assert()
@@ -281,7 +281,7 @@ mod arithmetic_tests {
     #[test]
     fn it_divides_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 / \"1.24Hello\";}")
+            .program(r#"{print 2.14 / "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1.7258065")
             .assert()
@@ -290,7 +290,7 @@ mod arithmetic_tests {
     #[test]
     fn it_divides_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" / 2;}")
+            .program(r#"{print "02Hello" / 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("1")
             .assert()
@@ -299,7 +299,7 @@ mod arithmetic_tests {
     #[test]
     fn it_divides_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" / 1.21;}")
+            .program(r#"{print "5.55Hello" / 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4.5867767")
             .assert()
@@ -308,7 +308,7 @@ mod arithmetic_tests {
     #[test]
     fn it_modulos_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 % \"1Hello\";}")
+            .program(r#"{print 2.14 % "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0.1400001")
             .assert()
@@ -317,7 +317,7 @@ mod arithmetic_tests {
     #[test]
     fn it_modulos_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 % \"1.24Hello\";}")
+            .program(r#"{print 2.14 % "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("0.9000001")
             .assert()
@@ -326,7 +326,7 @@ mod arithmetic_tests {
     #[test]
     fn it_modulos_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" % 2;}")
+            .program(r#"{print "02Hello" % 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
@@ -335,7 +335,7 @@ mod arithmetic_tests {
     #[test]
     fn it_modulos_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" % 1.21;}")
+            .program(r#"{print "5.55Hello" % 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("0.71000004")
             .assert()
@@ -344,7 +344,7 @@ mod arithmetic_tests {
     #[test]
     fn it_exponentiates_an_integer_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 ^ \"1Hello\";}")
+            .program(r#"{print 2.14 ^ "1Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("2.14")
             .assert()
@@ -353,7 +353,7 @@ mod arithmetic_tests {
     #[test]
     fn it_exponentiates_a_float_and_a_string() {
         utils::CodeRunner::init()
-            .program("{print 2.14 ^ \"1.24Hello\";}")
+            .program(r#"{print 2.14 ^ "1.24Hello";}"#)
             .cli_options(vec!["-q"])
             .expect_output("2.5686984")
             .assert()
@@ -362,7 +362,7 @@ mod arithmetic_tests {
     #[test]
     fn it_exponentiates_a_string_and_an_integer() {
         utils::CodeRunner::init()
-            .program("{print \"02Hello\" ^ 2;}")
+            .program(r#"{print "02Hello" ^ 2;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4")
             .assert()
@@ -371,7 +371,7 @@ mod arithmetic_tests {
     #[test]
     fn it_exponentiates_a_string_and_a_float() {
         utils::CodeRunner::init()
-            .program("{print \"5.55Hello\" ^ 1.21;}")
+            .program(r#"{print "5.55Hello" ^ 1.21;}"#)
             .cli_options(vec!["-q"])
             .expect_output("7.9541645")
             .assert()
@@ -380,7 +380,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_two_strings() {
         utils::CodeRunner::init()
-            .program("{print \"Hello\" \" World!\";}")
+            .program(r#"{print "Hello" " World!";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello World!")
             .assert()
@@ -389,7 +389,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_multiple_strings() {
         utils::CodeRunner::init()
-            .program("{print \"Hello\" \" World!\" \" \" \"I come in peace!\";}")
+            .program(r#"{print "Hello" " World!" " " "I come in peace!";}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hello World! I come in peace!")
             .assert()
@@ -398,7 +398,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_a_number_and_string() {
         utils::CodeRunner::init()
-            .program("{print 1 \" World\";}")
+            .program(r#"{print 1 " World";}"#)
             .cli_options(vec!["-q"])
             .expect_output("1 World")
             .assert()
@@ -407,7 +407,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_a_string_and_number() {
         utils::CodeRunner::init()
-            .program("{print \"Hell\" 0;}")
+            .program(r#"{print "Hell" 0;}"#)
             .cli_options(vec!["-q"])
             .expect_output("Hell0")
             .assert()
@@ -416,7 +416,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_with_binary_str_addition() {
         utils::CodeRunner::init()
-            .program("{print 3 + \"Hello\" 4;}")
+            .program(r#"{print 3 + "Hello" 4;}"#)
             .cli_options(vec!["-q"])
             .expect_output("34")
             .assert()
@@ -425,7 +425,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_using_comma_in_print_statement() {
         utils::CodeRunner::init()
-            .program("{print \"hello\",\"world\";}")
+            .program(r#"{print "hello","world";}"#)
             .cli_options(vec!["-q"])
             .expect_output("hello world")
             .assert()
@@ -434,7 +434,7 @@ mod arithmetic_tests {
     #[test]
     fn it_concatenates_using_comma_with_undefined_variable() {
         utils::CodeRunner::init()
-            .program("{print hello,\"world\";}")
+            .program(r#"{print hello,"world";}"#)
             .cli_options(vec!["-q"])
             .expect_output(" world")
             .assert()
@@ -452,7 +452,7 @@ mod arithmetic_tests {
     #[test]
     fn it_coerces_a_variable_to_number() {
         utils::CodeRunner::init()
-            .program("{foo = \"3\"; print foo * 3;}")
+            .program(r#"{foo = "3"; print foo * 3;}"#)
             .cli_options(vec!["-q"])
             .expect_output("9")
             .assert()
@@ -461,7 +461,7 @@ mod arithmetic_tests {
     #[test]
     fn it_coerces_a_variable_to_string() {
         utils::CodeRunner::init()
-            .program("{foo = 3; print foo \"3\";}")
+            .program(r#"{foo = 3; print foo "3";}"#)
             .cli_options(vec!["-q"])
             .expect_output("33")
             .assert()
@@ -470,7 +470,7 @@ mod arithmetic_tests {
     #[test]
     fn it_ignores_unknown_variables_for_concatenation() {
         utils::CodeRunner::init()
-            .program("{zfoo=3; print \"z\" foo\"z\";}")
+            .program(r#"{zfoo=3; print "z" foo"z";}"#)
             .cli_options(vec!["-q"])
             .expect_output("zz")
             .assert()
@@ -479,7 +479,7 @@ mod arithmetic_tests {
     #[test]
     fn it_uses_variables_in_concatenation() {
         utils::CodeRunner::init()
-            .program("{zfoo=3; print \"z\" zfoo\"z\";}")
+            .program(r#"{zfoo=3; print "z" zfoo"z";}"#)
             .cli_options(vec!["-q"])
             .expect_output("z3z")
             .assert()

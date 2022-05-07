@@ -9,7 +9,7 @@ mod variable_tests {
     #[test]
     fn it_stores_a_value_and_reads_it_back() {
         utils::CodeRunner::init()
-            .program("{price = \"4.99\"; print price;}")
+            .program(r#"{price = "4.99"; print price;}"#)
             .cli_options(vec!["-q"])
             .expect_output("4.99")
             .assert()
@@ -18,7 +18,7 @@ mod variable_tests {
     #[test]
     fn it_stores_and_updates_a_value() {
         utils::CodeRunner::init()
-            .program("{price = \"4.99\"; price = price + 1; print price;}")
+            .program(r#"{price = "4.99"; price = price + 1; print price;}"#)
             .cli_options(vec!["-q"])
             .expect_output("5.99")
             .assert()
@@ -27,7 +27,7 @@ mod variable_tests {
     #[test]
     fn it_reassigns_a_value() {
         utils::CodeRunner::init()
-            .program("{price = \"4.99\"; price = 2; print price;}")
+            .program(r#"{price = "4.99"; price = 2; print price;}"#)
             .cli_options(vec!["-q"])
             .expect_output("2")
             .assert()
