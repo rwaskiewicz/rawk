@@ -1,4 +1,4 @@
-use clap::{App, Arg, ArgMatches};
+use clap::{Arg, ArgMatches, Command};
 use env_logger::{Builder, Env};
 use log::LevelFilter;
 use rawk::runtime_config::RuntimeConfig;
@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     const FIELD_SEPARATOR_KEY: &str = "field_separator";
 
     // https://www.gnu.org/software/gawk/manual/html_node/Options.html
-    let cmd_line_app = App::new(env!("CARGO_PKG_NAME"))
+    let cmd_line_app = Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .about("awk, implemented in Rust");
 
