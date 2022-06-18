@@ -118,19 +118,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 /// # Return value
 /// - The awk program to run
 fn get_awk_program(cmd_line_matches: &ArgMatches) -> String {
-    let mut program = String::new();
-
     if let Some(provided_awk_filepaths) = cmd_line_matches.values_of(PROGRAM_FILE_KEY) {
-        for awk_filepath in provided_awk_filepaths {
-            // TODO: Support for '-' as a special filename
-            let contents = match fs::read_to_string(awk_filepath) {
-                Ok(contents) => contents,
-                Err(_) => panic!("{:?}", TempAwkReadFileError::FileDoesNotExist),
-            };
-            program.push_str(contents.as_str());
-        }
+        provided_awk_filepaths
+            .map(|awk_filepath| {
+                // TODO: Support for '-' as a special filename
+                match fs::read_to_string(awk_filepath) {
+                    Ok(contents) => contents,
+                    Err(_) => panic!("{:?}", TempAwkReadFileError::FileDoesNotExist),
+                }
+            })
+            .collect()
     } else {
-        program = cmd_line_matches.value_of(PROGRAM_KEY).unwrap().into();
+        cmd_line_matches.value_of(PROGRAM_KEY).unwrap().into()
     }
-    program
 }
