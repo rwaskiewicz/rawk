@@ -302,14 +302,14 @@ impl Scanner {
                 }
                 // TODO: Array membership
                 _ => {
-                    if ch.is_digit(10) {
+                    if ch.is_ascii_digit() {
                         Scanner::check_and_emit_concatenation(&mut tokens, current_line);
                         let mut num_parsed = String::from("");
                         num_parsed.push(ch);
 
                         // TODO: Refactor this function out
                         while let Some(maybe_number) = char_stream.peek() {
-                            if !maybe_number.is_digit(10) {
+                            if !maybe_number.is_ascii_digit() {
                                 break;
                             }
                             if let Some(next_ch) = char_stream.next() {
@@ -333,7 +333,7 @@ impl Scanner {
                             }
 
                             while let Some(maybe_number) = char_stream.peek() {
-                                if !maybe_number.is_digit(10) {
+                                if !maybe_number.is_ascii_digit() {
                                     break;
                                 }
                                 if let Some(next_ch) = char_stream.next() {

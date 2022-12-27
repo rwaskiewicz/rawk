@@ -306,7 +306,7 @@ impl VM {
         let a = self.stack.pop().unwrap();
 
         if is_string_comparison {
-            self.string_comparison(op_code, &*a.str_value(), &*b.str_value());
+            self.string_comparison(op_code, &a.str_value(), &b.str_value());
         } else {
             // implicitly convert `Value::StrNum` to numbers
             self.numeric_comparison(op_code, a.num_value(), b.num_value());
