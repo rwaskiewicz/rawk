@@ -96,14 +96,13 @@ impl CodeRunner {
     ///
     /// If no value was provided, assert an empty string was printed to STDOUT
     pub fn assert(mut self) {
-        let mut expected_text = String::from("^$");
-        if !self.expected_value.is_empty() {
-            expected_text = self.expected_value.clone();
-        };
+        if self.expected_value.is_empty() {
+            self = self.expect_empty_output();
+        }
 
         self.build_assert()
             .success()
-            .stdout(predicates::str::is_match(&(expected_text)).unwrap());
+            .stdout(predicates::str::is_match(&(self.expected_value)).unwrap());
     }
 
     /// Runs r-awk, and asserts that command failed
