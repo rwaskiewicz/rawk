@@ -65,8 +65,8 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
 /// If the user inputs an end of file or interrupted character, or if for some reason a `Readline` error is returned by
 /// the call to `readline()`
 fn read_user_data_from_terminal() -> String {
-    let mut rl = Editor::<()>::new();
-    let data_input = rl.readline("");
+    let mut editor = Editor::<()>::new().expect("unable to create an editor");
+    let data_input = editor.readline("");
     let data_received = match data_input {
         Ok(data_line) => {
             debug!("data line to process: {}", data_line);
