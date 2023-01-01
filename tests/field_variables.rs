@@ -132,4 +132,22 @@ mod field_variables {
             .expect_output("bc")
             .assert()
     }
+
+    #[test]
+    fn it_supports_unary_operations() {
+        utils::CodeRunner::init()
+            .program("{print -$1;}")
+            .stdin_data("40")
+            .expect_output("-40")
+            .assert()
+    }
+
+    #[test]
+    fn it_supports_unary_operations_out_of_bounds() {
+        utils::CodeRunner::init()
+            .program("{print -$2;}")
+            .stdin_data("40")
+            .expect_output("0")
+            .assert()
+    }
 }

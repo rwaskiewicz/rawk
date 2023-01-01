@@ -450,7 +450,10 @@ impl VM {
                     }
                     self.stack.push(Value::Number(result))
                 }
-                _ => panic!("Unknown op code given for unary '{:?}'", op_code),
+                _ => panic!(
+                    "Unknown op code given for unary on num/strnum: '{:?}'",
+                    op_code
+                ),
             }
         } else if matches!(self.peek(0), Value::String(_)) {
             if let Value::String(a) = self.stack.pop().unwrap() {
@@ -462,7 +465,14 @@ impl VM {
                         }
                         self.stack.push(Value::Number(result));
                     }
-                    _ => panic!("Unknown op code given for unary '{:?}'", op_code),
+                    OpCode::UnaryMinus | OpCode::UnaryPlus => {
+                        // if we go out of bounds on a field variable, push zero
+                        self.stack.push(Value::Number(0.0))
+                    }
+                    _ => panic!(
+                        "Unknown op code given for unary operation on string: '{:?}'",
+                        op_code
+                    ),
                 }
             }
         } else {
