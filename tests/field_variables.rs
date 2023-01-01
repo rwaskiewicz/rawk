@@ -143,9 +143,18 @@ mod field_variables {
     }
 
     #[test]
-    fn it_supports_unary_operations_out_of_bounds() {
+    fn it_supports_unary_minus_operations_out_of_bounds() {
         utils::CodeRunner::init()
             .program("{print -$2;}")
+            .stdin_data("40")
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn it_supports_unary_plus_operations_out_of_bounds() {
+        utils::CodeRunner::init()
+            .program("{print +$2;}")
             .stdin_data("40")
             .expect_output("0")
             .assert()
