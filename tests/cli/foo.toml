@@ -1,0 +1,13 @@
+bin.name = "rawk"
+args = ["-q", """
+# { foo=3; bar+=foo; print bar; }
+{
+foo=3;
+bar+=foo;
+print bar;
+}
+"""
+  ]
+stdout = """32
+"""
+
