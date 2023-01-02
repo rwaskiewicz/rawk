@@ -217,9 +217,9 @@ mod control_flow {
     #[test]
     fn it_supports_strnum_in_if_condition_zero() {
         utils::CodeRunner::init()
-            .program(r#"{if ($1) print "should print"; else print "this should not";}"#)
+            .program(r#"{if ($1) print "this should not"; else print "should print";}"#)
             .stdin_data("0")
-            .expect_output("this should not")
+            .expect_output("should print")
             .assert()
     }
 

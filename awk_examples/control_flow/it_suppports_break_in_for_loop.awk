@@ -2,7 +2,8 @@
 {
     result = "hell";
     for (i=0; i<10; i=i+1) {
-        result = result "," i;
+        result = result i;
         break;
     }
+    print result;
 } # EXPECT: hell0

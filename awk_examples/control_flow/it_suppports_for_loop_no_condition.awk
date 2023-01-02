@@ -2,9 +2,10 @@
 {
     result = "";
     for (i=0;;i=i+1) {
-        result = result "," i;
+        result = result i;
         if (i>=10) {
             break;
         }
     }
+    print result;
 } # EXPECT: 012345678910

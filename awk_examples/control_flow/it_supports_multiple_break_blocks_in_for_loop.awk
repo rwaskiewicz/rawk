@@ -1,7 +1,7 @@
 # { for (i=1; i < 2; i=i+1) { for (j=2; j < 3; j=j+2) { break; print "This is the j loop - this should not print"; } break; print "This is the i loop - this should not print";} print "i is", i, "and j is", j; }
 {
     for (i=1; i < 2; i=i+1) {
-        for (j=2 j < 3; j=j+2) {
+        for (j=2; j < 3; j=j+2) {
             break;
             print "This is the j loop - this should not print";
         }
