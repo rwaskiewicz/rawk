@@ -1,8 +1,8 @@
 //! Runtime configuration structs and impl
 
 pub struct RuntimeConfig {
-    // the path of the data file to read and run a program against
-    pub data_file_path: Option<String>,
+    // the path of the data files to read and run a program against
+    pub data_file_paths: Vec<String>,
     // a single character or regex to be used to split user input by
     pub field_separator: String,
     // whether or not a single line of awk code is being interpreted. If so, terminate after a single line of code from
@@ -15,13 +15,13 @@ pub struct RuntimeConfig {
 
 impl RuntimeConfig {
     pub fn new(
-        data_file_path: Option<String>,
+        data_file_paths: Vec<String>,
         field_separator: String,
         is_eval: bool,
         is_quick: bool,
     ) -> RuntimeConfig {
         RuntimeConfig {
-            data_file_path,
+            data_file_paths,
             field_separator,
             is_eval,
             is_quick,
