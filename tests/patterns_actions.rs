@@ -123,4 +123,21 @@ mod patterns_actions {
             .expect_output("Hello World")
             .assert()
     }
+
+    #[test]
+    fn it_supports_multiple_patterns_and_actions() {
+        utils::CodeRunner::init()
+            .program(
+                r#"
+                1 > 0 { foo = 23; }
+                1
+                { foo += 3; }
+                2 < 1 { foo += 5; }
+                { print foo; }
+            "#,
+            )
+            .cli_options(vec!["-q"])
+            .expect_output("26")
+            .assert()
+    }
 }
