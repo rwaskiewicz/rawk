@@ -18,6 +18,14 @@ use crate::token::token_type::TokenType;
 use crate::token::Token;
 use crate::vm::VM;
 
+/// Container for data that has been parsed & split per an Awk field separator (FS)
+pub struct ParsedDataInput {
+    /// The original data, prior to being parsed/split
+    original: String,
+    /// The original data, split based on a field separator
+    parsed: Vec<String>,
+}
+
 /// Invokes a REPL for awk code.
 ///
 /// This function runs on a loop, which will be prematurely halted if `is_eval` is `true` (which is
@@ -39,12 +47,23 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
 
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
-        let _result = vm.interpret(&tokens, &[]);
+        let _result = vm.interpret(
+            &tokens,
+            &ParsedDataInput {
+                original: "".into(),
+                parsed: vec![],
+            },
+        );
     } else if runtime_config.data_file_path.is_none() {
         loop {
             let data_received = read_user_data_from_terminal();
-            let data_to_eval = split_user_data(&runtime_config.field_separator, data_received);
-            let _result = vm.interpret(&tokens, &data_to_eval);
+            let split_data = split_user_data(&runtime_config.field_separator, &data_received);
+            let parsed_data = ParsedDataInput {
+                original: data_received,
+                parsed: split_data,
+            };
+
+            let _result = vm.interpret(&tokens, &parsed_data);
 
             if runtime_config.is_eval {
                 // the eval should only run once
@@ -86,18 +105,8 @@ fn read_user_data_from_terminal() -> String {
     data_received
 }
 
-/// Splits data to be used as field variables.
-///
-/// The data is of the format [original_data, piece1, piece2, ...] where `original_data` matches `data_received`, and
-/// each `piece` is the the N-th item to be split by a field separator, stored in `runtime_config`.
-///
-/// # Arguments:
-/// - `field_separator` the field separator to use when splitting the `data_received`
-/// - `data_received` the data to split
-///
-/// # Returns:
-/// - the split data, as described above
-fn split_user_data(field_separator: &str, data_received: String) -> Vec<String> {
+/// Splits data to be used as field variables based on the provided field separator.
+fn split_user_data(field_separator: &str, data_received: &str) -> Vec<String> {
     let mut split_data;
     if field_separator.is_empty() {
         // Case: field separator is an empty string
@@ -127,9 +136,8 @@ fn split_user_data(field_separator: &str, data_received: String) -> Vec<String> 
         // Case: field separator is more than one character, and should be treated as a regex
         panic!("TODO: Implement Regex Field Separators")
     }
-    let mut data_to_eval = vec![data_received];
-    data_to_eval.append(&mut split_data);
-    data_to_eval
+
+    split_data
 }
 
 #[cfg(test)]
@@ -139,63 +147,47 @@ mod lib {
     #[test]
     fn it_splits_data_by_single_char_fs() {
         let test_data = "  Hello,World  ,I\tam,someone! ";
-        let split_data = split_user_data(&",", String::from(test_data));
 
-        assert_eq!(split_data.len(), 5);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "  Hello");
-        assert_eq!(split_data[2], "World  ");
-        assert_eq!(split_data[3], "I\tam");
-        assert_eq!(split_data[4], "someone! ");
+        let split_data = split_user_data(&",", test_data);
+
+        assert_eq!(split_data, vec!["  Hello", "World  ", "I\tam", "someone! "]);
     }
 
     #[test]
     fn it_does_not_truncate_whitespace_for_fs() {
         let test_data = " Alice  ,40 ,25 ";
-        let split_data = split_user_data(&",", String::from(test_data));
 
-        assert_eq!(split_data.len(), 4);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], " Alice  ");
-        assert_eq!(split_data[2], "40 ");
-        assert_eq!(split_data[3], "25 ");
+        let split_data = split_user_data(&",", test_data);
+
+        assert_eq!(split_data, vec![" Alice  ", "40 ", "25 "]);
     }
 
     #[test]
     fn it_counts_two_consecutive_fs_as_empty_record() {
         let test_data = "Hello,,World!";
-        let split_data = split_user_data(&",", String::from(test_data));
 
-        assert_eq!(split_data.len(), 4);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "Hello");
-        assert_eq!(split_data[2], "");
-        assert_eq!(split_data[3], "World!");
+        let split_data = split_user_data(&",", test_data);
+
+        assert_eq!(split_data, vec!["Hello", "", "World!"]);
     }
 
     #[test]
     fn it_splits_nothing_when_fs_not_found() {
         let test_data = "  Hello World  I\tam  someone! ";
-        let split_data = split_user_data(&",", String::from(test_data));
 
-        assert_eq!(split_data.len(), 2);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], test_data);
+        let split_data = split_user_data(&",", test_data);
+
+        assert_eq!(split_data, vec![test_data]);
     }
 
     #[test]
     fn it_splits_data_by_whitespace_when_no_fs_provided() {
         let test_data = "  Hello World  I\tam  someone! ";
-        // awk/gawk/r-awk defaults to a single empty character, provide it in the test to satisfy the contract of th fn
-        let split_data = split_user_data(&" ", String::from(test_data));
 
-        assert_eq!(split_data.len(), 6);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "Hello");
-        assert_eq!(split_data[2], "World");
-        assert_eq!(split_data[3], "I");
-        assert_eq!(split_data[4], "am");
-        assert_eq!(split_data[5], "someone!");
+        // awk/gawk/r-awk defaults to a single empty character, provide it in the test to satisfy the contract of the fn
+        let split_data = split_user_data(&" ", test_data);
+
+        assert_eq!(split_data, vec!["Hello", "World", "I", "am", "someone!"]);
     }
 
     #[test]
@@ -206,65 +198,49 @@ mod lib {
         // > Command-Line Options), if FS is the null string, then gawk also behaves this way.
         // r-awk chooses to respect FS="" as g-awk does
         let test_data = "Hello World";
-        let split_data = split_user_data(&"", String::from(test_data));
 
-        assert_eq!(split_data.len(), 12);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "H");
-        assert_eq!(split_data[2], "e");
-        assert_eq!(split_data[3], "l");
-        assert_eq!(split_data[4], "l");
-        assert_eq!(split_data[5], "o");
-        assert_eq!(split_data[6], " ");
-        assert_eq!(split_data[7], "W");
-        assert_eq!(split_data[8], "o");
-        assert_eq!(split_data[9], "r");
-        assert_eq!(split_data[10], "l");
-        assert_eq!(split_data[11], "d");
+        let split_data = split_user_data(&"", test_data);
+
+        assert_eq!(
+            split_data,
+            vec!["H", "e", "l", "l", "o", " ", "W", "o", "r", "l", "d"]
+        );
     }
 
     #[test]
     fn it_splits_empty_data_when_fs_is_null_string() {
         let test_data = "";
-        let split_data = split_user_data(&"", String::from(test_data));
 
-        assert_eq!(split_data.len(), 1);
-        assert_eq!(split_data[0], test_data);
+        let split_data = split_user_data(&"", test_data);
+
+        assert_eq!(split_data.len(), 0);
     }
 
     #[test]
     fn it_splits_data_entirely_when_fs_matches_test_data_single_char() {
         let test_data = "a";
-        let split_data = split_user_data(&"a", String::from(test_data));
 
-        assert_eq!(split_data.len(), 3);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "");
-        assert_eq!(split_data[2], "");
+        let split_data = split_user_data(&"a", test_data);
+
+        assert_eq!(split_data, vec!["", ""]);
     }
 
     #[test]
     fn it_splits_data_when_fs_matches_leading_char() {
         let test_data = "abac";
-        let split_data = split_user_data(&"a", String::from(test_data));
 
-        assert_eq!(split_data.len(), 4);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "");
-        assert_eq!(split_data[2], "b");
-        assert_eq!(split_data[3], "c");
+        let split_data = split_user_data(&"a", test_data);
+
+        assert_eq!(split_data, vec!["", "b", "c"]);
     }
 
     #[test]
     fn it_splits_data_when_fs_matches_trailing_char() {
         let test_data = "baca";
-        let split_data = split_user_data(&"a", String::from(test_data));
 
-        assert_eq!(split_data.len(), 4);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "b");
-        assert_eq!(split_data[2], "c");
-        assert_eq!(split_data[3], "");
+        let split_data = split_user_data(&"a", test_data);
+
+        assert_eq!(split_data, vec!["b", "c", ""]);
     }
 
     // TODO: Regex - test the case of FS = "[ \t\n]+" - which should _not_ strip leading spaces and add an integration test
@@ -273,14 +249,9 @@ mod lib {
     #[ignore]
     fn it_splits_data_by_whitespace_via_regex() {
         let test_data = "  Hello World  I\tam  someone! ";
-        let split_data = split_user_data(&"[ \t\n]+", String::from(test_data));
 
-        assert_eq!(split_data.len(), 6);
-        assert_eq!(split_data[0], test_data);
-        assert_eq!(split_data[1], "  Hello");
-        assert_eq!(split_data[2], "World");
-        assert_eq!(split_data[3], "I");
-        assert_eq!(split_data[4], "am");
-        assert_eq!(split_data[5], "someone! ");
+        let split_data = split_user_data(&"[ \t\n]+", test_data);
+
+        assert_eq!(split_data, vec!["  Hello", "World", "I", "am", "someone! "]);
     }
 }

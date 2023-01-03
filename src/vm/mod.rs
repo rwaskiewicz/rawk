@@ -2,6 +2,7 @@ use crate::chunk::{Chunk, OpCode};
 use crate::parser::Parser;
 use crate::token::Token;
 use crate::value::Value;
+use crate::ParsedDataInput;
 
 use log::{debug, error};
 use std::collections::HashMap;
@@ -37,7 +38,7 @@ impl VM {
     /// # Return value
     /// the result of running the provided source, expressed as an `InterpretError` if the code is
     /// unable to run to completion
-    pub fn run(&mut self, data: &[String]) -> Result<(), InterpretError> {
+    pub fn run(&mut self, data: &ParsedDataInput) -> Result<(), InterpretError> {
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
             self.ip += 1;
@@ -128,13 +129,16 @@ impl VM {
                     }
 
                     let safer_index = index as usize;
-
-                    if safer_index < data.len() {
-                        let value = &data[safer_index];
-                        if value.trim().parse::<f32>().is_ok() {
-                            self.stack.push(Value::StrNum(value.clone()));
+                    if safer_index <= data.parsed.len() {
+                        let value = if safer_index == 0 {
+                            data.original.clone()
                         } else {
-                            self.stack.push(Value::String(value.clone()));
+                            data.parsed[safer_index - 1].clone()
+                        };
+                        if value.trim().parse::<f32>().is_ok() {
+                            self.stack.push(Value::StrNum(value));
+                        } else {
+                            self.stack.push(Value::String(value));
                         }
                     } else {
                         // if the index that user specified does not exist, push something on the
@@ -189,7 +193,11 @@ impl VM {
     /// # Return value
     /// the result of running the provided source, expressed as an `InterpretError` if the code is unable to run to
     /// completion
-    pub fn interpret(&mut self, tokens: &[Token], data: &[String]) -> Result<(), InterpretError> {
+    pub fn interpret(
+        &mut self,
+        tokens: &[Token],
+        data: &ParsedDataInput,
+    ) -> Result<(), InterpretError> {
         self.chunk = Chunk::new();
         self.ip = 0;
         let mut parser = Parser::new(tokens.iter(), &mut self.chunk);
