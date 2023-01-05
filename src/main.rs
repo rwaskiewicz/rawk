@@ -28,8 +28,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     let render_version = cmd.render_version();
     let cmd_line_matches = cmd.get_matches();
 
-    if !cmd_line_matches.contains_id(PROGRAM_KEY) && !cmd_line_matches.contains_id(PROGRAM_FILE_KEY)
-    {
+    let has_program_literal = cmd_line_matches.contains_id(PROGRAM_KEY);
+    let has_program_file = cmd_line_matches.contains_id(PROGRAM_FILE_KEY);
+    // catch the case where clap believes we've found a program literal and a program file:
+    // $ rawk -f some_awk.awk '{print $0;}'
+    // but really we've found:
+    // $ rawk -f some_awk.awk some_data.dat
+    // the problem being it's hard to disambiguate whether the first positional argument is an awk
+    // program or a file on disk to read
+    let is_program_data_file = has_program_literal && has_program_file;
+
+    if !has_program_literal && !has_program_file {
         // clap will add a newline to the rendered version string for us
         print!("{render_version}");
         return Ok(());
@@ -48,11 +57,24 @@ fn main() -> Result<(), Box<dyn Error>> {
         .value_source(QUICK_KEY)
         .unwrap_or_else(|| panic!("{} not configured for command line", QUICK_KEY))
         .eq(&ValueSource::CommandLine);
-    let data_file_paths: Vec<String> = cmd_line_matches
+
+    let mut data_file_paths: Vec<String> = if is_program_data_file {
+        vec![cmd_line_matches
+            .get_one::<String>(PROGRAM_KEY)
+            .unwrap()
+            .into()]
+    } else {
+        Vec::new()
+    };
+
+    cmd_line_matches
         .get_many::<String>(DATA_FILE)
         .unwrap_or_default()
         .cloned()
-        .collect();
+        .for_each(|data_file_path| {
+            data_file_paths.push(data_file_path);
+        });
+
     let config: RuntimeConfig =
         RuntimeConfig::new(data_file_paths, field_separator, is_eval, is_quick);
 

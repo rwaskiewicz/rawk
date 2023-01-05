@@ -96,6 +96,48 @@ Erin 660"#,
     }
 
     #[test]
+    fn accepts_an_awk_and_data_input_file() {
+        utils::CodeRunner::init()
+            .cli_options(vec![
+                "-f",
+                "./awk_examples/field_variables/it_prints_all_line_parts.awk",
+                "./tests/data/hours1.dat",
+            ])
+            .expect_output(
+                r#"Alice 25.00 10
+Bob 20.75 20
+Charlie 15.25 40
+Dan 21.50 0
+Erin 22.00 30"#,
+            )
+            .assert()
+    }
+
+    #[test]
+    fn accepts_an_awk_and_data_input_files() {
+        utils::CodeRunner::init()
+            .cli_options(vec![
+                "-f",
+                "./awk_examples/field_variables/it_prints_all_line_parts.awk",
+                "./tests/data/hours1.dat",
+                "./tests/data/hours2.dat",
+            ])
+            .expect_output(
+                r#"Alice 25.00 10
+Bob 20.75 20
+Charlie 15.25 40
+Dan 21.50 0
+Erin 22.00 30
+Frank 15.00 11
+Gerry 1.75 19
+Hannah 25.50 40
+Igor 0 10
+Lauren 22.00 32"#,
+            )
+            .assert()
+    }
+
+    #[test]
     fn accepts_multiple_data_files() {
         utils::CodeRunner::init()
             .program("{print $1, $2 * $3;}")
@@ -180,5 +222,16 @@ Igor does not need to fill out a tax form
 Looking at employee Lauren
 Lauren needs to fill out a tax form"#)
             .assert();
+    }
+
+    #[test]
+    fn panics_when_awk_file_and_program_literal_are_provided() {
+        utils::CodeRunner::init()
+            .cli_options(vec![
+                "-f",
+                "./awk_examples/field_variables/it_prints_all_line_parts.awk",
+                "{print $0;}",
+            ])
+            .assert_fail();
     }
 }
