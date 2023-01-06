@@ -18,21 +18,21 @@ At this time, running a REPL is fully supported and has limited support for awk 
 Like a real awk, this r-awk will take a single program from the STDIN when invoked.
 It then will prompt for input to serve as the data that is fed into the program.
 
-The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
-[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) with a comma (,) as a
-[field separator](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
+The program below demonstrates running a [compiled](#compiling) r-awk and demonstrates the usage of 
+[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) and
+[field separators](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
 
 ```commandline
-cargo run -- -F, '{print $2 * $3 + $1;}'
+./rawk -F, '{print $2 * $3 + $1;}'
 1,2,3
 7
 4,5,6
 34
 ```
 
-Patterns are also supported:
+Patterns are supported:
 ```commandline
-cargo run -- -F, '$1 > $2 {print "First is bigger";} $2 > $1 {print "Second is bigger";}'
+./rawk -F, '$1 > $2 {print "First is bigger";} $2 > $1 {print "Second is bigger";}'
 1,2
 Second is bigger
 2,1
@@ -41,29 +41,8 @@ First is bigger
 
 Multi-line programs are supported in the REPL.
 Take 'fizzbuzz' for example:
-```awk
-cargo run -- '{
-    i=0;
-    while (i < 100) {
-        i=i+1;
-        is_three_div = (i % 3 == 0);
-        is_five_div = (i % 5 == 0);
-        if (is_three_div && is_five_div) {
-            print "fizzbuzz";
-        } else if (is_three_div) {
-            print "fizz";
-        } else if (is_five_div) {
-            print "buzz";
-        } else {
-            print i;
-        }
-    }
-}'
 ```
-
-Or with string concatenation:
-```awk
-cargo run -- '{
+./rawk '{
     for (i=0; i<=100; i=i+1) {
       result = "";
       if (i % 3 == 0) { 
@@ -82,7 +61,7 @@ cargo run -- '{
 
 Reading an awk program from a file:
 ```commandline
-cargo run -- -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
+./rawk -- -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
 IN: alice 40 25
 OUT: alice 40 25
 ```
