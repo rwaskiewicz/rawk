@@ -1,58 +1,48 @@
 # r-awk
 
-a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
+a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/), feature incomplete.
 
-## Running
-The minimum version required to run r-awk can be found under the `rust-version` key in the project's 
-[`Cargo.toml`](./Cargo.toml) file.
+## Minimum Rust Version
 
-At this time, running a REPL is fully supported and has limited support for awk file reading. Like a real awk, this r-awk
-will take a single program from the STDIN when invoked. It then will prompt for input to serve as the data that is fed
-into the program. The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
-[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) with a comma (,) as a
-[field separator](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
+The minimum version required to compile and run r-awk can be found under the `rust-version` key in the project's [`Cargo.toml`](./Cargo.toml) file.
+
+## Compiling
 
 ```commandline
-cargo run -- -F, '{print $2 * $3 + $1;}'
+cargo build --release
+```
+
+## Running
+
+At this time, running a REPL is fully supported and has limited support for awk file reading. 
+Like a real awk, this r-awk will take a single program from the STDIN when invoked.
+It then will prompt for input to serve as the data that is fed into the program.
+
+The program below demonstrates running a [compiled](#compiling) r-awk and demonstrates the usage of 
+[field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) and
+[field separators](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
+
+```commandline
+./rawk -F, '{print $2 * $3 + $1;}'
 1,2,3
 7
 4,5,6
 34
 ```
 
-Patterns are also supported:
+Patterns are supported:
 ```commandline
-cargo run -- -F, '$1 > $2 {print "First is bigger";} $2 > $1 {print "Second is bigger";}'
+./rawk -F, '$1 > $2 {print "First is bigger";} $2 > $1 {print "Second is bigger";}'
 1,2
 Second is bigger
 2,1
 First is bigger
 ```
 
-Multi-line programs are supported in the REPL. Take 'fizzbuzz' for example:
-```awk
-cargo run -- '{
-    i=0;
-    while (i < 100) {
-        i=i+1;
-        is_three_div = (i % 3 == 0);
-        is_five_div = (i % 5 == 0);
-        if (is_three_div && is_five_div) {
-            print "fizzbuzz";
-        } else if (is_three_div) {
-            print "fizz";
-        } else if (is_five_div) {
-            print "buzz";
-        } else {
-            print i;
-        }
-    }
-}'
+Multi-line programs are supported in the REPL.
+Take 'fizzbuzz' for example:
 ```
-
-Or with string concatenation:
-```awk
-cargo run -- '{
+./rawk '{
     for (i=0; i<=100; i=i+1) {
       result = "";
       if (i % 3 == 0) { 
@@ -71,14 +61,24 @@ cargo run -- '{
 
 Reading an awk program from a file:
 ```commandline
-cargo run -- -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
+./rawk -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
 IN: alice 40 25
 OUT: alice 40 25
 ```
 
-### Logging
-The `env_logger` crate is used as the implementation behind the `log` facade. Instructions for configuring log levels
-can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
+Reading an awk program and data from a file:
+```commandline
+./rawk -f ./awk_examples/field_variables/it_prints_all_line_parts.awk ./tests/data/hours1.dat
+Alice 25.00 10
+Bob 20.75 20
+Charlie 15.25 40
+Dan 21.50 0
+Erin 22.00 30
+```
+
+## Logging
+The `env_logger` crate is used as the implementation behind the `log` facade.
+Instructions for configuring log levels can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
 
 By default, the REPL will run with the ['Info' log filter](https://docs.rs/env_logger/0.8.2/env_logger/struct.Builder.html).
 
