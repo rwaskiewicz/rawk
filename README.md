@@ -3,12 +3,13 @@
 a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
 
 ## Running
-The minimum version required to run r-awk can be found under the `rust-version` key in the project's 
-[`Cargo.toml`](./Cargo.toml) file.
+The minimum version required to run r-awk can be found under the `rust-version` key in the project's [`Cargo.toml`](./Cargo.toml) file.
 
-At this time, running a REPL is fully supported and has limited support for awk file reading. Like a real awk, this r-awk
-will take a single program from the STDIN when invoked. It then will prompt for input to serve as the data that is fed
-into the program. The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
+At this time, running a REPL is fully supported and has limited support for awk file reading. 
+Like a real awk, this r-awk will take a single program from the STDIN when invoked.
+It then will prompt for input to serve as the data that is fed into the program.
+
+The program below demonstrates running r-awk via `cargo run` and demonstrates the usage of 
 [field variables](https://www.gnu.org/software/gawk/manual/gawk.html#Fields) with a comma (,) as a
 [field separator](https://www.gnu.org/software/gawk/manual/html_node/Single-Character-Fields.html).
 
@@ -29,7 +30,8 @@ Second is bigger
 First is bigger
 ```
 
-Multi-line programs are supported in the REPL. Take 'fizzbuzz' for example:
+Multi-line programs are supported in the REPL.
+Take 'fizzbuzz' for example:
 ```awk
 cargo run -- '{
     i=0;
@@ -77,8 +79,8 @@ OUT: alice 40 25
 ```
 
 ### Logging
-The `env_logger` crate is used as the implementation behind the `log` facade. Instructions for configuring log levels
-can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
+The `env_logger` crate is used as the implementation behind the `log` facade.
+Instructions for configuring log levels can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
 
 By default, the REPL will run with the ['Info' log filter](https://docs.rs/env_logger/0.8.2/env_logger/struct.Builder.html).
 
