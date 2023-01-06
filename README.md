@@ -2,8 +2,17 @@
 
 a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
 
+## Minimum Rust Version
+
+The minimum version required to compile and run r-awk can be found under the `rust-version` key in the project's [`Cargo.toml`](./Cargo.toml) file.
+
+## Compiling
+
+```commandline
+cargo build --release
+```
+
 ## Running
-The minimum version required to run r-awk can be found under the `rust-version` key in the project's [`Cargo.toml`](./Cargo.toml) file.
 
 At this time, running a REPL is fully supported and has limited support for awk file reading. 
 Like a real awk, this r-awk will take a single program from the STDIN when invoked.
