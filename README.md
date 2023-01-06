@@ -76,7 +76,7 @@ Dan 21.50 0
 Erin 22.00 30
 ```
 
-### Logging
+## Logging
 The `env_logger` crate is used as the implementation behind the `log` facade.
 Instructions for configuring log levels can be found in the crate's [documentation](https://docs.rs/env_logger/0.8.2/env_logger/).
 
