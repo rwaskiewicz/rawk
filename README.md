@@ -61,9 +61,19 @@ Take 'fizzbuzz' for example:
 
 Reading an awk program from a file:
 ```commandline
-./rawk -- -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
+./rawk -f ./awk_examples/field_variables/it_prints_all_line_parts.awk
 IN: alice 40 25
 OUT: alice 40 25
+```
+
+Reading an awk program and data from a file:
+```commandline
+./rawk -f ./awk_examples/field_variables/it_prints_all_line_parts.awk ./tests/data/hours1.dat
+Alice 25.00 10
+Bob 20.75 20
+Charlie 15.25 40
+Dan 21.50 0
+Erin 22.00 30
 ```
 
 ### Logging
