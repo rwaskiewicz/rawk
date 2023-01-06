@@ -38,7 +38,12 @@ impl VM {
     /// # Return value
     /// the result of running the provided source, expressed as an `InterpretError` if the code is
     /// unable to run to completion
-    pub fn run(&mut self, data: &ParsedDataInput) -> Result<(), InterpretError> {
+    pub fn run(&mut self, all_data: &[ParsedDataInput]) -> Result<(), InterpretError> {
+        // create an iterator that can be manually advanced, as some functionality (`getline`)
+        // requires more than one advancement per instruction
+        let mut data_iter = all_data.iter();
+        // prime the pump with the first set of data
+        let mut data = data_iter.next();
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
             self.ip += 1;
@@ -51,15 +56,23 @@ impl VM {
                     }
                     None => {
                         error!("Error: The stack was empty when trying to print");
-                        return Err(InterpretError::RuntimeError);
+                        break Err(InterpretError::RuntimeError);
                     }
                 },
                 OpCode::OpReturn => {
                     if !self.stack.is_empty() {
                         error!("The stack is not empty! {:?}", self.stack);
-                        return Err(InterpretError::RuntimeError);
+                        break Err(InterpretError::RuntimeError);
                     }
-                    return Ok(());
+
+                    data = data_iter.next();
+                    if data.is_none() {
+                        // we are out of records and are done running
+                        break Ok(());
+                    } else {
+                        // we have another record to process, reset the vm and start again
+                        self.reset_vm();
+                    }
                 }
                 OpCode::GreaterEqual => self.comparison_op(&instruction),
                 OpCode::Greater => self.comparison_op(&instruction),
@@ -117,18 +130,19 @@ impl VM {
                         Some(awk_value) => awk_value.num_value(),
                         None => {
                             error!("Error: The stack was empty when trying to determine a field reference lookup");
-                            return Err(InterpretError::RuntimeError);
+                            break Err(InterpretError::RuntimeError);
                         }
                     };
                     if index < 0.0 {
                         error!("r-awk: trying to access out of range field {}", index);
-                        return Err(InterpretError::RuntimeError);
+                        break Err(InterpretError::RuntimeError);
                     } else if (index - index.trunc()).abs() > 0.0 {
                         error!("r-awk: trying to access non integer index {}", index);
-                        return Err(InterpretError::RuntimeError);
+                        break Err(InterpretError::RuntimeError);
                     }
 
                     let safer_index = index as usize;
+                    let data = data.unwrap();
                     if safer_index <= data.parsed.len() {
                         let value = if safer_index == 0 {
                             data.original.clone()
@@ -176,6 +190,11 @@ impl VM {
         }
     }
 
+    fn reset_vm(&mut self) {
+        self.ip = 0;
+        self.stack = vec![];
+    }
+
     fn read_variable_name(&mut self, chunk_index: usize) -> String {
         self.chunk
             .constants
@@ -196,7 +215,7 @@ impl VM {
     pub fn interpret(
         &mut self,
         tokens: &[Token],
-        data: &ParsedDataInput,
+        data: &[ParsedDataInput],
     ) -> Result<(), InterpretError> {
         self.chunk = Chunk::new();
         self.ip = 0;

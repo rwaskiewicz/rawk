@@ -79,4 +79,106 @@ mod entrypoint {
             ])
             .assert_fail();
     }
+
+    #[test]
+    fn accepts_a_data_file() {
+        utils::CodeRunner::init()
+            .program("{print $1, $2 * $3;}")
+            .cli_options(vec!["./tests/data/hours1.dat"])
+            .expect_output(
+                r#"Alice 250
+Bob 415
+Charlie 610
+Dan 0
+Erin 660"#,
+            )
+            .assert();
+    }
+
+    #[test]
+    fn accepts_multiple_data_files() {
+        utils::CodeRunner::init()
+            .program("{print $1, $2 * $3;}")
+            .cli_options(vec!["./tests/data/hours1.dat", "./tests/data/hours2.dat"])
+            .expect_output(
+                r#"Alice 250
+Bob 415
+Charlie 610
+Dan 0
+Erin 660
+Frank 165
+Gerry 33.25
+Hannah 1020
+Igor 0
+Lauren 704"#,
+            )
+            .assert();
+    }
+
+    #[test]
+    fn accepts_the_same_data_file_multiple_times() {
+        utils::CodeRunner::init()
+            .program("{print $1, $2 * $3;}")
+            .cli_options(vec!["./tests/data/hours1.dat", "./tests/data/hours1.dat"])
+            .expect_output(
+                r#"Alice 250
+Bob 415
+Charlie 610
+Dan 0
+Erin 660
+Alice 250
+Bob 415
+Charlie 610
+Dan 0
+Erin 660"#,
+            )
+            .assert();
+    }
+
+    #[test]
+    fn processes_records_for_multiple_files_and_two_truthy_actions_correctly() {
+        utils::CodeRunner::init()
+            .program(r#"$2 * $3 > 600 {print $1,"needs to fill out a tax form";} $3 < 40 {print $1,"needs hours";}"#)
+            .cli_options(vec!["./tests/data/hours1.dat", "./tests/data/hours2.dat"])
+            .expect_output(r#"Alice needs hours
+Bob needs hours
+Charlie needs to fill out a tax form
+Dan needs hours
+Erin needs to fill out a tax form
+Erin needs hours
+Frank needs hours
+Gerry needs hours
+Hannah needs to fill out a tax form
+Igor needs hours
+Lauren needs to fill out a tax form
+Lauren needs hours"#)
+            .assert();
+    }
+    #[test]
+    fn processes_records_for_multiple_files_and_multiple_actions_correctly() {
+        utils::CodeRunner::init()
+            .program(r#"{print "Looking at employee",$1;} $2 * $3 > 600 {print $1,"needs to fill out a tax form";} $2 * $3 < 600 {print $1,"does not need to fill out a tax form";}"#)
+            .cli_options(vec!["./tests/data/hours1.dat", "./tests/data/hours2.dat"])
+            .expect_output(r#"Looking at employee Alice
+Alice does not need to fill out a tax form
+Looking at employee Bob
+Bob does not need to fill out a tax form
+Looking at employee Charlie
+Charlie needs to fill out a tax form
+Looking at employee Dan
+Dan does not need to fill out a tax form
+Looking at employee Erin
+Erin needs to fill out a tax form
+Looking at employee Frank
+Frank does not need to fill out a tax form
+Looking at employee Gerry
+Gerry does not need to fill out a tax form
+Looking at employee Hannah
+Hannah needs to fill out a tax form
+Looking at employee Igor
+Igor does not need to fill out a tax form
+Looking at employee Lauren
+Lauren needs to fill out a tax form"#)
+            .assert();
+    }
 }

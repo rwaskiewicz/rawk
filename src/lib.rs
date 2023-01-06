@@ -3,6 +3,7 @@
 use log::{debug, error};
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
+use std::fs;
 
 mod chunk;
 mod parser;
@@ -49,13 +50,14 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
         // TODO: Remove this when `BEGIN` is implemented
         let _result = vm.interpret(
             &tokens,
-            &ParsedDataInput {
+            &[ParsedDataInput {
                 original: "".into(),
                 parsed: vec![],
-            },
+            }],
         );
-    } else if runtime_config.data_file_path.is_none() {
+    } else if runtime_config.data_file_paths.is_empty() {
         loop {
+            // TODO(FUTURE): Handle record separator
             let data_received = read_user_data_from_terminal();
             let split_data = split_user_data(&runtime_config.field_separator, &data_received);
             let parsed_data = ParsedDataInput {
@@ -63,7 +65,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
                 parsed: split_data,
             };
 
-            let _result = vm.interpret(&tokens, &parsed_data);
+            let _result = vm.interpret(&tokens, &[parsed_data]);
 
             if runtime_config.is_eval {
                 // the eval should only run once
@@ -71,7 +73,22 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
             }
         }
     } else {
-        panic!("Reading a file is not implemented yet");
+        let parsed_data: Vec<ParsedDataInput> = runtime_config
+            .data_file_paths
+            .iter()
+            .flat_map(|single_path| {
+                fs::read_to_string(single_path)
+                    .expect("rawk: can't open file {single_path}")
+                    .split_terminator('\n') // TODO(FUTURE): Handle record separator
+                    .map(|record| ParsedDataInput {
+                        original: record.into(),
+                        parsed: split_user_data(&runtime_config.field_separator, record),
+                    })
+                    .collect::<Vec<ParsedDataInput>>()
+            })
+            .collect();
+
+        let _result = vm.interpret(&tokens, &parsed_data);
     }
 }
 

@@ -13,6 +13,7 @@ enum TempAwkReadFileError {
 
 const PROGRAM_KEY: &str = "program";
 const PROGRAM_FILE_KEY: &str = "file";
+const DATA_FILE: &str = "data_file";
 const QUICK_KEY: &str = "quick";
 const EVAL_KEY: &str = "eval";
 const FIELD_SEPARATOR_KEY: &str = "field_separator";
@@ -47,7 +48,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         .value_source(QUICK_KEY)
         .unwrap_or_else(|| panic!("{} not configured for command line", QUICK_KEY))
         .eq(&ValueSource::CommandLine);
-    let config: RuntimeConfig = RuntimeConfig::new(None, field_separator, is_eval, is_quick);
+    let data_file_paths: Vec<String> = cmd_line_matches
+        .get_many::<String>(DATA_FILE)
+        .unwrap_or_default()
+        .cloned()
+        .collect();
+    let config: RuntimeConfig =
+        RuntimeConfig::new(data_file_paths, field_separator, is_eval, is_quick);
 
     let program = get_awk_program(&cmd_line_matches);
     rawk::run_program(&program, config);
@@ -72,6 +79,11 @@ fn build_awk_cli_command() -> Command {
             // note this is the first positional argument relative to other positional arguments.
             // it is not the first position in the argument list as a whole
             Arg::new(PROGRAM_KEY).index(1),
+        )
+        .arg(
+            // note this is the second positional argument relative to other positional arguments.
+            // it is not the second position in the argument list as a whole
+            Arg::new(DATA_FILE).index(2).num_args(1..),
         )
         .arg(
             // TODO: Remove this when `BEGIN` is implemented. We could use -w, but this is quicker
