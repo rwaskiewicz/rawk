@@ -1,6 +1,6 @@
 # r-awk
 
-a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/).
+a toy [awk](https://en.wikipedia.org/wiki/AWK) written in [Rust](https://www.rust-lang.org/), feature incomplete.
 
 ## Minimum Rust Version
 
