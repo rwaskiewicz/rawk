@@ -11,6 +11,8 @@ pub struct RuntimeConfig {
     // whether or not a single line of awk code is being interpreted without data. If so, terminate after no code from
     // STDIN has been evaluated and is a temporary stand-in for `BEGIN`.
     pub is_quick: bool,
+    // the field separator to split record output by
+    pub output_record_separator: String,
 }
 
 impl RuntimeConfig {
@@ -19,12 +21,14 @@ impl RuntimeConfig {
         input_field_separator: String,
         is_eval: bool,
         is_quick: bool,
+        output_record_separator: Option<String>,
     ) -> RuntimeConfig {
         RuntimeConfig {
             data_file_paths,
             input_field_separator,
             is_eval,
             is_quick,
+            output_record_separator: output_record_separator.unwrap_or_else(|| "\n".into()),
         }
     }
 }

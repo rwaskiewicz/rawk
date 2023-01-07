@@ -76,7 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         });
 
     let config: RuntimeConfig =
-        RuntimeConfig::new(data_file_paths, field_separator, is_eval, is_quick);
+        RuntimeConfig::new(data_file_paths, field_separator, is_eval, is_quick, None);
 
     let program = get_awk_program(&cmd_line_matches);
     rawk::run_program(&program, config);
