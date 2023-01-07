@@ -59,7 +59,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
         loop {
             // TODO(FUTURE): Handle record separator
             let data_received = read_user_data_from_terminal();
-            let split_data = split_user_data(&runtime_config.field_separator, &data_received);
+            let split_data = split_user_data(&runtime_config.input_field_separator, &data_received);
             let parsed_data = ParsedDataInput {
                 original: data_received,
                 parsed: split_data,
@@ -82,7 +82,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
                     .split_terminator('\n') // TODO(FUTURE): Handle record separator
                     .map(|record| ParsedDataInput {
                         original: record.into(),
-                        parsed: split_user_data(&runtime_config.field_separator, record),
+                        parsed: split_user_data(&runtime_config.input_field_separator, record),
                     })
                     .collect::<Vec<ParsedDataInput>>()
             })
