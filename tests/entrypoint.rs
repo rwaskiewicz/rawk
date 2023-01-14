@@ -96,6 +96,30 @@ Erin 660"#,
     }
 
     #[test]
+    fn prints_a_nothing_from_file_for_no_pattern_nor_action() {
+        utils::CodeRunner::init()
+            .program("")
+            .cli_options(vec!["./tests/data/hours1.dat"])
+            .expect_empty_output()
+            .assert();
+    }
+
+    #[test]
+    fn prints_a_data_file_for_no_action() {
+        utils::CodeRunner::init()
+            .program("1 > 0")
+            .cli_options(vec!["./tests/data/hours1.dat"])
+            .expect_output(
+                r#"Alice    25.00  10
+Bob      20.75  20
+Charlie  15.25  40
+Dan      21.50  0
+Erin     22.00  30"#,
+            )
+            .assert();
+    }
+
+    #[test]
     fn accepts_an_awk_and_data_input_file() {
         utils::CodeRunner::init()
             .cli_options(vec![
