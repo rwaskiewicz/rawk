@@ -22,12 +22,14 @@ pub struct VM {
 
 impl VM {
     pub fn new() -> VM {
-        VM {
+        let mut vm = VM {
             chunk: Chunk::new(),
             ip: 0,
             stack: vec![],
             globals: HashMap::new(),
-        }
+        };
+        vm.globals.insert("NR".into(), Value::Number(0.0));
+        vm
     }
 
     /// Runs code that has been compiled
@@ -44,6 +46,7 @@ impl VM {
         let mut data_iter = all_data.iter();
         // prime the pump with the first set of data
         let mut data = data_iter.next();
+        self.globals.insert("NR".into(), Value::Number(self.globals.get("NR").unwrap().num_value() + 1.0));
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
             self.ip += 1;
@@ -66,6 +69,7 @@ impl VM {
                     }
 
                     data = data_iter.next();
+                    self.globals.insert("NR".into(), Value::Number(self.globals.get("NR").unwrap().num_value() + 1.0));
                     if data.is_none() {
                         // we are out of records and are done running
                         break Ok(());
