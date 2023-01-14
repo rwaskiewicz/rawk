@@ -249,6 +249,13 @@ Lauren needs to fill out a tax form"#)
     }
 
     #[test]
+    fn panics_only_a_data_file_is_provided() {
+        utils::CodeRunner::init()
+            .cli_options(vec!["./tests/data/hours1.dat"])
+            .assert_fail();
+    }
+
+    #[test]
     fn panics_when_awk_file_and_program_literal_are_provided() {
         utils::CodeRunner::init()
             .cli_options(vec![
