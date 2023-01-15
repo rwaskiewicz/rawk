@@ -618,8 +618,15 @@ impl<'a> Parser<'a> {
     }
 
     fn print_expr_list_opt(&mut self) {
-        // TODO: Support empty
-        self.print_expr_list();
+        // TODO(FUTURE): when removing semicolon requirement, this will need to change to EoL and
+        // other keyword checks
+        if self.peek_token(&TokenType::Semicolon) {
+            // no expr - default to '$0'
+            self.emit_constant(Value::Number(0.0));
+            self.emit_byte(OpCode::GetFieldVariable());
+        } else {
+            self.print_expr_list();
+        }
     }
 
     fn print_expr_list(&mut self) {
