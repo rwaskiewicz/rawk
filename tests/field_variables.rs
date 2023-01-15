@@ -17,6 +17,15 @@ mod field_variables {
     }
 
     #[test]
+    fn it_prints_the_whole_line_empty_print_expr() {
+        utils::CodeRunner::init()
+            .program("{print;}")
+            .stdin_data("Alice 40 25")
+            .expect_output("Alice 40 25")
+            .assert()
+    }
+
+    #[test]
     fn it_prints_nothing_for_out_of_bounds() {
         // since we do _not_ print $0, whitespace is not preserved
         utils::CodeRunner::init()
