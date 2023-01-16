@@ -11,8 +11,8 @@ mod field_variables {
         // since we print $0, whitespace is preserved
         utils::CodeRunner::init()
             .program("{print $0;}")
-            .stdin_data("Alice 40 25")
-            .expect_output("Alice 40 25")
+            .stdin_data("Alice   40  25")
+            .expect_output("Alice   40  25")
             .assert()
     }
 
@@ -20,8 +20,8 @@ mod field_variables {
     fn it_prints_the_whole_line_empty_print_expr() {
         utils::CodeRunner::init()
             .program("{print;}")
-            .stdin_data("Alice 40 25")
-            .expect_output("Alice 40 25")
+            .stdin_data("Alice    40   25")
+            .expect_output("Alice    40   25")
             .assert()
     }
 
