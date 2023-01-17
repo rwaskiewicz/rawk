@@ -28,7 +28,7 @@ impl VM {
             stack: vec![],
             globals: HashMap::new(),
         };
-        vm.globals.insert("NR".into(), Value::Number(0.0));
+        vm.globals.insert("NF".into(), Value::Number(0.0));
         vm
     }
 
@@ -47,8 +47,8 @@ impl VM {
         // prime the pump with the first set of data
         let mut data = data_iter.next();
         self.globals.insert(
-            "NR".into(),
-            Value::Number(self.globals.get("NR").unwrap().num_value() + 1.0),
+            "NF".into(),
+            Value::Number(self.globals.get("NF").unwrap().num_value() + 1.0),
         );
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
@@ -73,8 +73,8 @@ impl VM {
 
                     data = data_iter.next();
                     self.globals.insert(
-                        "NR".into(),
-                        Value::Number(self.globals.get("NR").unwrap().num_value() + 1.0),
+                        "NF".into(),
+                        Value::Number(self.globals.get("NF").unwrap().num_value() + 1.0),
                     );
                     if data.is_none() {
                         // we are out of records and are done running
