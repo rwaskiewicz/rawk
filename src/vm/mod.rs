@@ -48,7 +48,7 @@ impl VM {
         let mut data = data_iter.next();
         self.globals.insert(
             "NF".into(),
-            Value::Number(self.globals.get("NF").unwrap().num_value() + 1.0),
+            Value::Number(data.unwrap().parsed.len() as f32),
         );
         loop {
             let instruction: OpCode = self.chunk.code[self.ip].code.clone();
@@ -72,10 +72,6 @@ impl VM {
                     }
 
                     data = data_iter.next();
-                    self.globals.insert(
-                        "NF".into(),
-                        Value::Number(self.globals.get("NF").unwrap().num_value() + 1.0),
-                    );
                     if data.is_none() {
                         // we are out of records and are done running
                         break Ok(());

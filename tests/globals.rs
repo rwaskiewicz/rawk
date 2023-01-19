@@ -41,7 +41,7 @@ NF 23"#,
         utils::CodeRunner::init()
             .program("{ print $NF; }")
             .stdin_data("\n")
-            .expect_empty_output()
+            .expect_output("\n")
             .assert();
     }
 
