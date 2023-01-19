@@ -168,4 +168,6 @@ mod field_variables {
             .expect_output("0")
             .assert()
     }
+
+    // TODO Tests like $1=worldgit comdfgit f
 }
