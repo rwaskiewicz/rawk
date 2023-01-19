@@ -46,6 +46,25 @@ NF 23"#,
             .assert();
     }
 
+    #[test]
+    fn foo() {
+        // However, assigning to a nonexistent field (for example, $(NF+2)=5) shall increase the value of NF; create any intervening fields with the uninitialized value; and cause the value of $0 to be recomputed, with the fields being separated by the value of OFS.
+        utils::CodeRunner::init()
+            .program("{ $(NF+1)=5; print NF; print $0; }")
+            .stdin_data("hello world")
+            .expect_output(r#"3
+hello world 5"#)
+            .assert();
+    }
+
+    // Uninitialized variables include all types of variables including scalars, array elements, and
+    // fields. The definition of an uninitialized value in Variables and Special Variables is
+    // necessary to describe the value placed on uninitialized variables and on fields that are
+    // valid (for example, < $NF) but have no characters in them and to describe how these variables
+    // are to be used in comparisons. A valid field, such as $1, that has no characters in it can be
+    // obtained from an input line of "\t\t" when FS= '\t'. Historically, the comparison ($1<10) was
+    // done numerically after evaluating $1 to the value zero.
+
 //     #[test]
 //     fn it_sets_nf_per_input_line() {
 //         utils::CodeRunner::init()
