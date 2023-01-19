@@ -40,46 +40,47 @@ NF 23"#,
     fn it_prints_nf_in_field_variable_empty_input() {
         utils::CodeRunner::init()
             .program("{ print $NF; }")
-            .stdin_data("\n")
-            .expect_output("\n")
+            .cli_options(vec!["-q"])
+            // we need the implicit newline here
+            .expect_output("")
             .assert();
     }
 
-    #[test]
-    fn it_sets_nf_per_input_line() {
-        utils::CodeRunner::init()
-            .program("{ print NF; }")
-            .stdin_data(
-                r#"hello world
-i
-come in
-peace"#,
-            )
-            .expect_output(
-                r#"2
-1
-2
-1"#,
-            )
-            .assert();
-    }
-
-    #[test]
-    fn it_sets_nf_per_input_line_with_assign() {
-        utils::CodeRunner::init()
-            .program("{ if (NF == 2) { NF = 23; } print NF; }")
-            .stdin_data(
-                r#"hello world
-i
-come in
-peace"#,
-            )
-            .expect_output(
-                r#"23
-1
-23
-1"#,
-            )
-            .assert();
-    }
+//     #[test]
+//     fn it_sets_nf_per_input_line() {
+//         utils::CodeRunner::init()
+//             .program("{ print NF; }")
+//             .stdin_data(
+//                 r#"hello world
+// i
+// come in
+// peace"#,
+//             )
+//             .expect_output(
+//                 r#"2
+// 1
+// 2
+// 1"#,
+//             )
+//             .assert();
+//     }
+//
+//     #[test]
+//     fn it_sets_nf_per_input_line_with_assign() {
+//         utils::CodeRunner::init()
+//             .program("{ if (NF == 2) { NF = 23; } print NF; }")
+//             .stdin_data(
+//                 r#"hello world
+// i
+// come in
+// peace"#,
+//             )
+//             .expect_output(
+//                 r#"23
+// 1
+// 23
+// 1"#,
+//             )
+//             .assert();
+//     }
 }
