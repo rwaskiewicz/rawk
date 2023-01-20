@@ -168,4 +168,35 @@ mod field_variables {
             .expect_output("0")
             .assert()
     }
+
+    // TODO: Should $X be one variable? We need ot reassign it (maybe)
+    // We need to worry about 'scope' of each field variable, where $1 may live in a reassig and
+    // the data
+    // Also consider recreating $0 - that's hard!
+    #[test]
+    fn it_allows_assignment_back_to_0th_field_var() {
+        utils::CodeRunner::init()
+            .program(r#"{print $0="hello";}"#)
+            .stdin_data("40")
+            .expect_output("hello")
+            .assert()
+    }
+
+    #[test]
+    fn it_allows_assignment_back_to_nth_field_var() {
+        utils::CodeRunner::init()
+            .program(r#"{ $2="People"; print; }"#)
+            .stdin_data("Hello People How Are You?")
+            .expect_output("hello")
+            .assert()
+    }
+
+    #[test]
+    fn it_allows_assignment_back_to_nth_out_of_bounds_field_var() {
+        utils::CodeRunner::init()
+            .program(r#"{print $3="hello";}"#)
+            .stdin_data("40")
+            .expect_output("hello")
+            .assert()
+    }
 }
