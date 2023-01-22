@@ -78,7 +78,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
             .iter()
             .flat_map(|single_path| {
                 fs::read_to_string(single_path)
-                    .expect("rawk: can't open file {single_path}")
+                    .unwrap_or_else(|_| panic!("rawk: can't open file {single_path}"))
                     .split_terminator('\n') // TODO(FUTURE): Handle record separator
                     .map(|record| ParsedDataInput {
                         original: record.into(),
