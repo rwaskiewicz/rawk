@@ -19,6 +19,25 @@ NF 23"#,
     }
 
     #[test]
+    fn it_allows_nf_in_pattern_for_file() {
+        utils::CodeRunner::init()
+            .program("NF > 2 { print $0; }")
+            .cli_options(vec!["./tests/data/variable_data.dat"])
+            .expect_output(r#"
+I come in peace!"#)
+            .assert();
+    }
+
+    #[test]
+    fn it_allows_nf_in_pattern_for_data() {
+        utils::CodeRunner::init()
+            .program("NF > 2 { print $0; }")
+            .stdin_data("I come in peace!")
+            .expect_output("I come in peace!")
+            .assert();
+    }
+
+    #[test]
     fn it_prints_nf() {
         utils::CodeRunner::init()
             .program("{ print NF; }")
