@@ -169,5 +169,5 @@ mod field_variables {
             .assert()
     }
 
-    // TODO Tests like $1=worldgit comdfgit f
+    // TODO: Implement functionality + tests for assignment to field variables, e.g. $1=world
 }
