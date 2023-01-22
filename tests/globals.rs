@@ -23,10 +23,7 @@ NF 23"#,
         utils::CodeRunner::init()
             .program("NF > 2 { print $0; }")
             .cli_options(vec!["./tests/data/variable_data.dat"])
-            .expect_output(
-                r#"
-I come in peace!"#,
-            )
+            .expect_output("I come in peace!")
             .assert();
     }
 

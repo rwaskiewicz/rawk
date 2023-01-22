@@ -78,6 +78,11 @@ impl VM {
                     } else {
                         // we have another record to process, reset the vm and start again
                         self.reset_vm();
+                        // TODO: I don't love, but I don't know if we can get around this
+                        self.globals.insert(
+                            "NF".into(),
+                            Value::Number(data.unwrap().parsed.len() as f32),
+                        );
                     }
                 }
                 OpCode::GreaterEqual => self.comparison_op(&instruction),
