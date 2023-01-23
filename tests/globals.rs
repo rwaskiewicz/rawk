@@ -131,4 +131,12 @@ peace"#,
             )
             .assert();
     }
+
+    // TODO: It is important to note that making an assignment to an existing field changes the
+    // value of $0 but does not change the value of NF, even when you assign the empty string to a
+    // field.
+
+    // TODO: Decrementing NF throws away the values of the fields after the new value of NF and
+    // recomputes $0. (d.c.) CAUTION: Some versions of awk don’t rebuild $0 when NF is decremented.
+    // Until August, 2018, this included BWK awk; fortunately his version now handles this correctly.
 }
