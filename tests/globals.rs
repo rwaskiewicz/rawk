@@ -37,6 +37,16 @@ NF 23"#,
     }
 
     #[test]
+    fn it_prints_a_valid_nf_val_for_empty_field_variable() {
+        utils::CodeRunner::init()
+            .program("{ print $NF NF; }")
+            .cli_options(vec!["-F:"])
+            .stdin_data("::")
+            .expect_output("3")
+            .assert()
+    }
+
+    #[test]
     fn it_prints_nf() {
         utils::CodeRunner::init()
             .program("{ print NF; }")
@@ -79,14 +89,6 @@ hello world 5"#,
             )
             .assert();
     }
-
-    // Uninitialized variables include all types of variables including scalars, array elements, and
-    // fields. The definition of an uninitialized value in Variables and Special Variables is
-    // necessary to describe the value placed on uninitialized variables and on fields that are
-    // valid (for example, < $NF) but have no characters in them and to describe how these variables
-    // are to be used in comparisons. A valid field, such as $1, that has no characters in it can be
-    // obtained from an input line of "\t\t" when FS= '\t'. Historically, the comparison ($1<10) was
-    // done numerically after evaluating $1 to the value zero.
 
     #[test]
     // TODO: Restore once we support multiline input in the test runner
