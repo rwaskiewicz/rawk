@@ -79,6 +79,12 @@ impl VM {
                         // we have another record to process, reset the vm and start again
                         self.reset_vm();
                         // TODO: I don't love, but I don't know if we can get around this
+                        //
+                        // TODO: This recomputation affects and is affected by NF (the number of
+                        // fields; see Examining Fields). For example, the value of NF is set to the
+                        // number of the highest field you create. The exact format of $0 is also
+                        // affected by a feature that has not been discussed yet: the output field
+                        // separator, OFS, used to separate the fields (see Output Separators).
                         self.globals.insert(
                             "NF".into(),
                             Value::Number(data.unwrap().parsed.len() as f32),
