@@ -85,6 +85,26 @@ impl VM {
                         // number of the highest field you create. The exact format of $0 is also
                         // affected by a feature that has not been discussed yet: the output field
                         // separator, OFS, used to separate the fields (see Output Separators).
+                        //
+                        // TODO: Decrementing NF throws away the values of the fields after the new
+                        // value of NF and recomputes $0
+                        // ```
+                        // $ echo a b c d e f | awk '{ print "NF =", NF;
+                        // >                           NF = 3; print $0 }'
+                        // -| NF = 6
+                        // -| a b c
+                        // ```
+                        // ```
+                        // $ echo '   a b c d' | awk '{ print; $2 = $2; print }'
+                        // -|    a b c d
+                        // -| a b c d
+                        // ```
+                        // ```
+                        // $ echo a b c d | awk '{ OFS = ":"; $2 = ""; $6 = "new"
+                        // >                       print $0; print NF }'
+                        // -| a::c:d::new
+                        // -| 6
+                        // ```
                         self.globals.insert(
                             "NF".into(),
                             Value::Number(data.unwrap().parsed.len() as f32),
