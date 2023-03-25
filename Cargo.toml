@@ -15,4 +15,4 @@ rustyline = "10.1.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.10"
-predicates = "2.1.5"
+predicates = "3.0.1"
