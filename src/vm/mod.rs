@@ -239,18 +239,19 @@ impl VM {
         let b = self.stack.pop().unwrap().num_value();
         let a = self.stack.pop().unwrap().num_value();
 
-        match *op_code {
-            OpCode::Add => self.stack.push(Value::Number(a + b)),
-            OpCode::Subtract => self.stack.push(Value::Number(a - b)),
-            OpCode::Multiply => self.stack.push(Value::Number(a * b)),
-            OpCode::Divide => self.stack.push(Value::Number(a / b)),
-            OpCode::Modulus => self.stack.push(Value::Number(a % b)),
-            OpCode::Exponentiation => self.stack.push(Value::Number(a.powf(b))),
+        let val = match *op_code {
+            OpCode::Add => Value::Number(a + b),
+            OpCode::Subtract => Value::Number(a - b),
+            OpCode::Multiply => Value::Number(a * b),
+            OpCode::Divide => Value::Number(a / b),
+            OpCode::Modulus => Value::Number(a % b),
+            OpCode::Exponentiation => Value::Number(a.powf(b)),
             _ => panic!(
                 "Unknown op code given for arithmetic operation '{:?}'",
                 op_code
             ),
-        }
+        };
+        self.stack.push(val)
     }
 
     /// Perform an a concatenation operation on two values on the stack, placing the result on the stack
@@ -285,25 +286,25 @@ impl VM {
         let b = self.stack.pop().unwrap();
         let a = self.stack.pop().unwrap();
 
-        match *op_code {
+        let val = match *op_code {
             OpCode::LogicalAnd => {
                 // TODO: Look into lazy evaluation further
                 let result = a.truthy_value() && b.truthy_value();
-                self.stack.push(Value::Number(result as i32 as f32));
+                Value::Number(result as i32 as f32)
             }
             OpCode::LogicalOr => {
                 if a.truthy_value() {
-                    self.stack.push(Value::Number(1.0));
-                    return;
+                    Value::Number(1.0)
+                } else {
+                    Value::Number(b.truthy_value() as i32 as f32)
                 }
-                self.stack
-                    .push(Value::Number(b.truthy_value() as i32 as f32));
             }
             _ => panic!(
                 "Unknown op code given for logical operation '{:?}'",
                 op_code
             ),
-        }
+        };
+        self.stack.push(val)
     }
 
     /// Perform a relational comparison between two values on the stack
@@ -347,54 +348,55 @@ impl VM {
     /// - `a` the first argument of the comparison. Is placed on the left hand side of the expression
     /// - `b` the second argument of the comparison. Is placed on the right hand side of the expression
     fn string_comparison(&mut self, op_code: &OpCode, a: &str, b: &str) {
-        match *op_code {
+        let val = match *op_code {
             OpCode::GreaterEqual => {
                 let mut result: f32 = 0.0;
                 if a >= b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::Greater => {
                 let mut result: f32 = 0.0;
                 if a > b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::LessEqual => {
                 let mut result: f32 = 0.0;
                 if a <= b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::Less => {
                 let mut result: f32 = 0.0;
                 if a < b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::DoubleEqual => {
                 let mut result: f32 = 0.0;
                 if a.eq(b) {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::NotEqual => {
                 let mut result: f32 = 0.0;
                 if a.ne(b) {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             _ => panic!(
                 "Unknown op code given for string comparison '{:?}'",
                 op_code
             ),
-        }
+        };
+        self.stack.push(val)
     }
 
     /// Perform a relational comparison between two numbers, and push the result onto the stack
@@ -404,70 +406,71 @@ impl VM {
     /// - `a` the first argument of the comparison. Is placed on the left hand side of the expression
     /// - `b` the second argument of the comparison. Is placed on the right hand side of the expression
     fn numeric_comparison(&mut self, op_code: &OpCode, a: f32, b: f32) {
-        match *op_code {
+        let val = match *op_code {
             OpCode::GreaterEqual => {
                 let mut result: f32 = 0.0;
                 if a >= b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::Greater => {
                 let mut result: f32 = 0.0;
                 if a > b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::LessEqual => {
                 let mut result: f32 = 0.0;
                 if a <= b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::Less => {
                 let mut result: f32 = 0.0;
                 if a < b {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::DoubleEqual => {
                 let mut result: f32 = 0.0;
                 if (a - b).abs() == 0.0 {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             OpCode::NotEqual => {
                 let mut result: f32 = 0.0;
                 if (a - b).abs() != 0.0 {
                     result = 1.0;
                 }
-                self.stack.push(Value::Number(result))
+                Value::Number(result)
             }
             _ => panic!("Unknown op code given for comparison '{:?}'", op_code),
-        }
+        };
+        self.stack.push(val)
     }
 
     fn unary_op(&mut self, op_code: &OpCode) {
         if matches!(self.peek(0), Value::Number(_)) || matches!(self.peek(0), Value::StrNum(_)) {
             let num_like = self.stack.pop().unwrap().num_value();
-            match *op_code {
+            let val = match *op_code {
                 // Unary plus will be more useful for converting a string to a number
                 OpCode::UnaryPlus => {
                     if num_like == 0.0 {
-                        self.stack.push(Value::Number(0.0))
+                        Value::Number(0.0)
                     } else {
-                        self.stack.push(Value::Number(num_like))
+                        Value::Number(num_like)
                     }
                 }
                 OpCode::UnaryMinus => {
                     if num_like == 0.0 {
-                        self.stack.push(Value::Number(0.0))
+                        Value::Number(0.0)
                     } else {
-                        self.stack.push(Value::Number(-num_like))
+                        Value::Number(-num_like)
                     }
                 }
                 OpCode::LogicalNot => {
@@ -475,32 +478,34 @@ impl VM {
                     if num_like > 0.0 {
                         result = 0.0;
                     }
-                    self.stack.push(Value::Number(result))
+                    Value::Number(result)
                 }
                 _ => panic!(
                     "Unknown op code given for unary on num/strnum: '{:?}'",
                     op_code
                 ),
-            }
+            };
+            self.stack.push(val)
         } else if matches!(self.peek(0), Value::String(_)) {
             if let Value::String(a) = self.stack.pop().unwrap() {
-                match *op_code {
+                let val = match *op_code {
                     OpCode::LogicalNot => {
                         let mut result: f32 = 1.0;
                         if !a.is_empty() {
                             result = 0.0;
                         }
-                        self.stack.push(Value::Number(result));
+                        Value::Number(result)
                     }
                     OpCode::UnaryMinus | OpCode::UnaryPlus => {
                         // if we go out of bounds on a field variable, push zero
-                        self.stack.push(Value::Number(0.0))
+                        Value::Number(0.0)
                     }
                     _ => panic!(
                         "Unknown op code given for unary operation on string: '{:?}'",
                         op_code
                     ),
-                }
+                };
+                self.stack.push(val)
             }
         } else {
             let err_msg = "Unary operand must be a number or string.";
