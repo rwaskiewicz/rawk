@@ -103,7 +103,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
 fn read_user_data_from_terminal() -> String {
     let mut editor = Editor::<()>::new().expect("unable to create an editor");
     let data_input = editor.readline("");
-    let data_received = match data_input {
+    match data_input {
         Ok(data_line) => {
             debug!("data line to process: {}", data_line);
             data_line
@@ -118,8 +118,7 @@ fn read_user_data_from_terminal() -> String {
             }
             panic!();
         }
-    };
-    data_received
+    }
 }
 
 /// Splits data to be used as field variables based on the provided field separator.
