@@ -11,7 +11,7 @@ edition = "2021"
 clap = "4.1.14"
 env_logger = "0.10.0"
 log = "0.4.19"
-rustyline = "10.1.0"
+rustyline = "12.0.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.11"
