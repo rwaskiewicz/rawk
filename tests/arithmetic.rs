@@ -306,6 +306,15 @@ mod arithmetic_tests {
     }
 
     #[test]
+    fn it_divides_by_zero() {
+        utils::CodeRunner::init()
+            .program(r#"{print "1 / 0}"#)
+            .cli_options(vec!["-q"])
+            .expect_output("IDK")
+            .assert()
+    }
+
+    #[test]
     fn it_modulos_an_integer_and_a_string() {
         utils::CodeRunner::init()
             .program(r#"{print 2.14 % "1Hello";}"#)
@@ -590,6 +599,67 @@ mod arithmetic_tests {
             .program("{foo=2; foo^=foo^=foo; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("256")
+            .assert()
+    }
+}
+
+#[cfg(test)]
+mod nan_arithmetic_tests {
+    use crate::utils;
+
+    #[test]
+    fn treat_bare_nan_addition_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan + 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan + 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("1")
+            .assert()
+    }
+
+    #[test]
+    fn treat_bare_nan_subtraction_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan - 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan - 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("-1")
+            .assert()
+    }
+
+    #[test]
+    fn treat_bare_nan_multiplication_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan * 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan * 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn treat_bare_nan_division_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan / 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan / 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
             .assert()
     }
 }

@@ -243,6 +243,7 @@ impl VM {
             OpCode::Add => Value::Number(a + b),
             OpCode::Subtract => Value::Number(a - b),
             OpCode::Multiply => Value::Number(a * b),
+            // TODO(): This falls over for divide by zero/doesn't return what I expect it to
             OpCode::Divide => Value::Number(a / b),
             OpCode::Modulus => Value::Number(a % b),
             OpCode::Exponentiation => Value::Number(a.powf(b)),
