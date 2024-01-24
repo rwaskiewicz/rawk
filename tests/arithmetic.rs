@@ -622,6 +622,15 @@ mod nan_arithmetic_tests {
     }
 
     #[test]
+    fn allow_bare_nan_in_add_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=4; foo+=+nan; print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("4")
+            .assert()
+    }
+
+    #[test]
     fn treat_bare_nan_subtraction_as_zero_value() {
         utils::CodeRunner::init()
             .program("{print +nan - 0;}")
@@ -632,6 +641,15 @@ mod nan_arithmetic_tests {
             .program("{print +nan - 1;}")
             .cli_options(vec!["-q"])
             .expect_output("-1")
+            .assert()
+    }
+
+    #[test]
+    fn allow_bare_nan_in_sub_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=3; foo-=+nan; print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("3")
             .assert()
     }
 
@@ -650,6 +668,15 @@ mod nan_arithmetic_tests {
     }
 
     #[test]
+    fn allow_bare_nan_in_mul_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=7; foo*=+nan; print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
     fn treat_bare_nan_division_as_zero_value() {
         utils::CodeRunner::init()
             .program("{print +nan / 0;}")
@@ -658,6 +685,62 @@ mod nan_arithmetic_tests {
             .assert();
         utils::CodeRunner::init()
             .program("{print +nan / 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn allow_bare_nan_in_div_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=7; foo/=+nan; print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn treat_bare_nan_pow_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan ^ 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("1")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan ^ 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn allow_bare_nan_in_pow_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=7; foo^=+nan; print foo;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+    #[test]
+    fn treat_bare_nan_modulo_as_zero_value() {
+        utils::CodeRunner::init()
+            .program("{print +nan % 0;}")
+            .cli_options(vec!["-q"])
+            .expect_output("1")
+            .assert();
+        utils::CodeRunner::init()
+            .program("{print +nan % 1;}")
+            .cli_options(vec!["-q"])
+            .expect_output("0")
+            .assert()
+    }
+
+
+    #[test]
+    fn allow_bare_nan_in_mod_assign() {
+        utils::CodeRunner::init()
+            .program("{foo=7; foo%=+nan; print foo;}")
             .cli_options(vec!["-q"])
             .expect_output("0")
             .assert()
