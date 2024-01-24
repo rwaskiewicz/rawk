@@ -40,7 +40,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
     let scanner = Scanner::new(String::from(program));
     let tokens: Vec<Token> = scanner.scan();
 
-    if tokens.is_empty() || tokens.get(0).unwrap().token_type == &TokenType::Eof {
+    if tokens.is_empty() || tokens.first().unwrap().token_type == &TokenType::Eof {
         return;
     }
 
