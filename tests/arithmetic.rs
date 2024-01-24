@@ -308,10 +308,9 @@ mod arithmetic_tests {
     #[test]
     fn it_divides_by_zero() {
         utils::CodeRunner::init()
-            .program(r#"{print "1 / 0}"#)
+            .program(r#"{print 1 / 0;}"#)
             .cli_options(vec!["-q"])
-            .expect_output("IDK")
-            .assert()
+            .assert_fail()
     }
 
     #[test]

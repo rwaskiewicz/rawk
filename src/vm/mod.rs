@@ -83,7 +83,17 @@ impl VM {
                 OpCode::Add => self.arithmetic_op(&instruction),
                 OpCode::Subtract => self.arithmetic_op(&instruction),
                 OpCode::Multiply => self.arithmetic_op(&instruction),
-                OpCode::Divide => self.arithmetic_op(&instruction),
+                OpCode::Divide => {
+                    let b = self.stack.pop().unwrap().num_value();
+                    let a = self.stack.pop().unwrap().num_value();
+
+                    if b == 0.0 {
+                        error!("Error: Division by zero");
+                        break Err(InterpretError::RuntimeError)
+                    }
+
+                    self.stack.push(Value::Number(a / b))
+                },
                 OpCode::Modulus => self.arithmetic_op(&instruction),
                 OpCode::Exponentiation => self.arithmetic_op(&instruction),
                 OpCode::Concatenate => self.concatenation_op(&instruction),
@@ -243,8 +253,6 @@ impl VM {
             OpCode::Add => Value::Number(a + b),
             OpCode::Subtract => Value::Number(a - b),
             OpCode::Multiply => Value::Number(a * b),
-            // TODO(): This falls over for divide by zero/doesn't return what I expect it to
-            OpCode::Divide => Value::Number(a / b),
             OpCode::Modulus => Value::Number(a % b),
             OpCode::Exponentiation => Value::Number(a.powf(b)),
             _ => panic!(
