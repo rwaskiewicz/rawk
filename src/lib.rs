@@ -2,7 +2,7 @@
 
 use log::{debug, error};
 use rustyline::error::ReadlineError;
-use rustyline::Editor;
+use rustyline::DefaultEditor;
 use std::fs;
 
 mod chunk;
@@ -101,7 +101,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
 /// If the user inputs an end of file or interrupted character, or if for some reason a `Readline` error is returned by
 /// the call to `readline()`
 fn read_user_data_from_terminal() -> String {
-    let mut editor = Editor::<()>::new().expect("unable to create an editor");
+    let mut editor = DefaultEditor::new().expect("unable to create an editor");
     let data_input = editor.readline("");
     match data_input {
         Ok(data_line) => {
