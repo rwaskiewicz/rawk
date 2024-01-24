@@ -48,13 +48,17 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
 
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
-        let _result = vm.interpret(
+        let result = vm.interpret(
             &tokens,
             &[ParsedDataInput {
                 original: "".into(),
                 parsed: vec![],
             }],
         );
+
+        if result.is_err() {
+            return;
+        }
     } else if runtime_config.data_file_paths.is_empty() {
         loop {
             // TODO(FUTURE): Handle record separator
@@ -88,7 +92,11 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
             })
             .collect();
 
-        let _result = vm.interpret(&tokens, &parsed_data);
+        let result = vm.interpret(&tokens, &parsed_data);
+
+        if result.is_err() {
+            return;
+        }
     }
 }
 
