@@ -82,7 +82,7 @@ impl CodeRunner {
     /// Set the expected output of a program run to be the provided string.
     ///
     /// This method does not determine which output stream the provided string should be evaluated
-    /// against. To assert against `STDOUT`, see [`assert`].
+    /// against. To assert against `STDOUT`, see [`assert`]. To assert against `STDERR`, see [`assert_fail`].
     ///
     /// # Arguments
     /// - `expected_value` the expected result to appear
@@ -105,9 +105,12 @@ impl CodeRunner {
             .stdout(predicates::str::is_match(&(self.expected_value)).unwrap());
     }
 
-    /// Runs r-awk, and asserts that command failed
+    /// Runs r-awk, the program fails, and asserts that the value printed to STDERR matches the value provided by
+    /// [`expect_output`]
     pub fn assert_fail(mut self) {
-        self.build_assert().failure();
+        self.build_assert()
+            .failure()
+            .stderr(predicates::str::is_match(&(self.expected_value)).unwrap());
     }
 
     /// Helper method for creating an [`Assert`] object from the current state of `Self`.

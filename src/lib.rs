@@ -17,7 +17,7 @@ use crate::runtime_config::RuntimeConfig;
 use crate::scanner::Scanner;
 use crate::token::token_type::TokenType;
 use crate::token::Token;
-use crate::vm::VM;
+use crate::vm::{InterpretError, VM};
 
 /// Container for data that has been parsed & split per an Awk field separator (FS)
 pub struct ParsedDataInput {
@@ -36,25 +36,25 @@ pub struct ParsedDataInput {
 /// # Arguments
 /// - `program` the user's program to run
 /// - `runtime_config` the runtime configuration for the lifetime of the awk program
-pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
+pub fn run_program(program: &str, runtime_config: RuntimeConfig) -> Result<(), InterpretError> {
     let scanner = Scanner::new(String::from(program));
     let tokens: Vec<Token> = scanner.scan();
 
     if tokens.is_empty() || tokens.first().unwrap().token_type == &TokenType::Eof {
-        return;
+        return Ok(());
     }
 
     let mut vm = VM::new();
 
     if runtime_config.is_quick {
         // TODO: Remove this when `BEGIN` is implemented
-        let _result = vm.interpret(
+        vm.interpret(
             &tokens,
             &[ParsedDataInput {
                 original: "".into(),
                 parsed: vec![],
             }],
-        );
+        )
     } else if runtime_config.data_file_paths.is_empty() {
         loop {
             // TODO(FUTURE): Handle record separator
@@ -65,11 +65,10 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
                 parsed: split_data,
             };
 
-            let _result = vm.interpret(&tokens, &[parsed_data]);
+            let result = vm.interpret(&tokens, &[parsed_data]);
 
             if runtime_config.is_eval {
-                // the eval should only run once
-                break;
+                return result;
             }
         }
     } else {
@@ -88,7 +87,7 @@ pub fn run_program(program: &str, runtime_config: RuntimeConfig) {
             })
             .collect();
 
-        let _result = vm.interpret(&tokens, &parsed_data);
+        vm.interpret(&tokens, &parsed_data)
     }
 }
 
