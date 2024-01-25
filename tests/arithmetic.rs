@@ -310,8 +310,7 @@ mod arithmetic_tests {
         utils::CodeRunner::init()
             .program(r#"{print 1 / 0;}"#)
             .cli_options(vec!["-q"])
-            // TODO(): Fix [ERROR rawk::vm] magic
-            .expect_output(".*Error: Division by zero")
+            .expect_output("Error: Division by zero")
             .assert_fail()
     }
 
@@ -356,8 +355,7 @@ mod arithmetic_tests {
         utils::CodeRunner::init()
             .program(r#"{print 1 % 0;}"#)
             .cli_options(vec!["-q"])
-            // TODO(): Fix [ERROR rawk::vm] magic
-            .expect_output(".*Error: Mod by zero")
+            .expect_output("Error: Mod by zero")
             .assert_fail()
     }
 
