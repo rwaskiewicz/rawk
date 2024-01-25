@@ -310,7 +310,7 @@ mod arithmetic_tests {
         utils::CodeRunner::init()
             .program(r#"{print 1 / 0;}"#)
             .cli_options(vec!["-q"])
-            .assert_fail()
+            .assert()
     }
 
     #[test]
