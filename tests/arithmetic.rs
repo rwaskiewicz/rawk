@@ -735,7 +735,6 @@ mod nan_arithmetic_tests {
             .assert()
     }
 
-
     #[test]
     fn allow_bare_nan_in_mod_assign() {
         utils::CodeRunner::init()

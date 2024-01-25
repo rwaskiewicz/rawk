@@ -89,11 +89,11 @@ impl VM {
 
                     if b == 0.0 {
                         error!("Error: Division by zero");
-                        break Err(InterpretError::RuntimeError)
+                        break Err(InterpretError::RuntimeError);
                     }
 
                     self.stack.push(Value::Number(a / b))
-                },
+                }
                 OpCode::Modulus => self.arithmetic_op(&instruction),
                 OpCode::Exponentiation => self.arithmetic_op(&instruction),
                 OpCode::Concatenate => self.concatenation_op(&instruction),
