@@ -88,7 +88,7 @@ impl VM {
                     let a = self.stack.pop().unwrap().num_value();
 
                     if b == 0.0 {
-                        error!("Error: Division by zero");
+                        eprintln!("Error: Division by zero");
                         break Err(InterpretError::RuntimeError);
                     }
 
@@ -99,7 +99,7 @@ impl VM {
                     let a = self.stack.pop().unwrap().num_value();
 
                     if b == 0.0 {
-                        error!("Error: Mod by zero");
+                        eprintln!("Error: Mod by zero");
                         break Err(InterpretError::RuntimeError);
                     }
 
