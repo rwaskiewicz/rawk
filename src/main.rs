@@ -5,6 +5,7 @@ use rawk::runtime_config::RuntimeConfig;
 use std::error::Error;
 use std::fmt::Debug;
 use std::fs;
+use std::process::exit;
 
 #[derive(Debug)]
 enum TempAwkReadFileError {
@@ -79,8 +80,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         RuntimeConfig::new(data_file_paths, field_separator, is_eval, is_quick);
 
     let program = get_awk_program(&cmd_line_matches);
-    rawk::run_program(&program, config);
-    Ok(())
+    match rawk::run_program(&program, config) {
+        Ok(_) => exit(0),
+        Err(_) => exit(1),
+    }
 }
 
 fn build_awk_cli_command() -> Command {
