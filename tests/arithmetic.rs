@@ -310,7 +310,9 @@ mod arithmetic_tests {
         utils::CodeRunner::init()
             .program(r#"{print 1 / 0;}"#)
             .cli_options(vec!["-q"])
-            .assert()
+            // TODO(): Fix [ERROR rawk::vm] magic
+            .expect_output(".*Error: Division by zero")
+            .assert_fail()
     }
 
     #[test]
@@ -680,8 +682,9 @@ mod nan_arithmetic_tests {
         utils::CodeRunner::init()
             .program("{print +nan / 0;}")
             .cli_options(vec!["-q"])
-            .expect_output("0")
-            .assert();
+            // TODO(): Fix [ERROR rawk::vm] magic
+            .expect_output(".*Error: Division by zero")
+            .assert_fail();
         utils::CodeRunner::init()
             .program("{print +nan / 1;}")
             .cli_options(vec!["-q"])
@@ -694,8 +697,9 @@ mod nan_arithmetic_tests {
         utils::CodeRunner::init()
             .program("{foo=7; foo/=+nan; print foo;}")
             .cli_options(vec!["-q"])
-            .expect_output("0")
-            .assert()
+            // TODO(): Fix [ERROR rawk::vm] magic
+            .expect_output(".*Error: Division by zero")
+            .assert_fail()
     }
 
     #[test]
@@ -726,8 +730,9 @@ mod nan_arithmetic_tests {
         utils::CodeRunner::init()
             .program("{print +nan % 0;}")
             .cli_options(vec!["-q"])
-            .expect_output("1")
-            .assert();
+            // TODO(): Fix [ERROR rawk::vm] magic
+            .expect_output(".*Error: Mod by zero")
+            .assert_fail();
         utils::CodeRunner::init()
             .program("{print +nan % 1;}")
             .cli_options(vec!["-q"])
@@ -740,7 +745,8 @@ mod nan_arithmetic_tests {
         utils::CodeRunner::init()
             .program("{foo=7; foo%=+nan; print foo;}")
             .cli_options(vec!["-q"])
-            .expect_output("0")
-            .assert()
+            // TODO(): Fix [ERROR rawk::vm] magic
+            .expect_output(".*Error: Mod by zero")
+            .assert_fail()
     }
 }
