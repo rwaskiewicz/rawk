@@ -516,9 +516,8 @@ impl VM {
 
     fn peek(&mut self, distance: usize) -> &Value {
         let last_index = self.stack.len() - 1;
-        return self
-            .stack
+        self.stack
             .get(last_index - distance)
-            .expect("Unable to peek at stack!");
+            .expect("Unable to peek at stack!")
     }
 }

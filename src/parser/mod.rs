@@ -131,8 +131,8 @@ impl<'a> Parser<'a> {
     /// 1. Advancing the pointer to the current token at least once
     /// 2. Invoking the prefix expression parse function for the `previous_token`
     /// 3. Successively advancing the pointer to the current token and calling the infix expression
-    /// parse function for the `current_token` while its precedence is lower than the one that is
-    /// provided. Lower precedences will subsume more/larger expressions.
+    ///    parse function for the `current_token` while its precedence is lower than the one that is
+    ///    provided. Lower precedences will subsume more/larger expressions.
     ///
     /// # Arguments
     /// - `precedence` the precedence of the current token
@@ -200,7 +200,7 @@ impl<'a> Parser<'a> {
     ///
     /// * `token_type` - The expected token type that the parser's `current_token` is sitting on
     /// * `error_msg` - The error message that should be emitted if the `current_token`'s type does
-    /// not match `token_type`
+    ///   not match `token_type`
     fn consume(&mut self, token_type: &TokenType, error_msg: &str) {
         if self.current_token.expect("No token type").token_type == token_type {
             self.advance();

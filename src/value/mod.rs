@@ -25,7 +25,7 @@ impl Value {
                 let mut decimal_flag = false;
 
                 for char in val.chars() {
-                    let is_scientific = char.to_ascii_lowercase() == 'e';
+                    let is_scientific = char.eq_ignore_ascii_case(&'e');
                     let is_one_time_prefix = char == '+' || char == '-';
                     let is_decimal = char == '.';
 
